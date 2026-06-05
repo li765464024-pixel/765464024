@@ -11,3 +11,5 @@ dist/
 build/
 *.db-shm
 *.db-wal
+data/jiuyan_cookies.json
+data/*.json
