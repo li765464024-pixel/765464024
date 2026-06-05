@@ -8,9 +8,14 @@
 </head>
 <body>
 
-<header>
+<header style="display:flex;align-items:center;justify-content:space-between">
+<div>
 <h1>📊 <span id="header-date">加载中...</span> 双社区全面复盘</h1>
-<div class="meta">淘股吧×韭研公社 | <span id="header-meta">数据加载中</span></div>
+<div class="meta">淘股吧×韭研公社 | <span id="header-meta">数据加载中</span> | <a href="javascript:refreshData()" id="refresh-btn" style="color:var(--gold);font-weight:700;cursor:pointer">🔄 刷新数据</a></div>
+</div>
+<div style="font-size:10px;color:var(--muted);text-align:right">
+<span id="db-status">数据库</span> · <span id="ver-status">v2.3</span>
+</div>
 </header>
 
 <div class="tabs-wrap">

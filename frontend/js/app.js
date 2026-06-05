@@ -1,6 +1,6 @@
 /**
  * 复盘工具 — 前端交互逻辑
- * 从后端 API 加载原始 HTML 内容，1:1 渲染
+ * 数据来源: 静态分析(section_html) + 实时爬虫(API)
  */
 const API_BASE = 'http://localhost:5500/api';
 
@@ -28,10 +28,6 @@ function switchTab(id) {
   if (event && event.target) event.target.classList.add('active');
 }
 
-// ════════════════════════════════════════════
-// Board Tab 切换 (需要重绑定时用)
-// ════════════════════════════════════════════
-
 function switchBoardTab(tab) {
   qa('.board-tab').forEach(function(t) { t.classList.remove('active'); });
   qa('.board-table-wrap').forEach(function(t) { t.style.display = 'none'; });
@@ -40,10 +36,6 @@ function switchBoardTab(tab) {
   var boardEl = document.getElementById('board-' + tab);
   if (boardEl) boardEl.style.display = 'block';
 }
-
-// ════════════════════════════════════════════
-// 表格排序 (注入 HTML 后需要重新绑定)
-// ════════════════════════════════════════════
 
 function setupTableSorting() {
   qa('.board-table-wrap table').forEach(function(table) {
@@ -56,11 +48,9 @@ function setupTableSorting() {
         if (!tbody) return;
         var rows = Array.from(tbody.querySelectorAll('tr'));
         if (rows.length === 0) return;
-
         var isAsc = this.classList.contains('asc');
         headers.forEach(function(h) { h.classList.remove('asc', 'desc'); });
         this.classList.add(isAsc ? 'desc' : 'asc');
-
         rows.sort(function(a, b) {
           var av = (a.getAttribute('data-sort-' + col) || '').replace(/[^0-9.\-]/g, '');
           var bv = (b.getAttribute('data-sort-' + col) || '').replace(/[^0-9.\-]/g, '');
@@ -69,11 +59,9 @@ function setupTableSorting() {
             bv = (b.getAttribute('data-sort-' + col) || '');
             return isAsc ? av.localeCompare(bv) : bv.localeCompare(av);
           }
-          av = parseFloat(av) || 0;
-          bv = parseFloat(bv) || 0;
+          av = parseFloat(av) || 0; bv = parseFloat(bv) || 0;
           return isAsc ? av - bv : bv - av;
         });
-
         tbody.innerHTML = '';
         rows.forEach(function(r) { tbody.appendChild(r); });
       });
@@ -82,38 +70,83 @@ function setupTableSorting() {
 }
 
 // ════════════════════════════════════════════
-// 初始化：加载所有 section 的 HTML
+// 刷新数据按钮
+// ════════════════════════════════════════════
+
+function refreshData() {
+  q('#refresh-btn').textContent = '⏳ 刷新中...';
+  q('#refresh-btn').disabled = true;
+  fetch(API_BASE + '/market/refresh', {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      if (d.ok) {
+        q('#refresh-btn').textContent = '✅ ' + d.message;
+        setTimeout(function() {
+          q('#refresh-btn').textContent = '🔄 刷新数据';
+          q('#refresh-btn').disabled = false;
+          location.reload();
+        }, 1500);
+      } else {
+        q('#refresh-btn').textContent = '❌ 刷新失败';
+        setTimeout(function() {
+          q('#refresh-btn').textContent = '🔄 刷新数据';
+          q('#refresh-btn').disabled = false;
+        }, 2000);
+      }
+    })
+    .catch(function() {
+      q('#refresh-btn').textContent = '❌ 请求失败';
+      setTimeout(function() {
+        q('#refresh-btn').textContent = '🔄 刷新数据';
+        q('#refresh-btn').disabled = false;
+      }, 2000);
+    });
+}
+
+// ════════════════════════════════════════════
+// 初始化
 // ════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', async function() {
   try {
-    // 1. 获取 header 信息
+    // 1. Header
     var marketRes = await apiGet('/market/today');
+    var todayStr = '';
     if (marketRes.ok) {
-      q('#header-date').textContent = marketRes.data.date || '';
+      todayStr = marketRes.data.date || '';
+      q('#header-date').textContent = todayStr;
       var meta = q('#header-meta');
       if (meta) {
-        meta.innerHTML = marketRes.data.date + ' 收盘数据 | 涨停' + marketRes.data.zt_count + ' · 跌停' + marketRes.data.dt_count + ' | 数据来源：同花顺+东方财富+韭研公社+财联社';
+        meta.innerHTML = todayStr + ' 收盘数据 | 涨停' + marketRes.data.zt_count + ' · 跌停' + marketRes.data.dt_count + ' | 点击🔄刷新实时爬取';
       }
     }
 
-    // 2. 加载所有 section HTML (1:1 还原)
+    // 2. 加载 section HTML (静态分析页面)
     var sectionsRes = await apiGet('/sections/all');
+    var loadedCount = 0;
     if (sectionsRes.ok && sectionsRes.data) {
-      var count = 0;
       Object.keys(sectionsRes.data).forEach(function(sid) {
         var sec = sectionsRes.data[sid];
         var el = document.getElementById(sid);
         if (el && sec.html) {
           el.innerHTML = sec.html;
-          count++;
+          loadedCount++;
         }
       });
-      console.log('已加载 ' + count + ' 个板块 (1:1还原)');
     }
+    console.log('已加载 ' + loadedCount + ' 个板块 (静态分析)');
 
-    // 3. 重新绑定排序（board 表格来自原始 HTML）
+    // 3. 重新绑定排序
     setupTableSorting();
+
+    // 4. 更新 header 显示最新数据日期
+    var versionsRes = await apiGet('/data/versions');
+    if (versionsRes.ok && versionsRes.data) {
+      var dates = versionsRes.data;
+      if (dates.length > 0) {
+        q('#header-date').textContent = dates[0];
+      }
+    }
 
   } catch (e) {
     console.error('加载失败:', e);

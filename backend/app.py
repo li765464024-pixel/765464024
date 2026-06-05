@@ -3,13 +3,14 @@ Flask 主应用 — API 路由
 """
 import os
 import sys
+from datetime import date
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 from backend.models import query, init_db
-from backend.seed_data import migrate_all
+from backend.services.crawler import refresh_all
 
 app = Flask(__name__, static_folder=None)
 CORS(app)
@@ -85,10 +86,10 @@ def api_board_higher():
 
 @app.route('/api/market/refresh', methods=['POST'])
 def api_market_refresh():
-    """触发数据刷新"""
+    """触发数据刷新 — 实时爬取"""
     try:
-        ok = migrate_all()
-        return jsonify({'ok': ok, 'message': '数据刷新完成' if ok else '刷新失败'})
+        results = refresh_all()
+        return jsonify({'ok': True, 'message': f'更新完成: 涨停{results.get("zt_pool",0)}只 · 韭研公社{results.get("jy_posts",0)}条', 'data': results})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)})
 
@@ -119,13 +120,50 @@ def api_sections_dates():
     rows = query("SELECT DISTINCT date FROM section_html ORDER BY date DESC")
     return jsonify({'ok': True, 'data': [r['date'] for r in rows]})
 
+@app.route('/api/today/overview')
+def api_today_overview():
+    """今日数据全景 — 前端动态渲染"""
+    today = date.today().strftime("%Y-%m-%d")
+    
+    # 大盘
+    market = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (today,))
+    # 涨停板分布
+    zt_by_board = {b: query("SELECT COUNT(*) as c FROM zt_stocks WHERE board_num=? AND date=?", (b, today))[0]['c'] for b in range(1,6)}
+    # 韭研公社帖子
+    jy_posts = query("SELECT * FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 10", (today,))
+    # 所有有数据的日期
+    versions = query("SELECT DISTINCT date FROM market_data ORDER BY date DESC")
+    
+    return jsonify({
+        'ok': True,
+        'data': {
+            'today': today,
+            'market': market[0] if market else None,
+            'zt_by_board': zt_by_board,
+            'zt_total': sum(zt_by_board.values()),
+            'jy_posts_count': len(jy_posts),
+            'versions': [r['date'] for r in versions],
+        }
+    })
+
 # ── 启动 ──
 if __name__ == '__main__':
     init_db()
-    # 有数据才不重新迁移
+    # 首次启动 → 迁移静态数据 + 实时爬取
     existing = query("SELECT COUNT(*) as c FROM market_data")
     if existing[0]['c'] == 0:
-        print("首次启动，迁移初始数据...")
+        print("📥 首次启动，迁移初始数据...")
+        from backend.seed_data import migrate_all
         migrate_all()
-    print(f"\n🌐 访问地址: http://localhost:5000")
+        print("📡 实时爬取今日数据...")
+        refresh_all()
+    else:
+        # 非首次：检查今日是否有数据，没有则爬取
+        today_count = query("SELECT COUNT(*) as c FROM market_data WHERE date=?", (date.today().strftime("%Y-%m-%d"),))
+        if today_count[0]['c'] == 0:
+            print("📡 今日数据尚未抓取，自动爬取...")
+            refresh_all()
+        else:
+            print(f"✅ 今日数据已存在")
+    print(f"\n🌐 访问地址: http://localhost:5500")
     app.run(host='0.0.0.0', port=5500, debug=True)
