@@ -425,6 +425,105 @@ def _build_s1_html(today):
     return result
 
 
+def _build_s2_html(today):
+    """板块热度 — 从zt_stocks实时生成"""
+    sectors = query("SELECT sector, COUNT(*) as cnt, MAX(board_num) as mb FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (today,))
+    if not sectors:
+        return ''
+    
+    def stage_label(cnt, mb):
+        if cnt >= 5: return '<span class="tag r">主升加速</span>' if mb >= 3 else '<span class="tag r">主升</span>'
+        if cnt >= 3: return '<span class="tag y">分歧</span>' if mb >= 2 else '<span class="tag y">活跃</span>'
+        return '<span class="tag b">试错</span>'
+    
+    def leader_stocks(sector):
+        leaders = query("SELECT name, board_num FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC, seal_time LIMIT 2", (today, sector))
+        if not leaders: return ''
+        return '/'.join([l['name'] + (f'({l["board_num"]}板)' if l['board_num'] >= 2 else '') for l in leaders])
+    
+    # Card 1: 板块全景
+    rows1 = ''
+    for s in sectors[:12]:
+        stage = stage_label(s['cnt'], s['mb'])
+        leaders = leader_stocks(s['sector'])
+        rows1 += f'<tr><td><strong>{s["sector"]}</strong></td><td>{s["cnt"]}</td><td style="font-size:11px">{s["cnt"]}家涨停，最高{s["mb"]}板</td><td>{stage}</td><td>{leaders}</td></tr>'
+    
+    part1 = f'''<div class="card">
+<h3>板块全景</h3>
+<table>
+<tr><th>板块</th><th>涨停家数</th><th>核心逻辑</th><th>阶段</th><th>龙头</th></tr>
+{rows1}
+</table>
+</div>'''
+    
+    # Card 2: Serenity瓶颈热力榜 (复用在_build_s16_html中的逻辑)
+    bottleneck_map = [
+        {'name': 'MLCC/电容', 'rating': 'S+', 'tags': ['MLCC','电容','被动','元件','电子','陶瓷'], 'type': '产能瓶颈',
+         'logic': 'AI服务器MLCC需求4年4倍(2150-9200亿日元)，产能年增仅10%。风华全面停接新单，村田6月涨价30%。',
+         'icon': '🐢'},
+        {'name': 'CPO/光通信', 'rating': 'S+', 'tags': ['CPO','光通信','光模块','光纤','通信设备'], 'type': '技术拐点',
+         'logic': '英伟达Spectrum-X硅光全面量产。Marvell单日+22%被钦点"下一个万亿美元公司"。CPO升级加速。',
+         'icon': '🔦'},
+        {'name': '半导体设备/材料', 'rating': 'S', 'tags': ['半导体','芯片','封测','硅片','光刻'], 'type': '国产替代',
+         'logic': '硅片全面提价(AI专用+18-22%)，沪硅+14%，中船特气20cm涨停。国产替代空间巨大。',
+         'icon': '💻'},
+        {'name': '存储芯片', 'rating': 'S', 'tags': ['存储','DRAM','NAND','HBM','内存'], 'type': '周期反转',
+         'logic': '海力士5年内晶圆产能翻番+预警紧缺持续到2030年。兆易创新受益存储涨价周期。',
+         'icon': '💾'},
+        {'name': 'PCB/铜箔', 'rating': 'A', 'tags': ['PCB','铜箔','CCL','覆铜','金属新材料'], 'type': '材料缺口',
+         'logic': '高端铜箔2026-28年缺口35-45%，产线建设需18-24月。RV200单柜铜箔+275%。',
+         'icon': '🔗'},
+        {'name': '商业航天', 'rating': 'A', 'tags': ['航天','卫星','太空','火箭','航天装备'], 'type': 'IPO催化',
+         'logic': 'SpaceX上市催化。星链卫星BOM拆解-A股产业链受益。铖昌科技/信维通信。',
+         'icon': '🚀'},
+        {'name': '自动化设备', 'rating': 'B+', 'tags': ['自动化','机器人','电机','通用设备','专用设备'], 'type': '量产元年',
+         'logic': '机器人量产元年，宇树科技IPO过会。自动化设备需求持续增长。',
+         'icon': '🤖'},
+    ]
+    
+    rows2 = ''
+    for bm in bottleneck_map:
+        total_zt = 0
+        max_board = 0
+        leaders = []
+        for sec in sectors:
+            if any(tag in sec['sector'] for tag in bm['tags']):
+                total_zt += sec['cnt']
+                if sec['mb'] > max_board: max_board = sec['mb']
+                ls = query("SELECT name FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC LIMIT 2", (today, sec['sector']))
+                for l in ls:
+                    if l['name'] not in leaders: leaders.append(l['name'])
+        if total_zt == 0: continue
+        
+        leader_str = '/'.join(leaders[:2]) if leaders else ''
+        rows2 += f'''<tr>
+<td><span class="badge {"bg" if bm["rating"] in ("S+","S") else "br"}">{bm["rating"]}</span></td>
+<td><strong>{bm["name"]}</strong></td>
+<td>{total_zt}</td>
+<td>{bm["icon"]} {bm["type"]}</td>
+<td style="font-size:11px">{bm["logic"]}</td>
+<td>{leader_str}</td>
+</tr>'''
+    
+    part2 = f'''<div class="card">
+<h3>🔍 Serenity瓶颈热力榜 — 按供需缺口/产业逻辑排序 <span class="src sj">实时数据</span></h3>
+<div class="bl-blue" style="margin-bottom:10px;font-size:12px">
+<strong>框架说明：</strong>Serenity瓶颈投资框架认为AI资本开支的3-4万亿美元每年将通过物理瓶颈环节流动。抓住市场还没发现的瓶颈 = 抓住10倍股。以下按<strong>供需缺口大小 × 涨停热度</strong>排序。
+</div>
+<table>
+<tr><th>热度</th><th>板块</th><th>涨停</th><th>瓶颈类型</th><th>核心逻辑（Serenity视角）</th><th>龙头</th></tr>
+{rows2}
+</table>
+</div>'''
+    
+    return f'''<h2>二、板块热度 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时数据 · {today}</span></h2>
+{part1}
+{part2}'''
+
+
+    return result
+
+
 def _build_s7_html(today):
     """连板梯队 — 从 zt_stocks + board_summary 生成"""
     stock_rows = query("SELECT * FROM zt_stocks WHERE date=? ORDER BY board_num DESC, seal_time", (today,))
@@ -1190,6 +1289,12 @@ def rebuild_section_html(today=None):
     if s6:
         sections.append({'date': today, 'section_id': 's6', 'title': f'韭研公社视角 {today}', 'html': s6})
     
+
+    # 3b. 板块热度 (实时)
+    s2 = _build_s2_html(today)
+    if s2:
+        sections.append({'date': today, 'section_id': 's2', 'title': f'板块热度 {today}', 'html': s2})
+
     # 4. 题材生命周期 (实时)
     s3 = _build_s3_html(today)
     if s3:
@@ -1216,7 +1321,7 @@ def rebuild_section_html(today=None):
         sections.append({'date': today, 'section_id': 's16', 'title': f'Serenity瓶颈分析 {today}', 'html': s16})
     
     # 9. 静态分析部分 (从最新可用日期复制)
-    analysis_sections = ['s0', 's2', 's8', 's10', 's13', 's15', 's17', 's18']
+    analysis_sections = ['s0', 's8', 's10', 's13', 's15', 's17', 's18']
     latest_date = query("SELECT MAX(date) as md FROM section_html WHERE date < ?", (today,))
     if latest_date and latest_date[0]['md']:
         src_date = latest_date[0]['md']
