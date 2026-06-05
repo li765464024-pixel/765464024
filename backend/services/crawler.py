@@ -2,6 +2,7 @@
 数据爬虫引擎 — 自动抓取各大平台数据
 """
 import re
+import os
 import requests
 from bs4 import BeautifulSoup
 from datetime import date, datetime
@@ -378,6 +379,297 @@ def _build_s6_html(today):
 </div>
 {cards}'''
 
+# ════════════════════════════════════════════
+# 4b. 淘股吧 — 从现有HTML导入(因反爬)
+# ════════════════════════════════════════════
+
+def fetch_taoguba_from_html():
+    """从静态 HTML 导入淘股吧帖子"""
+    html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '社区复盘_20260604.html')
+    if not os.path.exists(html_path):
+        return 0
+    
+    with open(html_path, 'r', encoding='utf-8') as f:
+        html = f.read()
+    
+    s5 = html[html.find('id="s5"'):html.find('id="s6"')]
+    posts = []
+    for card in re.finditer(r'<div class="card">(.*?)</div>\s*(?=<div class="card"|<div class="section)', s5, re.DOTALL):
+        card_html = card.group(1)
+        title_m = re.search(r'<h3>(.*?)</h3>', card_html)
+        if not title_m:
+            continue
+        title = re.sub(r'<[^>]+>', '', title_m.group(1)).strip()
+        direction = '看多' if '看多' in title else ('看空' if '看空' in title else '中性')
+        content = re.sub(r'<[^>]+>', '', card_html).strip()[:500]
+        posts.append({
+            'date': '2026-06-04',
+            'platform': 'taoguba',
+            'author': '',
+            'title': title[:200],
+            'content': content,
+            'direction': direction,
+            'views': 0, 'comments': 0, 'tags': '淘股吧',
+        })
+    
+    if posts:
+        execute("DELETE FROM posts WHERE platform='taoguba'")
+        insert_many('posts', posts)
+        return len(posts)
+    return 0
+
+
+# ════════════════════════════════════════════
+# 4c. 财联社 — 快讯
+# ════════════════════════════════════════════
+
+def fetch_cls_news():
+    """抓取财联社快讯 → 写入 posts 表 (platform='cls')"""
+    try:
+        url = "https://www.cls.cn/telegraph"
+        r = requests.get(url, headers=HEADERS, timeout=10)
+        
+        # 尝试从HTML提取新闻
+        import re
+        items = re.findall(r'"content":"([^"]+)"', r.text)
+        if not items:
+            # 尝试另一种格式
+            items = re.findall(r'"content":"((?:[^"\\]|\\.)*)"', r.text)
+        
+        if not items:
+            return 0
+        
+        execute("DELETE FROM posts WHERE platform='cls' AND date=?", (TODAY,))
+        
+        cls_posts = []
+        for content in items[:20]:
+            # 解码 unicode
+            try:
+                text = content.encode().decode('unicode_escape')
+            except:
+                text = content
+            text = re.sub(r'<[^>]+>', '', text).strip()
+            if len(text) < 10:
+                continue
+            
+            # 找相关个股
+            stocks = re.findall(r'[SZ]\s*[A-Za-z\u4e00-\u9fff]{2,8}', text)
+            stock_tags = ' '.join(stocks[:3]) if stocks else ''
+            tag = '财联社'
+            if any(k in text for k in ['MLCC','电容','半导体','芯片','AI','算力','光通信','CPO','PCB','光伏','新能源','汽车','机器人','煤炭','电力']):
+                direction = '看多'
+            elif any(k in text for k in ['减持','跌','风险','利空','违约','退市']):
+                direction = '看空'
+            else:
+                direction = '中性'
+            
+            cls_posts.append({
+                'date': TODAY,
+                'platform': 'cls',
+                'author': '财联社',
+                'title': text[:80],
+                'content': text[:300],
+                'direction': direction,
+                'views': 0, 'comments': 0,
+                'tags': '财联社快讯',
+            })
+        
+        if cls_posts:
+            insert_many('posts', cls_posts)
+            return len(cls_posts)
+        return 0
+    except Exception as e:
+        print(f"  ⚠️ 财联社爬取失败: {e}")
+        return 0
+
+
+# ════════════════════════════════════════════
+# 5. 新 section 构建器
+# ════════════════════════════════════════════
+
+def _build_s3_html(today):
+    """题材生命周期 — 从 sectors 和 zt_stocks 生成"""
+    # 用行业板块分组涨停股
+    zt = query("SELECT sector, COUNT(*) as cnt FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (today,))
+    if not zt:
+        return ''
+    
+    board_max = query("SELECT MAX(board_num) as mb FROM zt_stocks WHERE date=?", (today,))[0]['mb'] or 0
+    
+    boxes = ''
+    stage_colors = {'主升': 'red', '分歧': 'gold', '退潮': 'green', '试错': 'blue', '萌芽': 'red'}
+    stage_tags = {'主升': 'r', '分歧': 'y', '退潮': 'g', '试错': 'b', '萌芽': 'r'}
+    
+    for i, row in enumerate(zt[:10]):
+        sector = row['sector']
+        cnt = row['cnt']
+        
+        # 判断阶段
+        high_boards = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND sector=? AND board_num>=3", (today, sector))
+        has_high = high_boards[0]['c'] > 0
+        
+        if has_high and cnt >= 5:
+            stage = '主升'
+        elif cnt >= 3:
+            stage = '分歧'
+        elif cnt >= 1:
+            stage = '萌芽'
+        else:
+            stage = '试错'
+        
+        color = stage_colors.get(stage, 'blue')
+        tag = stage_tags.get(stage, 'b')
+        
+        # 找龙头
+        leaders = query("SELECT name, board_num FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC, seal_time LIMIT 3", (today, sector))
+        leader_str = '、'.join([f"{l['name']}{l['board_num']}板" for l in leaders])
+        
+        boxes += f'''<div class="stock-box" style="border-color:var(--{color});background:rgba(248,81,73,.04)">
+<h4>{sector} <span class="tag {tag}">{stage}</span></h4>
+<div class="headline">{cnt}家涨停 · 龙头: {leader_str}</div>
+<p>板块梯队形成{'' if has_high else '中'}，涨停{cnt}家{', 含高标' + str(high_boards[0]['c']) + '只' if has_high else ''}。</p>
+<div class="vote"><div class="v-up" style="width:{50 + cnt * 3}%"></div><div class="v-dn" style="width:{20}%"></div><div class="v-ne" style="width:{30 - cnt * 2}%"></div></div>
+<div class="v-label">涨停{cnt}家 | 最高{max([l['board_num'] for l in leaders], default=0)}板</div>
+</div>'''
+    
+    return f'''<h2>三、题材生命周期全景 <span style="font-size:11px;color:var(--muted);font-weight:normal">涨停行业分布 · 实时数据</span></h2>
+{boxes}'''
+
+
+def _build_s9_html(today):
+    """题材轮动逻辑 — 从 market_data / zt_stocks 生成"""
+    md = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (today,))
+    zt_total = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=?", (today,))[0]['c']
+    dt_total = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND reopen_count>0", (today,))[0]['c']
+    board_dist = query("SELECT board_num, COUNT(*) as cnt FROM zt_stocks WHERE date=? AND board_num>=1 GROUP BY board_num ORDER BY board_num", (today,))
+    
+    max_b = 0
+    total_st = zt_total
+    for r in board_dist:
+        if r['board_num'] > max_b:
+            max_b = r['board_num']
+    
+    seal_rate = md[0]['seal_rate'] if md else 0
+    sentiment = md[0]['sentiment'] if md else '分化'
+    zt_count = md[0]['zt_count'] if md else zt_total
+    
+    seal_tag = 'r' if seal_rate and seal_rate >= 60 else ('y' if seal_rate and seal_rate >= 40 else 'g')
+    sentiment_tag = 'r' if '分化' in str(sentiment) else ('y' if '震荡' in str(sentiment) else 'g')
+    
+    # 主线判断
+    sectors = query("SELECT sector, COUNT(*) as cnt FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC LIMIT 3", (today,))
+    main_line = '、'.join([f"{s['sector']}({s['cnt']}家)" for s in sectors]) if sectors else '暂无明确主线'
+    
+    return f'''<h2>九、题材轮动逻辑 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时数据 · {today}</span></h2>
+
+<div class="card">
+<h3>判定框架</h3>
+<table>
+<tr><th>因子</th><th>数据</th><th>判定</th></tr>
+<tr><td>涨停/跌停比</td><td class="up">{zt_total}:{dt_total}</td><td><span class="tag {sentiment_tag}">{sentiment}</span></td></tr>
+<tr><td>封板率</td><td class="up">{seal_rate:.1f}%</td><td><span class="tag {seal_tag}">{'良好' if seal_rate and seal_rate >= 50 else '一般'}</span></td></tr>
+<tr><td>连板高度</td><td class="up">{max_b}板</td><td><span class="tag r">梯队{'完整' if max_b >= 4 else '一般'}</span></td></tr>
+<tr><td>涨停家数</td><td>{zt_total}只</td><td><span class="tag r">{'活跃' if zt_total >= 50 else '一般'}</span></td></tr>
+<tr><td>主线清晰度</td><td>{main_line}</td><td><span class="tag r">清晰</span></td></tr>
+</table>
+<div style="background:rgba(210,153,29,.12);border:2px solid var(--gold);border-radius:8px;padding:16px 20px;margin-top:14px;text-align:center">
+<div style="font-size:20px;font-weight:900;color:var(--gold);margin-bottom:6px">今日焦点：{main_line}</div>
+<div style="font-size:13px;color:var(--text)">涨停{zt_total}只 | 最高{max_b}板 | 封板率{seal_rate:.1f}%</div>
+</div>
+</div>
+
+<div class="card">
+<h3>核心热点方向</h3>
+<table>
+<tr><th>行业</th><th>涨停数</th><th>阶段</th></tr>
+{''.join([f'<tr><td><span class="chip chip-up">{s["sector"]}</span></td><td><strong>{s["cnt"]}</strong></td><td><span class="tag r">主升</span></td></tr>' for s in sectors])}
+</table>
+</div>'''
+
+
+def _build_s4_html(today):
+    """产业链深度 — 从 zt_stocks 按行业分组生成"""
+    sectors = query("SELECT sector, COUNT(*) as cnt FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (today,))
+    if not sectors:
+        return ''
+    
+    cards = ''
+    for i, sec in enumerate(sectors[:6]):
+        sector = sec['sector']
+        cnt = sec['cnt']
+        
+        # 找该行业个股
+        stocks = query("SELECT name, board_num, board_tag, code FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC, seal_time LIMIT 8", (today, sector))
+        if not stocks:
+            continue
+        
+        # 构建层级表
+        leaders = [s for s in stocks if s['board_num'] >= 3]
+        mid = [s for s in stocks if s['board_num'] == 2]
+        first = [s for s in stocks if s['board_num'] == 1]
+        
+        chips = lambda slist: ' '.join([f'<span class="chip chip-up">{s["name"]}</span>' for s in slist[:5]])
+        
+        max_b = max([s['board_num'] for s in stocks], default=0)
+        board_desc = f'最高{max_b}板' if max_b >= 3 else f'{cnt}家涨停'
+        
+        cards += f'''<div class="card">
+<h3>⛓ {i+1}：{sector} — {board_desc}</h3>
+<table>
+<tr><th>层级</th><th>环节</th><th>关键数据</th><th>龙头标的</th></tr>
+<tr><td><strong>高标</strong></td><td>龙头股引领</td><td>最高{max_b}板，板块涨停{cnt}家</td><td>{chips(leaders) if leaders else '—'}</td></tr>
+<tr><td><strong>中位</strong></td><td>二板跟风</td><td>第二梯队{len(mid)}只</td><td>{chips(mid) if mid else '—'}</td></tr>
+<tr><td><strong>首板</strong></td><td>低位启动</td><td>首板{len(first)}只</td><td>{chips(first) if first else '—'}</td></tr>
+</table>
+</div>'''
+    
+    return f'''<h2>四、产业链深度拆解 <span style="font-size:11px;color:var(--muted);font-weight:normal">涨停行业链 · 实时数据</span></h2>
+{cards}'''
+
+
+def _build_s5_html(today):
+    """淘股吧视角 — 从 posts 表生成"""
+    rows = query("SELECT * FROM posts WHERE platform='taoguba' AND date=? ORDER BY id DESC LIMIT 20", (today,))
+    
+    # 如果没有今日数据，用昨日
+    if not rows:
+        yesterday = query("SELECT MAX(date) as md FROM posts WHERE platform='taoguba'")
+        if yesterday and yesterday[0]['md']:
+            rows = query("SELECT * FROM posts WHERE platform='taoguba' AND date=? ORDER BY id DESC LIMIT 20", (yesterday[0]['md'],))
+    
+    bullish = sum(1 for r in rows if r['direction'] == '看多')
+    bearish = sum(1 for r in rows if r['direction'] == '看空')
+    neutral = sum(1 for r in rows if r['direction'] in ('', '中性'))
+    
+    cards = ''
+    for r in rows:
+        title = (r['title'] or '').replace('<', '&lt;').replace('>', '&gt;')
+        content = (r['content'] or '').replace('<', '&lt;').replace('>', '&gt;')
+        author = (r['author'] or '').replace('<', '&lt;').replace('>', '&gt;')
+        dir_tag = 'r' if r['direction'] == '看多' else ('g' if r['direction'] == '看空' else 'b')
+        cards += f'''<div class="card">
+<h3>{title[:80]} <span class="tag {dir_tag}">{r['direction'] or '中性'}</span></h3>
+<div class="bl-gold" style="font-size:12px">{content[:300]}</div>
+<div style="font-size:11px;color:var(--muted);margin-top:6px">✍️ {author}</div>
+</div>'''
+    
+    src_date = ''
+    if rows:
+        src_date = rows[0]['date']
+    
+    return f'''<h2>🐂 淘股吧游资视角 <span style="font-size:11px;color:var(--muted);font-weight:normal">共{len(rows)}帖 · {src_date}</span></h2>
+<div class="grid2" style="margin-bottom:12px">
+<div class="stat"><div class="v" style="color:var(--red)">{bullish}看多</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">{bearish}看空</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">{neutral}中性</div></div>
+</div>
+{cards}'''
+
+
+# ════════════════════════════════════════════
+# 6. 统一 rebuild section_html (增强版)
+# ════════════════════════════════════════════
+
 def rebuild_section_html(today=None):
     """用实时数据重建 section_html"""
     if not today:
@@ -403,8 +695,28 @@ def rebuild_section_html(today=None):
     if s6:
         sections.append({'date': today, 'section_id': 's6', 'title': f'韭研公社视角 {today}', 'html': s6})
     
-    # 4. 静态分析部分 (从最新可用日期复制)
-    analysis_sections = ['s0', 's2', 's3', 's4', 's5', 's8', 's9', 's10', 's13', 's15', 's16', 's17', 's18']
+    # 4. 题材生命周期 (实时)
+    s3 = _build_s3_html(today)
+    if s3:
+        sections.append({'date': today, 'section_id': 's3', 'title': f'题材生命周期 {today}', 'html': s3})
+    
+    # 5. 题材轮动 (实时)
+    s9 = _build_s9_html(today)
+    if s9:
+        sections.append({'date': today, 'section_id': 's9', 'title': f'题材轮动 {today}', 'html': s9})
+    
+    # 6. 产业链深度 (实时)
+    s4 = _build_s4_html(today)
+    if s4:
+        sections.append({'date': today, 'section_id': 's4', 'title': f'产业链深度 {today}', 'html': s4})
+    
+    # 7. 淘股吧视角 (从DB)
+    s5 = _build_s5_html(today)
+    if s5:
+        sections.append({'date': today, 'section_id': 's5', 'title': f'淘股吧视角 {today}', 'html': s5})
+    
+    # 8. 静态分析部分 (从最新可用日期复制)
+    analysis_sections = ['s0', 's2', 's8', 's10', 's13', 's15', 's16', 's17', 's18']
     latest_date = query("SELECT MAX(date) as md FROM section_html WHERE date < ?", (today,))
     if latest_date and latest_date[0]['md']:
         src_date = latest_date[0]['md']
@@ -441,19 +753,31 @@ def refresh_all():
     results['market'] = fetch_market_data()
     print(f"    ✅ 大盘数据更新完成")
     
-    # 3. 韭研公社
+    # 3. 财联社快讯
+    print("  → 爬取财联社...")
+    cls_count = fetch_cls_news()
+    results['cls_news'] = cls_count
+    print(f"    ✅ {cls_count}条快讯")
+    
+    # 4. 韭研公社
     print("  → 爬取韭研公社...")
     post_count = fetch_jiuyangongshe()
     results['jy_posts'] = post_count
     print(f"    ✅ {post_count}条帖子")
     
-    # 4. 重建 section_html (用实时数据替换静态分析)
+    # 5. 淘股吧 (从静态HTML导入)
+    print("  → 导入淘股吧...")
+    tg_count = fetch_taoguba_from_html()
+    results['tg_posts'] = tg_count
+    print(f"    ✅ {tg_count}条帖子")
+    
+    # 6. 重建 section_html (用实时数据替换静态分析)
     print("  → 重建页面...")
     sec_count = rebuild_section_html()
     results['sections'] = sec_count
     
     # 汇总
-    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · {sec_count}个板块已更新")
+    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · 财联社{cls_count}条 · {sec_count}个板块已更新")
     return results
 
 
