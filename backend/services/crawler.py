@@ -16,6 +16,11 @@ HEADERS = {
 
 TODAY = date.today().strftime("%Y-%m-%d")
 
+def fmt_percent(v):
+    if v is None: return '0.0%'
+    try: return f"{float(v):.1f}%"
+    except: return '0.0%'
+
 # ════════════════════════════════════════════
 # 1. 韭研公社 — 热榜帖子
 # ════════════════════════════════════════════
@@ -169,6 +174,215 @@ def fetch_market_data():
 
 
 # ════════════════════════════════════════════
+# 4. 重建 section_html (用实时数据替换静态分析)
+# ════════════════════════════════════════════
+
+def _build_s1_html(today):
+    """大盘概况 — 从 market_data 生成"""
+    rows = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (today,))
+    if not rows:
+        return ''
+    d = rows[0]
+    sentiment = d['sentiment'] or '分化'
+    sc = 'gold' if sentiment == '分化' else ('red' if '强' in str(sentiment) else 'green')
+    return f'''<h2>一、大盘概况 <span style="font-size:11px;color:var(--muted);font-weight:normal">{today} 实时数据</span></h2>
+<div class="grid2">
+<div class="stat"><div class="v" style="color:var(--{sc})">{sentiment}</div><div class="l">市场情绪</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">{d['zt_count'] or 0}</div><div class="l">涨停家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">东方财富数据</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">{d['dt_count'] or 0}</div><div class="l">跌停家数</div></div>
+<div class="stat"><div class="v" style="color:var(--gold)">{fmt_percent(d['seal_rate'])}</div><div class="l">封板率</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">{d['max_board'] or 0}板</div><div class="l">最高板</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">{d['up_count'] or '-'}</div><div class="l">上涨家数</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">{d['down_count'] or '-'}</div><div class="l">下跌家数</div></div>
+</div>'''
+
+def _build_s7_html(today):
+    """连板梯队 — 从 zt_stocks + board_summary 生成"""
+    stock_rows = query("SELECT * FROM zt_stocks WHERE date=? ORDER BY board_num DESC, seal_time", (today,))
+    summary_rows = query("SELECT * FROM board_summary WHERE date=? ORDER BY board_num", (today,))
+    
+    if not stock_rows:
+        return ''
+    
+    # 统计数据
+    boards = {1: [], 2: [], 3: [], 4: [], 5: []}
+    for s in stock_rows:
+        bn = s['board_num']
+        if bn in boards:
+            boards[bn].append(s)
+    
+    total = len(stock_rows)
+    max_b = max((k for k, v in boards.items() if v), default=1)
+    
+    def fmt_money(val):
+        if not val: return '-'
+        v = float(val)
+        if abs(v) >= 100000000:
+            return f"{v/100000000:.2f}亿"
+        if abs(v) >= 10000:
+            return f"{v/10000:.0f}万"
+        return f"{v:.2f}"
+    
+    def build_table(stocks_list, board_num, label):
+        if not stocks_list:
+            return f'<div id="board-{board_num}" class="board-table-wrap" style="display:none"><div class="empty-msg">暂无数据</div></div>'
+        
+        # 晋级率
+        rate = ''
+        for s in summary_rows:
+            if s['board_num'] == board_num:
+                pct = s['promotion_rate'] or 0
+                yest = s['yesterday_count'] or 0
+                today_c = s['today_count'] or len(stocks_list)
+                rate = f'<div class="rate-bar"><div class="rate-stat"><span class="rate-value">{pct:.0f}%</span><span class="rate-detail">昨{yest}只 → 今{today_c}只</span></div></div>'
+                break
+        
+        def board_tag(n):
+            if n == 1: return '首板'
+            return f'{n}板'
+        
+        rows = ''
+        for s in stocks_list:
+            tag = board_tag(s['board_num'])
+            p = s['price'] or 0
+            t = (s['seal_time'] or '')[:5]
+            reason = (s['reason'] or '').replace('<', '&lt;').replace('>', '&gt;')
+            sector = (s['sector'] or '').replace('<', '&lt;').replace('>', '&gt;')
+            name = (s['name'] or '').replace('<', '&lt;').replace('>', '&gt;')
+            code = (s['code'] or '')
+            limit = fmt_money(s['seal_amount'])
+            tover = f"{s['turnovers']:.1f}%" if s['turnovers'] else '-'
+            price_str = f"{p:.2f}" if p else '-'
+            rows += f'''<tr data-sort-price="{p}" data-sort-time="{t}" data-sort-reason="{reason}" data-sort-limit="{s['seal_amount'] or 0}" data-sort-sector="{sector}" data-sort-turnover="{s['turnovers'] or 0}">
+<td>{name}<br><span style="font-size:10px;color:var(--muted)">{code}</span></td>
+<td>{price_str}</td>
+<td>{t}<br><span class="board-days-tag">{tag}</span></td>
+<td style="font-size:11px">{reason}</td>
+<td>{limit}</td>
+<td>{sector}</td>
+<td>{tover}</td>
+</tr>'''
+        
+        display = 'block' if board_num == 1 else 'none'
+        return f'''<div id="board-{board_num}" class="board-table-wrap" style="display:{display}">
+{rate}
+<table class="sortable">
+<thead><tr>
+<th data-sort="none" style="min-width:100px">股票名称</th>
+<th data-sort="price" class="sort-header">价格 <span class="sort-icon">↕</span></th>
+<th data-sort="time" class="sort-header">涨停时间 <span class="sort-icon">↕</span></th>
+<th data-sort="reason" class="sort-header">涨停原因 <span class="sort-icon">↕</span></th>
+<th data-sort="limit" class="sort-header">封单 <span class="sort-icon">↕</span></th>
+<th data-sort="sector" class="sort-header">板块 <span class="sort-icon">↕</span></th>
+<th data-sort="turnover" class="sort-header">换手 <span class="sort-icon">↕</span></th>
+</tr></thead>
+<tbody>
+{rows}
+</tbody>
+</table>
+</div>'''
+    
+    def tab_label(n, name):
+        cnt = len(boards.get(n, []))
+        active = ' active' if n == 1 else ''
+        return f'<div class="board-tab{active}" onclick="switchBoardTab(\'{name}\')" data-board="{name}">{name}板（{cnt}）</div>'
+    
+    board_tabs = tab_label(1, '一') + tab_label(2, '二') + tab_label(3, '三') + f'<div class="board-tab" onclick="switchBoardTab(\'higher\')" data-board="higher">更高（{sum(len(boards[b]) for b in [4,5])}）</div>'
+    
+    t1 = build_table(boards[1], 'one', '一板')
+    t2 = build_table(boards[2], 'two', '二板')
+    t3 = build_table(boards[3], 'three', '三板')
+    t4 = build_table(boards[4] + boards[5], 'higher', '更高')
+    
+    return f'''<h2>七、连板梯队 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时数据 · 东方财富涨停池</span></h2>
+<div class="card">
+<h3>📊 连板全景表</h3>
+<div class="bl-blue" style="font-size:12px;margin-bottom:8px">
+<strong>✅ 数据来源：</strong>东方财富涨停池 — 涨停{total}只，最高板<strong>{max_b}板</strong>。点击下方板数标签切换，点击列头排序。
+</div>
+<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
+{board_tabs}
+</div>
+<div style="overflow-x:auto">
+{t1}
+{t2}
+{t3}
+{t4}
+</div>
+</div>'''
+
+def _build_s6_html(today):
+    """韭研公社 — 从 posts 表生成"""
+    rows = query("SELECT * FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 20", (today,))
+    if not rows:
+        return ''
+    bullish = sum(1 for r in rows if r['direction'] == '看多')
+    bearish = sum(1 for r in rows if r['direction'] == '看空')
+    neutral = sum(1 for r in rows if r['direction'] in ('', '中性'))
+    
+    cards = ''
+    for r in rows:
+        title = (r['title'] or '')[:80].replace('<', '&lt;').replace('>', '&gt;')
+        content = (r['content'] or '')[:300].replace('<', '&lt;').replace('>', '&gt;')
+        author = (r['author'] or '').replace('<', '&lt;').replace('>', '&gt;')
+        dir_tag = 'r' if r['direction'] == '看多' else ('g' if r['direction'] == '看空' else 'b')
+        cards += f'''<div class="card">
+<h3>{title} <span class="tag {dir_tag}">{r['direction'] or '中性'}</span></h3>
+<div class="bl-gold" style="font-size:12px">{content}</div>
+<div style="font-size:11px;color:var(--muted);margin-top:6px">✍️ {author} · 实时爬取</div>
+</div>'''
+    
+    return f'''<h2>🔬 韭研公社视角 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时爬取 · {today}</span></h2>
+<div class="grid2" style="margin-bottom:12px">
+<div class="stat"><div class="v" style="color:var(--red)">{bullish}看多</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">{bearish}看空</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">{neutral}中性</div></div>
+</div>
+{cards}'''
+
+def rebuild_section_html(today=None):
+    """用实时数据重建 section_html"""
+    if not today:
+        today = date.today().strftime("%Y-%m-%d")
+    
+    # 先清除今天的 section_html
+    execute("DELETE FROM section_html WHERE date=?", (today,))
+    
+    sections = []
+    
+    # 1. 大盘概况 (实时)
+    s1 = _build_s1_html(today)
+    if s1:
+        sections.append({'date': today, 'section_id': 's1', 'title': f'大盘概况 {today}', 'html': s1})
+    
+    # 2. 连板梯队 (实时)
+    s7 = _build_s7_html(today)
+    if s7:
+        sections.append({'date': today, 'section_id': 's7', 'title': f'连板梯队 {today}', 'html': s7})
+    
+    # 3. 韭研公社 (实时)
+    s6 = _build_s6_html(today)
+    if s6:
+        sections.append({'date': today, 'section_id': 's6', 'title': f'韭研公社视角 {today}', 'html': s6})
+    
+    # 4. 静态分析部分 (从最新可用日期复制)
+    analysis_sections = ['s0', 's2', 's3', 's4', 's5', 's8', 's9', 's10', 's13', 's15', 's16', 's17', 's18']
+    latest_date = query("SELECT MAX(date) as md FROM section_html WHERE date < ?", (today,))
+    if latest_date and latest_date[0]['md']:
+        src_date = latest_date[0]['md']
+        old = query("SELECT * FROM section_html WHERE date=? ORDER BY id", (src_date,))
+        for r in old:
+            if r['section_id'] in analysis_sections:
+                sections.append({'date': today, 'section_id': r['section_id'], 'title': r['title'], 'html': r['html']})
+    
+    if sections:
+        insert_many('section_html', sections)
+        print(f"  ✅ section_html 已重建: {len(sections)}个板块")
+        return len(sections)
+    return 0
+
+
+# ════════════════════════════════════════════
 # 统一入口
 # ════════════════════════════════════════════
 
@@ -195,8 +409,13 @@ def refresh_all():
     results['jy_posts'] = post_count
     print(f"    ✅ {post_count}条帖子")
     
+    # 4. 重建 section_html (用实时数据替换静态分析)
+    print("  → 重建页面...")
+    sec_count = rebuild_section_html()
+    results['sections'] = sec_count
+    
     # 汇总
-    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条")
+    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · {sec_count}个板块已更新")
     return results
 
 
