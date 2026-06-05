@@ -32,6 +32,9 @@ def fetch_jiuyangongshe():
         r = requests.get(url, headers=HEADERS, timeout=15)
         soup = BeautifulSoup(r.text, 'html.parser')
         
+        # ⚠️ 清除今日旧帖子，防止重复累积
+        execute("DELETE FROM posts WHERE platform='jy' AND date=?", (TODAY,))
+        
         posts = []
         current_title = ''
         
@@ -83,7 +86,6 @@ def fetch_zt_pool():
         df = ak.stock_zt_pool_em(date=today_str)
         
         if df is None or len(df) == 0:
-            # 今日可能无数据，试试昨日
             from datetime import timedelta
             yesterday = (date.today() - timedelta(days=1)).strftime("%Y%m%d")
             df = ak.stock_zt_pool_em(date=yesterday)
@@ -91,9 +93,13 @@ def fetch_zt_pool():
         if df is None or len(df) == 0:
             return 0, 0
         
-        stocks = []
         use_date = TODAY
         
+        # ⚠️ 清除今日旧数据，防止重复累积
+        execute("DELETE FROM zt_stocks WHERE date=?", (use_date,))
+        execute("DELETE FROM board_summary WHERE date=?", (use_date,))
+        
+        stocks = []
         for _, row in df.iterrows():
             board = int(row.get('连板数', 1))
             stocks.append({
@@ -282,12 +288,16 @@ def _build_s7_html(today):
 </table>
 </div>'''
     
-    def tab_label(n, name):
-        cnt = len(boards.get(n, []))
-        active = ' active' if n == 1 else ''
-        return f'<div class="board-tab{active}" onclick="switchBoardTab(\'{name}\')" data-board="{name}">{name}板（{cnt}）</div>'
+    def tab_label(tab_name, label, cnt, active=False):
+        act = ' active' if active else ''
+        return f'<div class="board-tab{act}" onclick="switchBoardTab(\'{tab_name}\')" data-board="{tab_name}">{label}板（{cnt}）</div>'
     
-    board_tabs = tab_label(1, '一') + tab_label(2, '二') + tab_label(3, '三') + f'<div class="board-tab" onclick="switchBoardTab(\'higher\')" data-board="higher">更高（{sum(len(boards[b]) for b in [4,5])}）</div>'
+    board_tabs = ''
+    board_tabs += tab_label('one', '一', len(boards[1]), active=True)
+    board_tabs += tab_label('two', '二', len(boards[2]))
+    board_tabs += tab_label('three', '三', len(boards[3]))
+    higher_cnt = sum(len(boards[b]) for b in [4,5])
+    board_tabs += f'<div class="board-tab" onclick="switchBoardTab(\'higher\')" data-board="higher">更高（{higher_cnt}）</div>'
     
     t1 = build_table(boards[1], 'one', '一板')
     t2 = build_table(boards[2], 'two', '二板')
