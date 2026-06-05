@@ -331,7 +331,123 @@ function closeTopicDetail() {
   var modal = document.getElementById('topic-detail-modal');
   if (modal) modal.style.display = 'none';
 }
+
 // ════════════════════════════════════════════
+// AI 智能分析
+// ════════════════════════════════════════════
+
+async function aiCheckStatus() {
+  var badge = document.getElementById('ai-status-badge');
+  var msg = document.getElementById('ai-status-msg');
+  if (!badge) return;
+  
+  try {
+    var resp = await fetch(API_BASE + '/llm/status');
+    var data = await resp.json();
+    if (data.ok && data.data.connected) {
+      badge.className = 'tag g';
+      badge.textContent = '✅ LLM 已连接';
+      if (msg) msg.textContent = '模型路由: ' + (data.data.model || 'auto');
+    } else {
+      badge.className = 'tag r';
+      badge.textContent = '⚠️ LLM 离线';
+      if (msg) msg.textContent = '请启动 FreeLLMAPI (localhost:3001)';
+    }
+  } catch (e) {
+    badge.className = 'tag r';
+    badge.textContent = '❌ 连接失败';
+    if (msg) msg.textContent = '后端服务异常';
+  }
+}
+
+async function aiRefreshStrategy() {
+  var el = document.getElementById('ai-strategy-content');
+  if (!el) return;
+  el.innerHTML = '<div class="loading"><div class="spinner"></div><div>AI 生成策略中...</div></div>';
+  
+  try {
+    var resp = await fetch(API_BASE + '/llm/daily-strategy', {method: 'POST'});
+    var data = await resp.json();
+    if (data.ok && data.data && data.data.strategy) {
+      el.innerHTML = '<div style="font-size:13px;line-height:1.8">' + markedToHtml(data.data.strategy) + '</div>';
+    } else {
+      el.innerHTML = '<div class="empty-msg">⚠️ ' + (data.error || '生成失败') + '</div>';
+    }
+  } catch (e) {
+    el.innerHTML = '<div class="empty-msg">❌ 请求失败: ' + e.message + '</div>';
+  }
+}
+
+async function aiRefreshSentiment() {
+  var el = document.getElementById('ai-sentiment-content');
+  if (!el) return;
+  el.innerHTML = '<div class="loading"><div class="spinner"></div><div>加载热门题材...</div></div>';
+  
+  try {
+    // 先获取排行榜
+    var rankResp = await fetch(API_BASE + '/v2/hot-topics/rankings');
+    var rankData = await rankResp.json();
+    var topics = rankData.data && rankData.data.mainline_rankings ? rankData.data.mainline_rankings.slice(0, 5) : [];
+    
+    if (topics.length === 0) {
+      el.innerHTML = '<div class="empty-msg">暂无题材数据</div>';
+      return;
+    }
+    
+    var html = '';
+    for (var i = 0; i < topics.length; i++) {
+      var t = topics[i];
+      html += '<div style="margin:8px 0;padding:10px;border:1px solid var(--border);border-radius:6px">';
+      html += '<h4 style="font-size:14px;margin-bottom:4px">' + (i+1) + '. ' + (t.topic_name || '') + 
+              ' <span style="font-size:11px;color:var(--muted)">强度 ' + (t.mainline_strength_score || 0) + '</span></h4>';
+      
+      // 调用情绪分析
+      try {
+        var sentResp = await fetch(API_BASE + '/llm/analyze-sentiment', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({topic: t.topic_name}),
+        });
+        var sentData = await sentResp.json();
+        if (sentData.ok && sentData.data) {
+          var d = sentData.data;
+          html += '<div class="vote"><div class="v-up" style="width:' + (d.bull_pct || 40) + '%"></div>' +
+                  '<div class="v-dn" style="width:' + (d.bear_pct || 20) + '%"></div>' +
+                  '<div class="v-ne" style="width:' + (d.neutral_pct || 40) + '%"></div></div>';
+          html += '<div class="v-label">看多' + (d.bull_pct || 0) + '% | 看空' + (d.bear_pct || 0) + '% | 中性' + (d.neutral_pct || 0) + '%</div>';
+          if (d.summary) html += '<div style="margin-top:4px;font-size:12px;color:var(--muted)">📝 ' + d.summary + '</div>';
+        }
+      } catch(e) {
+        html += '<div style="font-size:11px;color:var(--muted)">情绪分析暂不可用</div>';
+      }
+      
+      html += '<div style="margin-top:4px;font-size:11px;color:var(--muted)">龙头: ' + (t.leader_stock || '-') + ' | 阶段: ' + (t.lifecycle_stage || '-') + '</div>';
+      html += '</div>';
+    }
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = '<div class="empty-msg">❌ 加载失败: ' + e.message + '</div>';
+  }
+}
+
+async function aiRefreshAll() {
+  aiCheckStatus();
+  aiRefreshStrategy();
+  aiRefreshSentiment();
+}
+
+function markedToHtml(md) {
+  // 简易 Markdown → HTML 转换
+  if (!md) return '';
+  var html = md
+    .replace(/### (.+)/g, '<h4 style="margin:8px 0 4px;color:var(--gold)">$1</h4>')
+    .replace(/## (.+)/g, '<h3 style="margin:10px 0 4px;color:var(--gold)">$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--red)">$1</strong>')
+    .replace(/\n- /g, '<br>• ')
+    .replace(/\n/g, '<br>')
+    .replace(/\d\. /g, '<br>$&');
+  return html;
+}
 
 document.addEventListener('DOMContentLoaded', async function() {
   try {
@@ -377,6 +493,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     s3refreshRankings();
+
+    // 6. 初始化 AI 智能分析
+    aiCheckStatus();
 
   } catch (e) {
     console.error('加载失败:', e);
