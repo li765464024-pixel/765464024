@@ -1504,10 +1504,10 @@ def _build_s4_html(today):
     cards += f'''<div class="card">
 <h3>⛓ 一：机器人/物理AI — 英伟达Computex钦点 <span class="src sj">{robot_post or '韭:戈壁淘金'}</span></h3>
 <table>
-<tr><th>层级</th><th>环节</th><th>关键数据</th></tr>
-<tr><td><strong>上游</strong></td><td>减速器/伺服系统（绿的谐波/双环传动/汇川技术）</td><td>黄仁勋公开表示"未来半导体制造将越来越依赖机器人和AI"，英伟达与韩国制造业深度合作，板块涨停{robot_total}家</td></tr>
-<tr><td><strong>中游</strong></td><td>通用设备/自动化（宇环数控/莱伯泰科/创远信科）</td><td>首板{len(up_stocks)}只全线爆发，资金全面涌入机器人产业链</td></tr>
-<tr><td><strong>下游</strong></td><td>专用设备/整机（中重科技、泰坦股份）</td><td>中重科技{robot_high}板领涨，泰坦股份2板跟随，梯队健康</td></tr>
+<tr><th>层级</th><th>环节</th><th>Serenity视角</th><th>关键数据</th></tr>
+<tr><td><strong>上游</strong></td><td>减速器/伺服系统（绿的谐波/双环传动/汇川技术）</td><td style="font-size:11px;color:var(--purple)">减速器是机器人"光芯片级"瓶颈，绿的谐波国产替代TAM从50亿→500亿，对标上一轮光模块旭创逻辑</td><td>黄仁勋公开表示"未来半导体制造将越来越依赖机器人和AI"，英伟达与韩国制造业深度合作，板块涨停{robot_total}家</td></tr>
+<tr><td><strong>中游</strong></td><td>通用设备/自动化（宇环数控/莱伯泰科/创远信科）</td><td style="font-size:11px;color:var(--purple)">通用设备是AI进入物理世界的"卖铲人"，首板{len(up_stocks)}只梯队形成，需等换手确认龙头</td><td>首板{len(up_stocks)}只全线爆发，资金全面涌入机器人产业链</td></tr>
+<tr><td><strong>下游</strong></td><td>专用设备/整机（中重科技、泰坦股份）</td><td style="font-size:11px;color:var(--purple)">中重科技3板=板块高度龙头，连板梯队健康=资金认可度验证，分歧日低吸</td><td>中重科技{robot_high}板领涨，泰坦股份2板跟随，梯队健康</td></tr>
 </table>
 <div class="bl-red">📈 <strong>核心判断：</strong>黄仁勋Computex钦点Physical AI + 韩国合作，机器人成为AI落地下一个主线。板块涨停{robot_total}家，梯队完整，分歧即是买点。</div>
 </div>'''
@@ -1528,10 +1528,10 @@ def _build_s4_html(today):
     cards += f'''<div class="card">
 <h3>⛓ 二：MLCC/被动元件 — 涨价大周期确认 <span class="src sj">{mlcc_post or '韭:戈壁淘金'}</span></h3>
 <table>
-<tr><th>层级</th><th>环节</th><th>关键数据</th></tr>
-<tr><td><strong>上游</strong></td><td>陶瓷粉体、氧化镝（国瓷材料/华宏科技）</td><td>氧化镝卖方给出10倍涨价空间，AI MLCC需求从0→1500吨，供不应求</td></tr>
-<tr><td><strong>中游</strong></td><td>MLCC制造/电感（顺络电子/麦捷科技/风华高科）</td><td>村田/太阳诱电7月1日再次对电感提价；三环集团晶振基座调价10-30%</td></tr>
-<tr><td><strong>下游</strong></td><td>AI服务器GPU周边（京东方A/铂科新材/江海股份）</td><td>MLCC供需极度紧张，村田/三星均表示景气度持续供不应求</td></tr>
+<tr><th>层级</th><th>环节</th><th>Serenity视角</th><th>关键数据</th></tr>
+<tr><td><strong>上游</strong></td><td>陶瓷粉体、氧化镝（国瓷材料/华宏科技）</td><td style="font-size:11px;color:var(--purple)">氧化镝供给瓶颈无解=MLCC的"光刻胶时刻"，国瓷材料卡位核心材料，10倍涨价空间=典型TAM不对称信号</td><td>氧化镝卖方给出10倍涨价空间，AI MLCC需求从0→1500吨，供不应求</td></tr>
+<tr><td><strong>中游</strong></td><td>MLCC制造/电感（顺络电子/麦捷科技/风华高科）</td><td style="font-size:11px;color:var(--purple)">村田涨价30%=超级周期确认信号，顺络电子涨停=资金开始定价，类比2021年HBM周期启动</td><td>村田/太阳诱电7月1日再次对电感提价；三环集团晶振基座调价10-30%</td></tr>
+<tr><td><strong>下游</strong></td><td>AI服务器GPU周边（京东方A/铂科新材/江海股份）</td><td style="font-size:11px;color:var(--purple)">AI服务器MLCC用量4年4倍=TAM从2150→9200亿日元指数级扩张，产能年增仅10%</td><td>MLCC供需极度紧张，村田/三星均表示景气度持续供不应求</td></tr>
 </table>
 <div class="bl-red">📈 <strong>核心判断：</strong>被动元件提价加速确认超级周期。仅5%均价涨幅即可带来30%+利润弹性。顺络电子/麦捷科技涨停领涨，趋势延续。</div>
 </div>'''
@@ -1550,10 +1550,10 @@ def _build_s4_html(today):
     cards += f'''<div class="card">
 <h3>⛓ 三：玻璃基板/先进封装 — 台积电官宣试产线 <span class="src sj">{glass_post or 'Vin7的大'}</span></h3>
 <table>
-<tr><th>层级</th><th>环节</th><th>关键数据</th></tr>
-<tr><td><strong>TGV设备</strong></td><td>激光钻孔/电镀（德龙激光/帝尔激光/大族激光）</td><td>TGV设备最先兑现业绩，2026Q2-Q3确认收入，卖铲人逻辑</td></tr>
-<tr><td><strong>玻璃原片</strong></td><td>玻璃基板原片（沃格光电/京东方A/彩虹股份）</td><td>台积电CoPoS玻璃基板试产线建成投产，产业步入实质推进</td></tr>
-<tr><td><strong>封测</strong></td><td>先进封装厂（长电科技/通富微电）</td><td>适配大尺寸高密度AI芯片封装，0到1产业机遇明确</td></tr>
+<tr><th>层级</th><th>环节</th><th>Serenity视角</th><th>关键数据</th></tr>
+<tr><td><strong>TGV设备</strong></td><td>激光钻孔/电镀（德龙激光/帝尔激光/大族激光）</td><td style="font-size:11px;color:var(--purple)">TGV设备=先进封装"卖铲人"，与上一轮光模块中际旭创逻辑一致，德龙激光0→1的TAM扩张</td><td>TGV设备最先兑现业绩，2026Q2-Q3确认收入，卖铲人逻辑</td></tr>
+<tr><td><strong>玻璃原片</strong></td><td>玻璃基板原片（沃格光电/京东方A/彩虹股份）</td><td style="font-size:11px;color:var(--purple)">台积电官宣试产线=产业化的"iPhone时刻"，沃格光电/京东方A卡位核心</td><td>台积电CoPoS玻璃基板试产线建成投产，产业步入实质推进</td></tr>
+<tr><td><strong>封测</strong></td><td>先进封装厂（长电科技/通富微电）</td><td style="font-size:11px;color:var(--purple)">先进封装是AI芯片的物理瓶颈环节，Chiplet拉动封装需求指数级增长</td><td>适配大尺寸高密度AI芯片封装，0到1产业机遇明确</td></tr>
 </table>
 <div class="bl-red">📈 <strong>核心判断：</strong>台积电官宣试产线=产业化关键里程碑。TGV设备最先受益（德龙激光涨停），玻璃原片和封测依次传导。三峡新材2板领涨。</div>
 </div>'''
@@ -1572,10 +1572,10 @@ def _build_s4_html(today):
     cards += f'''<div class="card">
 <h3>⛓ 四：光纤/光通信 — 预制棒价格暴涨550% <span class="src sj">{fiber_post or '独自等待'}</span></h3>
 <table>
-<tr><th>层级</th><th>环节</th><th>关键数据</th></tr>
-<tr><td><strong>上游</strong></td><td>高纯四氯化硅（宏柏新材）、光纤预制棒</td><td>AI算力拉动高端A2光纤预制棒年内暴涨550%，缺口持续到2027年</td></tr>
-<tr><td><strong>中游</strong></td><td>光纤光缆（亨通光电/长飞光纤/中天科技）</td><td>头部光缆厂订单排至2027年，央视实锤全行业爆单</td></tr>
-<tr><td><strong>下游</strong></td><td>CPO/光模块（武汉凡谷/东方通信/东土科技）</td><td>英伟达Spectrum-X硅光量产，CPO连接成AI新瓶颈</td></tr>
+<tr><th>层级</th><th>环节</th><th>Serenity视角</th><th>关键数据</th></tr>
+<tr><td><strong>上游</strong></td><td>高纯四氯化硅（宏柏新材）、光纤预制棒</td><td style="font-size:11px;color:var(--purple)">宏柏新材2万吨卡位=小盘卡位大TAM的典型Serenity逻辑，9N高纯四氯化硅对标三孚股份</td><td>AI算力拉动高端A2光纤预制棒年内暴涨550%，缺口持续到2027年</td></tr>
+<tr><td><strong>中游</strong></td><td>光纤光缆（亨通光电/长飞光纤/中天科技）</td><td style="font-size:11px;color:var(--purple)">预制棒暴涨550%=供给瓶颈教科书案例，扩产周期18-24月=紧缺至少持续3年</td><td>头部光缆厂订单排至2027年，央视实锤全行业爆单</td></tr>
+<tr><td><strong>下游</strong></td><td>CPO/光模块（武汉凡谷/东方通信/东土科技）</td><td style="font-size:11px;color:var(--purple)">CPO是Serenity核心Supercycle thesis，英伟达Spectrum-X硅光量产确认方向</td><td>英伟达Spectrum-X硅光量产，CPO连接成AI新瓶颈</td></tr>
 </table>
 <div class="bl-red">📈 <strong>核心判断：</strong>宏柏新材布局2万吨高纯四氯化硅，对标三孚股份。光棒扩产周期18-24月，供给瓶颈2027年前无解。武汉凡谷涨停领涨。</div>
 </div>'''
@@ -1588,10 +1588,10 @@ def _build_s4_html(today):
     cards += f'''<div class="card">
 <h3>⛓ 五：煤炭/高股息 — 大有能源5板最高标 <span class="src st">淘:庄哥说股</span></h3>
 <table>
-<tr><th>层级</th><th>环节</th><th>关键数据</th></tr>
-<tr><td><strong>龙头</strong></td><td>大有能源5板（全市场最高标）</td><td>焦煤期货大涨，板块防御避险品种逆势活跃</td></tr>
-<tr><td><strong>跟风</strong></td><td>安泰集团/平煤股份涨停</td><td>煤炭板块跟风力度偏弱，分歧较大</td></tr>
-<tr><td><strong>逻辑</strong></td><td>高股息+避险+期货涨价</td><td>全市场最高标5板+防御属性+华字辈加持</td></tr>
+<tr><th>层级</th><th>环节</th><th>Serenity视角</th><th>关键数据</th></tr>
+<tr><td><strong>龙头</strong></td><td>大有能源5板（全市场最高标）</td><td style="font-size:11px;color:var(--purple)">非AI供给瓶颈逻辑，属防御避险品种。高标独舞=资金暂无更好去处</td><td>焦煤期货大涨，板块防御避险品种逆势活跃</td></tr>
+<tr><td><strong>跟风</strong></td><td>安泰集团/平煤股份涨停</td><td style="font-size:11px;color:var(--purple)">板块联动弱=非主线方向，Serenity框架不关注此类资金博弈机会</td><td>煤炭板块跟风力度偏弱，分歧较大</td></tr>
+<tr><td><strong>逻辑</strong></td><td>高股息+避险+期货涨价</td><td style="font-size:11px;color:var(--purple)">高股息与Serenity瓶颈投资框架不重叠，仅作市场情绪补全观察</td><td>全市场最高标5板+防御属性+华字辈加持</td></tr>
 </table>
 <div class="bl-red">📈 <strong>核心判断：</strong>大有能源5板成市场最高标，但板块跟风极弱仅1家涨停。煤炭高标独舞分歧大，后续需观察板块联动能否跟上。</div>
 </div>'''
