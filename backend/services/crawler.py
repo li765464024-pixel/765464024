@@ -351,33 +351,137 @@ def _build_s7_html(today):
 </div>'''
 
 def _build_s6_html(today):
-    """韭研公社 — 从 posts 表生成"""
-    rows = query("SELECT * FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 20", (today,))
+    """韭研公社视角 — 1:1匹配JSON结构"""
+    rows = query("SELECT * FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 16", (today,))
     if not rows:
         return ''
+    
     bullish = sum(1 for r in rows if r['direction'] == '看多')
     bearish = sum(1 for r in rows if r['direction'] == '看空')
     neutral = sum(1 for r in rows if r['direction'] in ('', '中性'))
     
-    cards = ''
-    for r in rows:
-        title = (r['title'] or '')[:80].replace('<', '&lt;').replace('>', '&gt;')
-        content = (r['content'] or '')[:300].replace('<', '&lt;').replace('>', '&gt;')
-        author = (r['author'] or '').replace('<', '&lt;').replace('>', '&gt;')
-        dir_tag = 'r' if r['direction'] == '看多' else ('g' if r['direction'] == '看空' else 'b')
-        cards += f'''<div class="card">
-<h3>{title} <span class="tag {dir_tag}">{r['direction'] or '中性'}</span></h3>
-<div class="bl-gold" style="font-size:12px">{content}</div>
-<div style="font-size:11px;color:var(--muted);margin-top:6px">✍️ {author} · 实时爬取</div>
+    # 工具函数
+    def esc(s):
+        if not s: return ''
+        return str(s).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('"','&quot;')
+    
+    def chip(names):
+        return ' '.join(['<span class="chip chip-up">' + esc(n) + '</span>' for n in names]) if names else ''
+    
+    # ---- Card 1: 今日热帖汇总 ----
+    merged_summary = ''
+    for r in rows[:5]:
+        line = '<strong>' + esc(r['title'][:60]) + '</strong><br>'
+        line += esc(r['content'][:200])
+        line += '<span style="font-size:10px;color:var(--muted)"> — ' + esc(r['author'][:15]) + '</span>'
+        merged_summary += '<div class="bl-red" style="margin-bottom:6px;font-size:12px">' + line + '</div>'
+    
+    # ---- Card 2: 专家帖（8帖精选） ----
+    trade_top8 = rows[:8]
+    tag_labels = {
+        '看多': '<span class="tag r">产业研报</span>',
+        '看空': '<span class="tag g">风险提示</span>',
+        '中性': '<span class="tag b">盘面研判</span>',
+    }
+    default_tag = '<span class="tag b">盘面研判</span>'
+    
+    trader_cards = ''
+    for i, r in enumerate(trade_top8):
+        tag_display = tag_labels.get(r['direction'], default_tag)
+        author_short = esc(r['author'][:20])
+        if len(author_short) > 18:
+            author_short = author_short[:16] + '…'
+        content_text = esc(r['content'][:400])
+        trader_cards += '''<div class="card">
+<h3>''' + str(i+1) + '. ' + esc(r['title'][:60]) + ' ' + tag_display + '''</h3>
+<div class="bl-red" style="font-size:12px">
+<strong>核心逻辑：</strong>''' + content_text + '''
+</div>
+<div style="font-size:11px;color:var(--muted);margin-top:6px">✍️ ''' + author_short + ''' · 实时爬取</div>
 </div>'''
     
-    return f'''<h2>🔬 韭研公社视角 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时爬取 · {today}</span></h2>
-<div class="grid2" style="margin-bottom:12px">
-<div class="stat"><div class="v" style="color:var(--red)">{bullish}看多</div></div>
-<div class="stat"><div class="v" style="color:var(--green)">{bearish}看空</div></div>
-<div class="stat"><div class="v" style="color:var(--blue)">{neutral}中性</div></div>
-</div>
-{cards}'''
+    # ---- Card 3: 行业活跃榜 — 从 zt_stocks 生成 ----
+    sector_data = [
+        {'label': 'AI/MLCC/电子', 'sectors': ['MLCC','电容','元件','被动元件','电子','光学光电','半导体','芯片']},
+        {'label': 'PCB/铜箔', 'sectors': ['PCB','铜箔','CCL','覆铜板','封装基板','金属新材']},
+        {'label': '光通信/CPO', 'sectors': ['光通信','光模块','光纤','通信设备']},
+        {'label': '机器人/自动化', 'sectors': ['机器人','自动化','电机','专用设备','通用设备','航天装备']},
+        {'label': '新能源/电力', 'sectors': ['电力','煤炭','能源','电网','光伏','煤炭开采','汽车']},
+    ]
+    
+    active_rows = ''
+    sec_stocks_map = {}
+    for sd in sector_data:
+        total = 0
+        stocks = []
+        for sec_name in query("SELECT DISTINCT sector FROM zt_stocks WHERE date=? AND sector!=''", (today,)):
+            for tag in sd['sectors']:
+                if tag in sec_name['sector']:
+                    cnt = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND sector=?", (today, sec_name['sector']))[0]['c']
+                    total += cnt
+                    names = query("SELECT name FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC LIMIT 3", (today, sec_name['sector']))
+                    for n in names:
+                        if n['name'] not in stocks:
+                            stocks.append(n['name'])
+                    break
+        sec_stocks_map[sd['label']] = {'count': total, 'stocks': stocks[:5]}
+    
+    # 风险锚定
+    risk_map = {'AI/MLCC/电子': '短线追高', 'PCB/铜箔': '产业周期', '光通信/CPO': '产业周期',
+                '机器人/自动化': '万点调整', '新能源/电力': '趋势回调'}
+    
+    for label, info in sec_stocks_map.items():
+        if info['count'] > 0:
+            risk = risk_map.get(label, '待观察')
+            active_rows += '<tr>'
+            active_rows += '<td><span class="chip chip-up">' + label + '</span></td>'
+            active_rows += '<td>' + str(info['count']) + '家</td>'
+            active_rows += '<td style="font-size:11px">' + label + '</td>'
+            active_rows += '<td>' + chip(info['stocks']) + '</td>'
+            active_rows += '<td><span class="tag y">' + risk + '</span></td>'
+            active_rows += '</tr>'
+    
+    # ---- 拼装 ----
+    # 共识判断：从行业分布找出最大3个方向
+    sorted_sec = sorted(sec_stocks_map.items(), key=lambda x: x[1]['count'], reverse=True)
+    top3_directions = [s[0] for s in sorted_sec[:3] if s[1]['count'] > 0]
+    if top3_directions:
+        consensus_note = '、'.join(top3_directions) + '是当前板块第一共同主线'
+    else:
+        consensus_note = ''
+    
+    result = ''
+    result += '<h2>🔬 韭研公社产业视角 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时爬取 · ' + today + '</span></h2>'
+    
+    # 统计
+    result += '<div class="grid2" style="margin-bottom:12px">'
+    result += '<div class="stat"><div class="v" style="color:var(--red)">' + str(bullish) + '看多</div></div>'
+    result += '<div class="stat"><div class="v" style="color:var(--green)">' + str(bearish) + '看空</div></div>'
+    result += '<div class="stat"><div class="v" style="color:var(--blue)">' + str(neutral) + '中性</div></div>'
+    result += '</div>'
+    
+    # Card 1: 今日热帖
+    result += '<div class="card">'
+    result += '<h3>🔥 今日热帖（' + today.replace('2026-','') + '） <span class="src sj">韭:实时热帖</span></h3>'
+    result += merged_summary
+    result += '</div>'
+    
+    # Card 2: 专家帖
+    result += trader_cards
+    
+    # Card 3: 行业活跃榜
+    result += '<div class="card">'
+    result += '<h3>📊 行业活跃榜—涨停行业分布</h3>'
+    result += '<table>'
+    result += '<tr><th>赛道</th><th>涨停家数</th><th>细分方向</th><th>核心标的</th><th>风险锚定</th></tr>'
+    result += active_rows
+    result += '</table>'
+    if consensus_note:
+        first_dir = top3_directions[0] if top3_directions else ''
+        result += '<div class="bl-gold" style="margin-top:10px;font-size:11px"><strong>💡 跨博主共识：</strong>' + consensus_note + '。' + str(bullish) + '位博主看多方向集中于AI硬件产业链（' + first_dir + '），是当前韭研公社第一共识主线。</div>'
+    result += '</div>'
+    
+    return result
 
 # ════════════════════════════════════════════
 # 4b. 淘股吧 — 从现有HTML导入(因反爬)
