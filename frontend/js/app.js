@@ -461,25 +461,20 @@ function s9esc(s) {
 
 async function s9LoadData(dateStr) {
   var el = document.getElementById('s9-content');
-  var status = document.getElementById('s9-status');
   if (!el) return;
   
   el.innerHTML = '<div class="loading"><div class="spinner"></div><div>加载中...</div></div>';
-  if (status) status.textContent = '加载中...';
   
   try {
     var resp = await fetch('/data/s9_' + dateStr + '.json');
     if (!resp.ok) {
       el.innerHTML = '<div class="empty-msg">暂无 ' + dateStr + ' 题材轮动数据</div>';
-      if (status) status.textContent = '❌ 无数据';
       return;
     }
     var data = await resp.json();
     renderS9Rotation(data);
-    if (status) status.textContent = '✅ ' + (data.title || '');
   } catch (e) {
     el.innerHTML = '<div class="empty-msg">❌ 加载失败: ' + e.message + '</div>';
-    if (status) status.textContent = '❌ 加载失败';
   }
 }
 
@@ -598,10 +593,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     aiCheckStatus();
 
     // 7. 初始化 s9 题材轮动
-    var s9Date = document.getElementById('s9-date');
-    if (s9Date && s9Date.value) {
-      s9LoadData(s9Date.value);
-    }
+    s9LoadData('20260529');
 
   } catch (e) {
     console.error('加载失败:', e);

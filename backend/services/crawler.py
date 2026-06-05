@@ -1639,6 +1639,106 @@ def rebuild_section_html(today=None):
 
 
 # ════════════════════════════════════════════
+# 5. 淘股吧 — 实时爬取（替代静态HTML导入）
+# ════════════════════════════════════════════
+
+def fetch_taoguba_realtime():
+    """从淘股吧首页爬取热门帖子 → 写入 posts 表"""
+    try:
+        posts = []
+        # 从首页和boardList提取内容
+        for url in ["https://www.taoguba.com.cn", "https://www.taoguba.com.cn/boardList", "https://www.tgb.cn/feeds/qryFeedsViewPointView"]:
+            r = requests.get(url, headers=HEADERS, timeout=10)
+            if r.status_code != 200:
+                continue
+            soup = BeautifulSoup(r.text, 'html.parser')
+            for tag in soup.find_all(['a', 'div', 'h2', 'h3', 'h4']):
+                text = tag.get_text(strip=True)
+                if len(text) < 15 or len(text) > 200:
+                    continue
+                if any(kw in text for kw in ['首页','论坛','我的','登录','注册','版权','备案','举报','密码','关注','收藏','设置']):
+                    continue
+                if any(kw in text for kw in ['涨停','跌停','涨','板','板块','概念','AI','算力','MLCC','芯片','半导体','机器人','光伏','新能源','消费','地产','医药','汽车','煤炭','电力','通信','光纤','CPO','房地产','消费']):
+                    direction = '看多' if any(k in text for k in ['涨停','爆发','强势','大涨','突破','利好','主升']) else ('看空' if any(k in text for k in ['跌停','下跌','风险','利空','减持','退市','暴跌']) else '中性')
+                    posts.append({'date': TODAY, 'platform': 'taoguba', 'author': '淘股吧', 'title': text[:200], 'content': text[:300], 'direction': direction, 'views': len(posts), 'comments': 0, 'tags': '淘股吧·实时爬取'})
+            if len(posts) >= 20:
+                break
+        # 兜底：首页行情文本
+        if len(posts) < 5:
+            r = requests.get("https://www.taoguba.com.cn", headers=HEADERS, timeout=10)
+            soup = BeautifulSoup(r.text, 'html.parser')
+            for tag in soup.find_all(['a', 'div']):
+                text = tag.get_text(strip=True)
+                if len(text) > 10 and len(text) < 100 and '/' in text and ('%' in text or '万' in text):
+                    posts.append({'date': TODAY, 'platform': 'taoguba', 'author': '淘股吧行情', 'title': text[:200], 'content': f"实时行情: {text[:200]}", 'direction': '看多' if '+' in text else ('看空' if '-' in text else '中性'), 'views': 0, 'comments': 0, 'tags': '淘股吧·实时行情'})
+        if posts:
+            seen = set()
+            unique = []
+            for p in posts:
+                if p['title'] not in seen:
+                    seen.add(p['title']); unique.append(p)
+            execute("DELETE FROM posts WHERE platform='taoguba' AND date=?", (TODAY,))
+            insert_many('posts', unique[:25])
+            return len(unique[:25])
+        return 0
+    except Exception as e:
+        print(f"  ⚠️ 淘股吧实时爬取失败: {e}")
+        return 0
+
+
+# ════════════════════════════════════════════
+# 4d. 同花顺 — 概念板块热度
+# ════════════════════════════════════════════
+
+def fetch_thys_concepts():
+    """从同花顺爬取概念板块列表及热度 → 写入 posts 表 (platform='ths')"""
+    try:
+        r = requests.get("https://q.10jqka.com.cn/gn/", headers=HEADERS, timeout=10)
+        if r.status_code != 200:
+            return 0
+        
+        soup = BeautifulSoup(r.text, 'html.parser')
+        
+        # 概念板块包含涨跌幅信息
+        # 从列表中提取概念名称和涨跌幅
+        concepts = []
+        for a in soup.find_all('a'):
+            href = a.get('href', '')
+            text = a.get_text(strip=True)
+            if '/gn/detail/code/' in href and len(text) > 2 and len(text) < 20 and '..' not in href:
+                concepts.append(text.strip())
+        
+        if not concepts:
+            return 0
+        
+        # 存入 posts 表 (platform='ths')
+        execute("DELETE FROM posts WHERE platform='ths' AND date=?", (TODAY,))
+        
+        ths_posts = []
+        for i, name in enumerate(concepts[:30]):
+            direction = '看多' if any(k in name for k in ['概念','电池','芯片','AI','算力','光','半导体','新','超']) else '中性'
+            ths_posts.append({
+                'date': TODAY,
+                'platform': 'ths',
+                'author': '同花顺',
+                'title': f"概念板块#{i+1}: {name}",
+                'content': f"同花顺概念板块: {name}",
+                'direction': direction,
+                'views': 30 - i,
+                'comments': 0,
+                'tags': '同花顺·概念板块',
+            })
+        
+        if ths_posts:
+            insert_many('posts', ths_posts)
+            return len(ths_posts)
+        return 0
+    except Exception as e:
+        print(f"  ⚠️ 同花顺爬取失败: {e}")
+        return 0
+
+
+# ════════════════════════════════════════════
 # 统一入口
 # ════════════════════════════════════════════
 
@@ -1671,11 +1771,17 @@ def refresh_all():
     results['jy_posts'] = post_count
     print(f"    ✅ {post_count}条帖子")
     
-    # 5. 淘股吧 (从静态HTML导入)
-    print("  → 导入淘股吧...")
-    tg_count = fetch_taoguba_from_html()
+    # 5. 淘股吧 (实时爬取)
+    print("  → 爬取淘股吧...")
+    tg_count = fetch_taoguba_realtime()
     results['tg_posts'] = tg_count
     print(f"    ✅ {tg_count}条帖子")
+    
+    # 5b. 同花顺概念板块
+    print("  → 爬取同花顺概念板块...")
+    ths_count = fetch_thys_concepts()
+    results['ths_concepts'] = ths_count
+    print(f"    ✅ {ths_count}个概念")
     
     # 6. 题材生命周期分析
     print("  → 分析题材生命周期...")
@@ -1711,7 +1817,7 @@ def refresh_all():
     results['sections'] = sec_count
     
     # 汇总
-    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · 财联社{cls_count}条 · 题材{results['lifecycle_topics']}个 · {sec_count}个板块已更新")
+    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · 财联社{cls_count}条 · 淘股吧{tg_count}条 · 同花顺{ths_count}概念 · 题材{results['lifecycle_topics']}个 · {sec_count}个板块已更新")
     return results
 
 
