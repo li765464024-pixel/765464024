@@ -1822,6 +1822,68 @@ def _build_s16_html(today):
     result += '\n<div class="bl-blue" style="margin-top:8px;font-size:11px"><strong>\U0001f4cc Serenity\u6838\u5fc3\u7406\u5ff5\uff1a</strong>"\u74f6\u9888\u4e0d\u7834\uff0c\u884c\u60c5\u4e0d\u6b62\u3002\u771f\u6b63\u7684\u4f9b\u9700\u7f3a\u53e3\u4f1a\u6301\u7eed\u591a\u5e74\u3002\u4e0d\u8981\u56e0\u4e3a\u6da8\u4e86\u51e0\u4e2a\u6708\u5c31\u6050\u9ad8\u2014\u2014\u74f6\u9888\u73af\u8282\u4f1a\u6301\u7eed\u6570\u5e74\u3002\u4e70\u5728\u5206\u6b67\uff0c\u5356\u5728\u4e00\u81f4\u3002"</div>'
     result += '\n</div>'
     
+    # ════════════════════════════════════════════
+    # Card 4: 瓶颈层级涨停龙头匹配
+    # ════════════════════════════════════════════
+    
+    # 获取今日所有涨停个股（用于匹配）
+    all_zt = query("SELECT name, sector, board_num, price, code FROM zt_stocks WHERE date=? ORDER BY board_num DESC, sector", (today,))
+    all_zt_names = [s['name'] for s in all_zt]
+    all_zt_sectors = [s['sector'] for s in all_zt]
+    
+    level_rows = ''
+    for bm in bottleneck_map:
+        for link in bm['chain']:
+            stocks = link['stocks']
+            level = link['level']
+            chain_name = link['link']
+            
+            # 检查Serenity指定标的今日是否涨停
+            zt_matched = []
+            for stock in stocks:
+                if stock in all_zt_names:
+                    zt_info = [s for s in all_zt if s['name'] == stock][0]
+                    zt_matched.append((stock, zt_info['board_num']))
+            
+            # 检查该层级/环节是否有其他今日涨停个股（按sector精准关键词匹配，仅限>=3字的tag）
+            extra_zt = []
+            for s in all_zt:
+                if s['name'] in stocks:  # 排除已匹配的
+                    continue
+                for tag in bm['tags']:
+                    if len(tag) < 3:
+                        continue
+                    if tag in (s['sector'] or '') or (s['sector'] or '') in tag:
+                        extra_zt.append((s['name'], s['board_num']))
+                        break
+                if len(extra_zt) >= 2:
+                    break
+            
+            # 构建状态描述
+            if zt_matched:
+                names = [f"{n}({b}b)" for n, b in zt_matched]
+                status = '+' + ' '.join(names)
+                status_cls = 'up'
+            elif extra_zt:
+                # 有同板块其他涨停股，标注为新候选人
+                names = [f"{n}({b}b)" for n, b in extra_zt]
+                status = '新:' + ' '.join(names)
+                status_cls = 'ne'
+            else:
+                status = '\u2014'
+                status_cls = 'muted'
+            
+            level_rows += f'<tr><td><strong>{bm["name"]}</strong></td><td>{level}</td><td>{chain_name}</td><td>{", ".join(stocks)}</td><td class="{status_cls}">{status}</td></tr>'
+    
+    result += '\n\n<div class="card">'
+    result += '\n<h3>\U0001f50d \u74f6\u9888\u5c42\u7ea7\u6da8\u505c\u9f99\u5934\u5339\u914d \u2014 Serenity\u6307\u5b9a\u6807\u7684 vs \u4eca\u65e5\u6da8\u505c</h3>'
+    result += '\n<table>'
+    result += '\n<tr><th>\u74f6\u9888\u65b9\u5411</th><th>\u5c42\u7ea7</th><th>\u73af\u8282</th><th>Serenity\u6307\u5b9a</th><th>\u4eca\u65e5\u6da8\u505c</th></tr>'
+    result += level_rows
+    result += '\n</table>'
+    result += '\n<div class="bl-blue" style="margin-top:8px;font-size:11px"><strong>\u2191 \u6807\u7684\u6da8\u505c</strong> \u2014 Serenity\u6307\u5b9a\u6807\u7684\u4eca\u65e5\u6da8\u505c\uff0c\u786e\u8ba4\u8d44\u91d1\u5408\u529b \u00b7 <strong class="up">\u65b0:\u6807\u7684</strong> \u2014 \u540c\u677f\u5757\u4eca\u65e5\u6da8\u505c\u4f46\u975eSerenity\u6307\u5b9a\uff0c\u53ef\u80fd\u4e3a\u65b0\u9f99\u5934\u5019\u9009</div>'
+    result += '\n</div>'
+    
     return result
 
 
