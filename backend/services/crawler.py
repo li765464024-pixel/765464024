@@ -1823,13 +1823,56 @@ def _build_s16_html(today):
     result += '\n</div>'
     
     # ════════════════════════════════════════════
-    # Card 4: 瓶颈层级涨停龙头匹配
+    # Card 4: 瓶颈层级涨停龙头双维匹配（方案B）
     # ════════════════════════════════════════════
+    
+    # Serenity标的 → 股票代码映射（新浪财经API用）
+    STOCK_CODES = {
+        '国瓷材料':'sz300285','博迁新材':'sh605376','风华高科':'sz000636','三环集团':'sz300408',
+        '洁美科技':'sz002859','瑞华泰':'sh688323','金明精机':'sz300281','博杰股份':'sz002975',
+        '光迅科技':'sz002281','天孚通信':'sz300394','中际旭创':'sz300308','新易盛':'sz300502',
+        '亨通光电':'sh600487','长飞光纤':'sh601869',
+        '北方华创':'sz002371','中微公司':'sh688012','沪硅产业':'sh688126','中船特气':'sh688146',
+        '长电科技':'sh600584','通富微电':'sz002156',
+        '兆易创新':'sh603986','佰维存储':'sh688525','江波龙':'sz301308',
+        '诺德股份':'sh600110','长裕集团':'sh688070','鹏鼎控股':'sz002938',
+        '生益科技':'sh600183','深南电路':'sz002916','沪电股份':'sz002463',
+    }
+    
+    # 从新浪获取实时行情
+    def fetch_sina_prices():
+        try:
+            code_list = list(STOCK_CODES.values())
+            # 分批，每批30个
+            url = "https://hq.sinajs.cn/list=" + ",".join(code_list)
+            r = requests.get(url, headers={
+                "User-Agent": "Mozilla/5.0",
+                "Referer": "https://finance.sina.com.cn"
+            }, timeout=5)
+            result = {}
+            for line in r.text.strip().split('\n'):
+                if not line or '=' not in line:
+                    continue
+                parts = line.split(',')
+                if len(parts) < 3:
+                    continue
+                name = parts[0].split('=')[1].replace('"','') if '=' in parts[0] else ''
+                try:
+                    yest_close = float(parts[2])
+                    current = float(parts[3])
+                    change_pct = round((current - yest_close) / yest_close * 100, 2) if yest_close > 0 else 0
+                except:
+                    change_pct = 0
+                result[name] = change_pct
+            return result
+        except:
+            return {}
+    
+    sina_prices = fetch_sina_prices()
     
     # 获取今日所有涨停个股（用于匹配）
     all_zt = query("SELECT name, sector, board_num, price, code FROM zt_stocks WHERE date=? ORDER BY board_num DESC, sector", (today,))
     all_zt_names = [s['name'] for s in all_zt]
-    all_zt_sectors = [s['sector'] for s in all_zt]
     
     level_rows = ''
     for bm in bottleneck_map:
@@ -1838,50 +1881,41 @@ def _build_s16_html(today):
             level = link['level']
             chain_name = link['link']
             
-            # 检查Serenity指定标的今日是否涨停
-            zt_matched = []
+            # 1. Serenity指定标的的今日涨跌
+            stock_status = []
             for stock in stocks:
+                change_pct = sina_prices.get(stock)
                 if stock in all_zt_names:
                     zt_info = [s for s in all_zt if s['name'] == stock][0]
-                    zt_matched.append((stock, zt_info['board_num']))
+                    stock_status.append(f'<span class="up">+{stock}({zt_info["board_num"]}b)↑</span>')
+                elif change_pct is not None:
+                    cls = 'up' if change_pct > 0 else ('dn' if change_pct < 0 else '')
+                    sym = '+' if change_pct > 0 else ''
+                    stock_status.append(f'<span class="{cls}">{stock}({sym}{change_pct}%)</span>')
+                else:
+                    stock_status.append(f'<span class="muted">{stock}</span>')
             
-            # 检查该层级/环节是否有其他今日涨停个股（按sector精准关键词匹配，仅限>=3字的tag）
+            # 2. 同板块涨停股
             extra_zt = []
             for s in all_zt:
-                if s['name'] in stocks:  # 排除已匹配的
+                if s['name'] in stocks:
                     continue
                 for tag in bm['tags']:
-                    if len(tag) < 3:
-                        continue
-                    if tag in (s['sector'] or '') or (s['sector'] or '') in tag:
-                        extra_zt.append((s['name'], s['board_num']))
+                    if len(tag) >= 3 and (tag in (s['sector'] or '') or (s['sector'] or '') in tag):
+                        extra_zt.append(f"{s['name']}({s['board_num']}b)")
                         break
                 if len(extra_zt) >= 2:
                     break
             
-            # 构建状态描述
-            if zt_matched:
-                names = [f"{n}({b}b)" for n, b in zt_matched]
-                status = '+' + ' '.join(names)
-                status_cls = 'up'
-            elif extra_zt:
-                # 有同板块其他涨停股，标注为新候选人
-                names = [f"{n}({b}b)" for n, b in extra_zt]
-                status = '新:' + ' '.join(names)
-                status_cls = 'ne'
-            else:
-                status = '\u2014'
-                status_cls = 'muted'
-            
-            level_rows += f'<tr><td><strong>{bm["name"]}</strong></td><td>{level}</td><td>{chain_name}</td><td>{", ".join(stocks)}</td><td class="{status_cls}">{status}</td></tr>'
+            level_rows += f'<tr><td><strong>{bm["name"]}</strong></td><td>{level}</td><td>{chain_name}</td><td>{" ".join(stock_status)}</td><td>{" ".join(extra_zt) if extra_zt else "<span class=muted>—</span>"}</td></tr>'
     
     result += '\n\n<div class="card">'
-    result += '\n<h3>\U0001f50d \u74f6\u9888\u5c42\u7ea7\u6da8\u505c\u9f99\u5934\u5339\u914d \u2014 Serenity\u6307\u5b9a\u6807\u7684 vs \u4eca\u65e5\u6da8\u505c</h3>'
+    result += '\n<h3>\U0001f50d 瓶颈层级龙头双维匹配 — Serenity指定标的涨跌 + 同板块涨停</h3>'
     result += '\n<table>'
-    result += '\n<tr><th>\u74f6\u9888\u65b9\u5411</th><th>\u5c42\u7ea7</th><th>\u73af\u8282</th><th>Serenity\u6307\u5b9a</th><th>\u4eca\u65e5\u6da8\u505c</th></tr>'
+    result += '\n<tr><th>瓶颈方向</th><th>层级</th><th>环节</th><th>Serenity标的(今日涨跌)</th><th>同板块涨停股</th></tr>'
     result += level_rows
     result += '\n</table>'
-    result += '\n<div class="bl-blue" style="margin-top:8px;font-size:11px"><strong>\u2191 \u6807\u7684\u6da8\u505c</strong> \u2014 Serenity\u6307\u5b9a\u6807\u7684\u4eca\u65e5\u6da8\u505c\uff0c\u786e\u8ba4\u8d44\u91d1\u5408\u529b \u00b7 <strong class="up">\u65b0:\u6807\u7684</strong> \u2014 \u540c\u677f\u5757\u4eca\u65e5\u6da8\u505c\u4f46\u975eSerenity\u6307\u5b9a\uff0c\u53ef\u80fd\u4e3a\u65b0\u9f99\u5934\u5019\u9009</div>'
+    result += '\n<div class="bl-blue" style="margin-top:8px;font-size:11px"><strong class="up">红色↑涨停</strong> Serenity指定标的今日涨停 · <strong class="up">红色数字</strong> 标的涨了这些% · <strong class="dn">绿色数字</strong> 跌了这些% · <strong class="up">右侧红色</strong> 同板块今日涨停的非Serenity标的</div>'
     result += '\n</div>'
     
     return result
