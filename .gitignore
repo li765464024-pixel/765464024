@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+*.db
+data/fupan.db
+venv/
+.env
+*.egg-info/
+dist/
+build/

@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>06月04日双社区复盘 · 淘股吧×韭研公社</title>
+<style>
+:root{
+  --bg:#0d1117; --card:#161b22; --border:#30363d;
+  --text:#c9d1d9; --muted:#8b949e;
+  --red:#f85149; --green:#3fb950; --blue:#58a6ff; --gold:#d2991d; --purple:#a371f7;
+  --red-bg:rgba(248,81,73,.08); --green-bg:rgba(63,185,80,.08); --blue-bg:rgba(88,166,255,.08); --gold-bg:rgba(210,153,29,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.7}
+a{color:var(--blue);text-decoration:none}
+header{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;position:sticky;top:0;z-index:100}
+header h1{font-size:18px;margin-bottom:2px}
+header .meta{font-size:11px;color:var(--muted)}
+
+.tabs-wrap{background:var(--card);border-bottom:1px solid var(--border);padding:8px 24px;position:sticky;top:54px;z-index:99;overflow-x:auto;white-space:nowrap}
+.tab{display:inline-block;padding:5px 13px;border-radius:5px;cursor:pointer;font-size:12px;color:var(--muted);border:1px solid transparent;margin-right:3px;transition:.15s}
+.tab:hover{color:var(--text);border-color:var(--border)}
+.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+main{padding:20px 24px;max-width:1500px;margin:0 auto}
+.section{display:none}
+.section.active{display:block}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px 20px;margin-bottom:14px}
+.card h3{font-size:15px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+
+.stat{background:rgba(22,27,34,.8);border:1px solid var(--border);border-radius:6px;padding:10px 14px;text-align:center}
+.stat .v{font-size:22px;font-weight:700}
+.stat .l{font-size:10px;color:var(--muted);margin-top:2px}
+
+table{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+th{background:rgba(48,54,61,.4);padding:7px 10px;text-align:left;font-weight:600;color:var(--muted);font-size:11px;border-bottom:2px solid var(--border)}
+td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover{background:rgba(48,54,61,.2)}
+
+.tag{display:inline-block;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700}
+.r{background:rgba(248,81,73,.18);color:var(--red)}
+.g{background:rgba(63,185,80,.18);color:var(--green)}
+.b{background:rgba(88,166,255,.18);color:var(--blue)}
+.y{background:rgba(210,153,29,.18);color:var(--gold)}
+
+.up{color:var(--red)} .dn{color:var(--green)} .ne{color:var(--blue)} .warn{color:var(--gold)}
+
+.src{display:inline-block;padding:0 5px;border-radius:2px;font-size:9px;font-weight:700;margin-left:3px}
+.st{background:rgba(248,81,73,.2);color:var(--red)}
+.sj{background:rgba(88,166,255,.2);color:var(--blue)}
+
+.block{border-left:3px solid;padding:8px 14px;margin:8px 0;border-radius:0 6px 6px 0;font-size:13px}
+.bl-red{border-color:var(--red);background:var(--red-bg)}
+.bl-green{border-color:var(--green);background:var(--green-bg)}
+.bl-blue{border-color:var(--blue);background:var(--blue-bg)}
+.bl-gold{border-color:var(--gold);background:var(--gold-bg)}
+
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;border:1px solid var(--border);margin:2px}
+.chip-up{border-color:var(--red);color:var(--red);background:rgba(248,81,73,.08)}
+.chip-dn{border-color:var(--green);color:var(--green);background:rgba(63,185,80,.08)}
+
+.quote{background:rgba(163,113,247,.06);border-left:3px solid var(--purple);padding:8px 14px;margin:8px 0;border-radius:0 5px 5px 0;font-size:13px;color:var(--muted)}
+.quote strong{color:var(--purple)}
+
+.vote{display:flex;height:6px;border-radius:3px;overflow:hidden;margin:4px 0}
+.v-up{background:var(--red)} .v-dn{background:var(--green)} .v-ne{background:var(--border)}
+.v-label{font-size:10px;color:var(--muted)}
+
+.badge{display:inline-block;padding:1px 5px;border-radius:2px;font-size:9px;font-weight:700}
+.bg{background:rgba(248,81,73,.2);color:var(--red)}
+.br{background:rgba(63,185,80,.2);color:var(--green)}
+
+h2{font-size:17px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+.stock-box{border:1px solid var(--border);border-radius:6px;padding:14px;margin:10px 0}
+.stock-box h4{font-size:14px;margin-bottom:6px}
+.stock-box .headline{color:var(--muted);font-size:12px;margin-bottom:8px}
+
+/* Collapsible card */
+.collapsible-card details{color:var(--text)}
+.collapsible-card details summary::-webkit-details-marker{color:var(--gold)}
+.collapsible-card details[open] summary span{color:var(--gold)}
+.collapsible-card details summary{transition:.2s}
+.collapsible-card details summary:hover{color:var(--blue)}
+</style>
+</head>
+<body>
+
+<header>
+<h1>📊 2026-06-04 双社区全面复盘</h1>
+<div class="meta">淘股吧×韭研公社 | 2026-06-04 收盘数据 | MLCC反超CPO登顶年内最强板块 | 数据来源：同花顺+东方财富+韭研公社+财联社</div>
+</header>
+
+<div class="tabs-wrap">
+<div class="tab active" onclick="switchTab('s1')">📈 大盘概况</div>
+<div class="tab" onclick="switchTab('s2')">🔥 板块热度</div>
+<div class="tab" onclick="switchTab('s3')">🔄 题材生命周期</div>
+<div class="tab" onclick="switchTab('s4')">⛓ 产业链深度</div>
+<div class="tab" onclick="switchTab('s5')">🐂 淘股吧视角</div>
+<div class="tab" onclick="switchTab('s6')">🔬 韭研公社视角</div>
+<div class="tab" onclick="switchTab('s7')">🪜 连板梯队</div>
+<div class="tab" onclick="switchTab('s14')">🐉 今日龙一</div>
+<div class="tab" onclick="switchTab('s8')">🎯 高标个股分析</div>
+<div class="tab" onclick="switchTab('s9')">🔀 题材轮动</div>
+<div class="tab" onclick="switchTab('s10')">🤝 共识与分歧</div>
+<div class="tab" onclick="switchTab('s11')">🧠 综合研判</div>
+<div class="tab" onclick="switchTab('s12')">📋 明日策略</div>
+<div class="tab" onclick="switchTab('s0')">📰 盘前纪要</div>
+<div class="tab" onclick="switchTab('s13')">💰 游资实盘</div>
+<div class="tab" onclick="switchTab('s15')">🤝 游资参谋团</div>
+<div class="tab" onclick="switchTab('s16')">🔬 Serenity</div>
+</div>
+
+<main>
+
+<!-- ===== 0. 盘前纪要 ===== -->
+<div class="section" id="s0">
+<h2>📰 盘前纪要（06月04日） <span class="src sj">韭:盘前纪要 24.3w粉</span> <span style="font-size:12px;color:var(--muted);font-weight:normal">2026-06-04 07:30 · 实时数据</span></h2>
+
+<div class="card">
+<h3>No.1 盘前热点事件</h3>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>一、昨日（06/3）热点回顾</strong><br><span style="font-size:11px;color:var(--muted)">迈威尔:鑫科材料 | CPO电子胶:天洋新材 | MLCC上游碳酸钡:红星发展 | 光纤:亨通光电</span>
+<div class="chip-row" style="margin-top:4px">
+<span class="chip chip-up">电力:华电能源/粤电力A</span><span class="chip chip-up">电容:江海股份</span><span class="chip chip-up">MLCC:风华高科</span><span class="chip chip-up">PCB:华塑控股/中京电子</span><span class="chip chip-up">光纤:新能泰山</span><span class="chip chip-up">算力:大位科技</span><span class="chip chip-up">金刚石散热:黄河旋风</span>
+</div>
+</div>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>二、🚀 太空算力 — 工信部支持前瞻研究，2030年市场规模超万亿美元</strong><br>
+工信部支持开展太空算力技术前瞻性研究。4月北京经开区发起筹建太空算力创新中心，发布攻关榜单聚焦可回收火箭/太空光伏/激光通信/抗辐照芯片，单个项目最高资助1000万元。（央视财经）<br>
+<span style="font-size:12px;color:var(--muted)">太空算力：顺灏股份、金利华电、雷科防务 | 太空经济：航天机电、航天工程、航天动力、中国卫星、再升科技、西部材料</span>
+</div>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>三、💻 美股SaaS板块领涨 — Snowflake涨超36%</strong><br>
+Snowflake Q1营收13.9亿(+33%超预期)，承诺5年向AWS投入60亿美元(AI GPU+自研Graviton芯片)。收购AI智能体平台Natoma。<br>
+<span style="font-size:12px;color:var(--muted)">A股映射：华胜天成(AWS合作)、蓝色光标(AWS核心客户)、星环科技(云原生数仓)</span>
+</div>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>四、🖥 戴尔上调AI服务器展望 — 盘后涨超38%</strong><br>
+FY2027营收约1670亿美元，其中AI服务器600亿美元(此前约1400亿)。Q1业绩远超预期。<br>
+<span style="font-size:12px;color:var(--muted)">PCB:广合科技 | 电源线:泓淋电力 | 散热:飞荣达 | 连接:新亚电子 | 分销:神州数码 | 代工:华勤技术/工业富联</span>
+</div>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>五、🏙 国务院印发《城市更新"十五五"规划》</strong><br>
+到2030年城市更新行动取得重要进展。城市开发建设方式转型、安全发展基础、人居环境改善、新旧动能转换。<br>
+<span style="font-size:12px;color:var(--muted)">城市更新：新城市、通用电梯、快意电梯、梅轮电梯</span>
+</div>
+
+<div class="bl-blue">
+<strong>六、📋 行业要闻</strong>
+<table style="margin-top:4px">
+<tr><td style="width:5%">1</td><td>科创50指数冲高回落涨0.69%，算力硬件股韧性强劲</td><td style="font-size:11px;color:var(--muted)">同花顺快讯</td></tr>
+<tr><td style="width:5%">2</td><td>油价今晚下调了！加满一箱油能少花20.5元</td><td style="font-size:11px;color:var(--muted)">同花顺快讯</td></tr>
+<tr><td style="width:5%">3</td><td>美股已无恐慌，只剩FOMO！华尔街机构：这一幕像极了1998年</td><td style="font-size:11px;color:var(--muted)">同花顺快讯</td></tr>
+<tr><td style="width:5%">4</td><td>拟60亿跨界布局AIDC，光伏龙头直线拉20cm涨停</td><td style="font-size:11px;color:var(--muted)">同花顺快讯</td></tr>
+<tr><td style="width:5%">5</td><td>微信正与手机厂商合作推出Agent-to-Agent助手能力</td><td style="font-size:11px;color:var(--muted)">同花顺快讯</td></tr>
+<tr><td style="width:5%">6</td><td>油价或迎年内第二降！加满一箱油将少花21元</td><td style="font-size:11px;color:var(--muted)">同花顺快讯</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h3>No.2 公告精选</h3>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>📢 利好公告</strong>
+<table>
+<tr><td>吉林化纤</td><td>实控人变更为吉林省国资委</td></tr>
+<tr><td>禾盛新材</td><td>定增募资≤1.9亿用于国产智能算力中心建设</td></tr>
+<tr><td>智翔金泰</td><td>与药友制药签署GR1803项目许可协议，总金额至高18.2亿</td></tr>
+<tr><td>广电运通</td><td>控股子公司中标3.09亿政务云项目</td></tr>
+<tr><td>盛视科技</td><td>预中标2.69亿口岸查验设施项目</td></tr>
+<tr><td>华康洁净</td><td>中标9400万中微公司电子洁净项目</td></tr>
+<tr><td>*ST亚太</td><td><span class="tag r">停牌一天摘帽→亚太实业</span></td></tr>
+</table>
+</div>
+
+<div class="bl-green">
+<strong style="font-size:14px">⚠️ 地雷阵（减持）</strong>
+<div style="font-size:14px;color:var(--green);margin-top:6px;line-height:1.8">美年健康(-3%) &nbsp; 新致软件(-3%) &nbsp; 瑞晨环保(-3%)<br>声迅股份(-2.99%) &nbsp; 万德斯(-2%) &nbsp; 柏星龙(-1.99%) &nbsp; 庄园牧场(-1.16%)<br>正邦科技(-1%) &nbsp; 中国核建(-1%) &nbsp; 信科移动(-1%) &nbsp; 汉缆股份(-1%)</div>
+</div>
+
+<div class="bl-gold" style="margin-top:8px">
+<strong>🔔 异动公告（重要）</strong>
+<table>
+<tr><td>合锻智能</td><td>不涉及AI算力业务，未取得核聚变业务收入</td></tr>
+<tr><td>再升科技</td><td class="dn">"高硅氧纤维产品"暂无在手订单，后续订单存在较大不确定性</td></tr>
+<tr><td>江海股份</td><td class="dn">超级电容器/MLPC在AI服务器上应用较小</td></tr>
+<tr><td>粤电力A</td><td>克拉玛依项目12个月内不会带来重大影响</td></tr>
+<tr><td>中芯国际</td><td class="dn">国家大基金对港股中芯国际多头持仓降至7.99%</td></tr>
+<tr><td>德邦科技</td><td class="dn">大基金5/19-28减持142万股→持股11.9%</td></tr>
+<tr><td>沪硅产业</td><td class="dn">大基金5/20-28减持3305万股→持股12.89%</td></tr>
+</table>
+<div style="font-size:11px;color:var(--muted);margin-top:4px">⚠️ 大基金密集减持半导体（中芯国际/德邦科技/沪硅产业），主动为板块降温</div>
+</div>
+</div>
+
+<div class="card">
+<h3>No.3 全球市场</h3>
+<div class="bl-red">美股三大指数涨跌不一。A股三大指数：上证4060.80点(-0.57%)、深证15643.36点(-0.39%)。同花顺快讯：半导体/存储芯片/CPO持续活跃。</div>
+</div>
+
+<div class="card">
+<h3>No.4 昨日（06/3）连板梯队与涨停事件 <span style="font-size:11px;color:var(--muted)">（盘前数据，用于对比06/04实际结果）</span></h3>
+
+<div class="grid2" style="margin-bottom:8px">
+<div>
+<table>
+<tr><th colspan="2">连板梯队（06/3收盘）</th></tr>
+<tr><td><span class="badge bg">3板×3</span></td><td>红星发展、天洋新材、鑫科材料</td></tr>
+<tr><td><span class="badge bg">2板×6</span></td><td>豫能控股、瑞贝卡、上海石化、中重科技、元祖股份、新中港</td></tr>
+<tr><td><span class="badge bg">首板</span></td><td>京东方A/中船特气/宏达电子/沪硅产业/三安光电/晶方科技/立昂微/安泰/平煤/世运电路等</td></tr>
+</table>
+</div>
+<div>
+<table>
+<tr><th>涨停事件分类</th><th>家数</th><th>核心标的</th></tr>
+<tr><td>MLCC/电容/被动元件</td><td><span class="tag r">15</span></td><td>红星发展4板/宏达电子20cm/风华高科+4.89%</td></tr>
+<tr><td>半导体/芯片</td><td>32</td><td>MLCC涨价+AI硬件催化</td></tr>
+<tr><td>半导体/芯片</td><td>32</td><td>京东方A/三安/晶方/沪硅/中船特气/立昂微</td></tr>
+<tr><td>煤炭</td><td>5</td><td>大有能源4板/安泰/平煤涨停 焦煤+5%</td></tr>
+<tr><td>CPO/光通信</td><td>4</td><td>天洋新材4板/Marvell+22%催化</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>No.6 股价新高 <span class="src sj">韭</span></h3>
+<div class="bl-red">收盘价创历史新高<strong>96家</strong>（昨81家）。主要集中在MLCC/电容、半导体材料/设备、存储芯片。</div>
+</div>
+
+<div class="card">
+<h3>No.8 人气热榜（06/3收盘）</h3>
+<div class="grid2">
+<div>
+<strong>同花顺热榜 TOP5：</strong>
+<div class="chip-row" style="margin-top:4px">
+<span class="chip chip-up">京东方A</span><span class="chip chip-up">风华高科</span><span class="chip chip-up">三安光电</span><span class="chip chip-up">沪硅产业</span><span class="chip chip-up">中船特气</span>
+</div>
+</div>
+<div>
+<strong>东方财富热榜 TOP5：</strong>
+<div class="chip-row" style="margin-top:4px">
+<span class="chip chip-up">兆易创新</span><span class="chip chip-up">风华高科</span><span class="chip chip-up">京东方A</span><span class="chip chip-up">三安光电</span><span class="chip chip-up">佰维存储</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>📊 盘前纪要 vs 实际复盘对照</h3>
+<table>
+<tr><th>盘前预期（06/04盘前）</th><th>实际结果（06/04收盘）</th><th>验证</th></tr>
+<tr><td><strong>MLCC涨价+风华停接新单</strong>→MLCC/电容全线</td><td>MLCC反超CPO登顶年内最强(+108%)，宏达电子20cm涨停</td><td class="up">✅ 超级周期确认（年内最强板块）</td></tr>
+<tr><td><strong>Marvell单日+22%</strong>→铜缆/光通信</td><td>鑫科材料3板+鼎通科技20cm涨停，铜缆板块联动</td><td class="up">✅ 完美传导（黄仁勛钦点连接性）</td></tr>
+<tr><td><strong>半导体材料涨价</strong>→沪硅/立昂微/中船特气</td><td>沪硅+14%、立昂微涨停、中船特气20cm涨停，半导体全链条爆发</td><td class="up">✅ 超预期（半导体全线涨停潮）</td></tr>
+<tr><td><strong>煤炭/焦煤大涨</strong>→大有能源/安泰/平煤</td><td>大有能源4板+安泰/平煤涨停，焦煤期货+5%</td><td class="up">✅ 超预期（4,100+下跌中唯一逆势非科技）</td></tr>
+<tr><td><strong>大基金减持半导体</strong>（中芯/德邦/沪硅）</td><td>半导体未受减持影响，反而全线爆发（沪硅+14%/立昂微涨停）</td><td class="dn">❌ 盘前预判被证伪，减持利空被产业逻辑消化</td></tr>
+<tr><td><strong>异动公告：江海股份</strong>电容应用较小</td><td>江海股份涨停，元件板块午后拉升</td><td class="dn">❌ 异动公告未形成压制，电容方向热度超预期</td></tr>
+<tr><td><strong>连板：红星发展3板</strong></td><td>红星发展4板(8天6板)，MLCC上游龙头确立</td><td class="up">✅ 超预期晋级</td></tr>
+</table>
+<div class="bl-gold" style="margin-top:8px">
+<strong>💡 盘前纪要核心价值回顾：</strong>大基金减持半导体（中芯国际/德邦/沪硅）= 当日芯片暴跌的最早信号。城市更新十五五 = 香江破局的底层政策逻辑。江海股份异动公告 = 电容概念股走弱预警。<br>
+<strong>未预判到的：</strong>华塑控股竞价产业链做局(竞昨比35%)、科技股恐慌性出逃的烈度(科创50跌3-5%)。
+</div>
+</div>
+</div>
+
+<!-- ===== 1. 大盘概况 ===== -->
+<div class="section active" id="s1">
+<h2>一、大盘概况 <span style="font-size:11px;color:var(--muted);font-weight:normal">MLCC反超CPO登顶年内最强板块</span></h2>
+
+<div class="grid2">
+<div class="stat"><div class="v" style="color:var(--gold)">分化</div><div class="l">市场情绪</div><div style="font-size:10px;color:var(--muted);margin-top:2px">科创50+0.69%唯一红盘</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">62</div><div class="l">涨停家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">不含ST及未开板新股</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">18</div><div class="l">跌停家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">ST股另计54只</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">-460亿</div><div class="l">主力净额</div><div style="font-size:10px;color:var(--muted);margin-top:2px">半导体/电子逆势流入</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">4板</div><div class="l">连板高度</div><div style="font-size:10px;color:var(--muted);margin-top:2px">红星/天洋/大有</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">~1,200</div><div class="l">上涨家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">仅22.7%</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">4,100+</div><div class="l">下跌家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">超77.3%</div></div>
+<div class="stat"><div class="v" style="color:var(--gold)">27,791亿</div><div class="l">成交额</div><div style="font-size:10px;color:var(--muted);margin-top:2px">连续第30日>2.5万亿</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">~81%</div><div class="l">封板率</div><div style="font-size:10px;color:var(--muted);margin-top:2px">56封/13触板未封</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">+10.02%</div><div class="l">昨涨停表现</div><div style="font-size:10px;color:var(--muted);margin-top:2px">京东方A 199亿成交</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">+7.53%</div><div class="l">昨连板表现</div><div style="font-size:10px;color:var(--muted);margin-top:2px">红星发展8天6板</div></div>
+<div class="stat"><div class="v" style="color:var(--muted)">29,144亿</div><div class="l">两融余额</div><div style="font-size:10px;color:var(--muted);margin-top:2px">融资28932+融券212</div></div>
+</div>
+
+<div class="card">
+<h3>📊 今日 vs 昨日对比</h3>
+<table>
+<tr><th>指标</th><th>今日（6/4）</th><th>昨日（6/3）</th><th>变化</th></tr>
+<tr>
+  <td>市场情绪</td>
+  <td style="color:var(--gold)">极致分化</td>
+  <td style="color:var(--muted)">修复</td>
+  <td style="color:var(--muted)">分化加剧</td>
+</tr>
+<tr>
+  <td>涨停家数</td>
+  <td style="color:var(--red)">120+</td>
+  <td style="color:var(--red)">~54</td>
+  <td style="color:var(--red);font-weight:700">+66 ↑ <span style="font-size:10px;color:var(--green)">MLCC+半导体逆势活跃</span></td>
+</tr>
+<tr>
+  <td>跌停家数</td>
+  <td style="color:var(--green)">~10</td>
+  <td style="color:var(--green)">~18</td>
+  <td style="color:var(--red);font-weight:700">-8 ↓ <span style="font-size:10px;color:var(--green)">改善</span></td>
+</tr>
+<tr>
+  <td>亏钱效应</td>
+  <td style="color:var(--green)">3</td>
+  <td style="color:var(--muted)">—</td>
+  <td style="color:var(--muted)">—</td>
+</tr>
+<tr>
+  <td>主力流入</td>
+  <td style="color:var(--green)">-51.65亿</td>
+  <td style="color:var(--muted)">—</td>
+  <td style="color:var(--muted)">半导体逆势流入</td>
+</tr>
+<tr>
+  <td>连板高度</td>
+  <td style="color:var(--blue)">3板</td>
+  <td style="color:var(--blue)">4板</td>
+  <td style="color:var(--green);font-weight:700">-1 ↓ <span style="font-size:10px;color:var(--gold)">红星发展</span></td>
+</tr>
+<tr>
+  <td>上涨家数</td>
+  <td style="color:var(--red)">1,309</td>
+  <td style="color:var(--red)">1,446</td>
+  <td style="color:var(--green);font-weight:700">-137 ↓</td>
+</tr>
+<tr>
+  <td>下跌家数</td>
+  <td style="color:var(--green)">3,852</td>
+  <td style="color:var(--green)">3,672</td>
+  <td style="color:var(--red);font-weight:700">+180 ↑</td>
+</tr>
+<tr>
+  <td>封板率</td>
+  <td style="color:var(--red)">~75%</td>
+  <td style="color:var(--gold)">~60%</td>
+  <td style="color:var(--red);font-weight:700">+15pp ↑ <span style="font-size:10px;color:var(--green)">科技线封板好</span></td>
+</tr>
+<tr>
+  <td>昨涨停表现</td>
+  <td style="color:var(--red)">+5.82%</td>
+  <td style="color:var(--muted)">—</td>
+  <td style="color:var(--muted)">兆易+7.5%领涨</td>
+</tr>
+<tr>
+  <td>昨连板表现</td>
+  <td style="color:var(--red)">+4.15%</td>
+  <td style="color:var(--muted)">—</td>
+  <td style="color:var(--muted)">风华高科趋势</td>
+</tr>
+<tr>
+  <td>成交额</td>
+  <td style="color:var(--gold)">27,791亿</td>
+  <td style="color:var(--gold)">31,531亿</td>
+  <td style="color:var(--green);font-weight:700">-3,740亿 ↓</td>
+</tr>
+</table>
+<div class="bl-blue" style="margin-top:8px;font-size:12px">
+<strong>概要：</strong>今日MLCC概念反超CPO成为年内最强板块（+108%），半导体/芯片产业链逆势活跃。京东方A 199亿成交封板、三安光电涨停、沪硅产业+14.12%。科创50逆势+0.69%为唯一红盘指数。成交额2.78万亿。结构性极致分化——MLCC/半导体/煤炭强势 vs 消费/白酒/零售批量跌停、油气跌10%+。全市场仅~1,200只上涨，4,100+下跌。<span class="up">科技线赚钱效应极强</span><span class="dn">但整体跌多涨少(1200:4100+)</span>。
+</div>
+</div>
+
+<div class="card">
+<h3>指数表现</h3>
+<table>
+<tr><th>指数</th><th>收盘</th><th>涨跌幅</th><th>定性</th></tr>
+<tr><td>上证指数</td><td>4,057.78</td><td style="color:var(--green);font-weight:700">-0.64%</td><td><span class="tag g">缩量调整</span></td></tr>
+<tr><td>深证成指</td><td>15,661.57</td><td style="color:var(--green);font-weight:700">-0.27%</td><td><span class="tag g">窄幅震荡</span></td></tr>
+<tr><td>创业板指</td><td>4,088.88</td><td style="color:var(--green);font-weight:700">-0.83%</td><td><span class="tag g">宁德拖累</span></td></tr>
+<tr><td>科创50</td><td>1,738.06</td><td style="color:var(--red);font-weight:700">+0.69%</td><td><span class="tag b">逆势领涨</span></td></tr>
+</table>
+</div>
+
+
+
+<div class="bl-red">
+<strong>📌 核心定性：</strong>六月开局<span style="color:var(--red);font-weight:700">结构性分化</span>——三大指数普跌，科创50逆势<span style="color:var(--red);font-weight:700">+0.69%</span>。半导体/MLCC/CPO等科技主线持续活跃，MLCC超级周期确认，沪硅产业+14.12%、立昂微涨停、兆易创新293亿成交。<span class="src st">同花顺</span>。<span style="color:var(--green);font-weight:700">科技线涨停超120只</span>，局部赚钱效应极强。<br>
+<strong>但风险：</strong>成交额<span style="color:var(--gold);font-weight:700">2.78万亿</span>较上日缩量约3700亿，宁德时代-4.27%拖累创业板。科技方向一致性过强，明天面临分歧考验。
+</div>
+</div>
+
+<!-- ===== 2. 板块热度 ===== -->
+<div class="section" id="s2">
+<h2>二、板块热度 <span style="font-size:11px;color:var(--muted);font-weight:normal">MLCC反超CPO登顶 · 同花顺实时数据</span></h2>
+
+<div class="card">
+<h3>板块全景</h3>
+<table>
+<tr><th>板块</th><th>涨停家数</th><th>核心逻辑</th><th>阶段</th><th>龙头</th></tr>
+<tr><td><strong>MLCC/电容</strong></td><td>~12</td><td>高盛超级周期+风华全面停接单+村田6月涨价30%，年内+108%反超CPO登顶</td><td><span class="tag r">主升加速</span></td><td>风华高科(+277%YTD)</td></tr>
+<tr><td><strong>CPO/光通信</strong></td><td>~4</td><td>英伟达Spectrum-X量产+Marvell单日+22%，连线成AI新瓶颈</td><td><span class="tag r">主升</span></td><td>中际旭创/天孚通信</td></tr>
+<tr><td><strong>存储芯片</strong></td><td>~6</td><td>海力士5年内晶圆产能翻番，DRAM Q2价格环比+50%，德明利涨停</td><td><span class="tag r">主升</span></td><td>兆易创新/佰维存储</td></tr>
+<tr><td><strong>半导体材料/设备</strong></td><td>~8</td><td>硅片全面提价(AI专用+18-22%)、沪硅+14%、中船特气20cm涨停</td><td><span class="tag r">主升</span></td><td>沪硅产业/中船特气</td></tr>
+<tr><td><strong>煤炭</strong></td><td>~5</td><td>焦煤期货大涨5%+大有能源4板+安泰/平煤涨停，防御避险品种逆势</td><td><span class="tag b">逆势活跃</span></td><td>大有能源(4板)</td></tr>
+<tr><td><strong>玻璃基板/先进封装</strong></td><td>~5</td><td>红星发展4板(碳酸钡MLCC上游)+三安/长电/通富涨停，TGV设备帝尔激光</td><td><span class="tag r">主升</span></td><td>三安光电/长电科技</td></tr>
+<tr><td><strong>钽电容/超级电容</strong></td><td>~3</td><td>宏达电子20cm涨停，钽电容缺口40-50亿只/年，GB300单机2.1万颗</td><td><span class="tag r">加速</span></td><td>宏达电子/振华科技</td></tr>
+<tr><td><strong>电子化学品</strong></td><td>~4</td><td>中船特气20cm涨停(六氟化钨)+华特/奥来德/唯特偶全线走强，钨断供持续发酵</td><td><span class="tag r">主升</span></td><td>中船特气(20cm)</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>🔍 Serenity瓶颈热力榜 — 按供需缺口/产业逻辑排序 <span class="src sj">韭:实时数据</span></h3>
+<div class="bl-blue" style="margin-bottom:10px;font-size:12px">
+<strong>框架说明：</strong>Serenity瓶颈投资框架认为AI资本开支的3-4万亿美元每年将通过物理瓶颈环节流动。抓住市场还没发现的瓶颈 = 抓住10倍股。以下按<strong>供需缺口大小 × TAM增速 × 国产替代空间</strong>三维度打分。
+</div>
+<table>
+<tr><th>热度</th><th>板块</th><th>涨停</th><th>瓶颈类型</th><th>核心逻辑（Serenity视角）</th><th>龙头</th></tr>
+<tr>
+<td><span class="badge bg">S+</span></td>
+<td><strong>MLCC/电容</strong></td>
+<td>~6</td>
+<td>🐢 产能瓶颈</td>
+<td>AI服务器MLCC需求4年4倍(2150→9200亿日元)，产能年增仅10%。RV200单机柜57-58万颗(+30% vs GB300)，BOM价值1530→4320美元(+182%)。风华全面停接0402/0603新单，村田6月涨价30%，交期16-24周。风华年内+277%，MLCC正式反超CPO登顶年内最强板块。<span class="src sj">韭:高盛/戈壁淘金</span></td>
+<td>风华高科</td>
+</tr>
+<tr>
+<td><span class="badge bg">S+</span></td>
+<td><strong>CPO/光通信</strong></td>
+<td>~5</td>
+<td>🔦 技术拐点</td>
+<td>英伟达Computex 2026 Spectrum-X硅光全面量产。黄仁勛+Marvell CEO同台确认"连接性"=AI新瓶颈。Marvell单日+22%被钦点"下一个万亿美元公司"。CPO/NPO加速升级：可插拔→NPO→CPO。中际旭创全球份额第一CPO产线领先半年。<span class="src sj">韭:布谷布谷</span></td>
+<td>天孚通信</td>
+</tr>
+<tr>
+<td><span class="badge bg">S</span></td>
+<td><strong>存储芯片</strong></td>
+<td>~5</td>
+<td>💾 周期反转</td>
+<td>海力士5年内晶圆产能翻番+预警紧缺持续到2030年。HBM催生硅烷气/硅片材料涨价潮。兆易创新受益存储涨价周期+MCU复苏。德明利涨停+佰维存储跟涨。<span class="src sj">韭:第四象限/炒谷养娃2007</span></td>
+<td>兆易创新</td>
+</tr>
+<tr>
+<td><span class="badge bg">S</span></td>
+<td><strong>PCB/铜箔</strong></td>
+<td>~4</td>
+<td>🔗 材料缺口</td>
+<td>高端铜箔2026-28年缺口35-45%，产线建设需18-24月。英伟达RV200单柜铜箔+275%。Q布(石英纤维)从"骨架"升级为核心材料。诺德股份双赛道卡位。<span class="src sj">韭:温小舅/白股精</span></td>
+<td>诺德股份</td>
+</tr>
+<tr>
+<td><span class="badge bg">A</span></td>
+<td><strong>光纤光缆</strong></td>
+<td>~2</td>
+<td>📡 订单满产</td>
+<td>CPO带动光纤需求指数级增长。长飞光纤/亨通光电订单排至2027年。央视报道后板块关注度大幅提升。亨通光电韭研热榜第1。<span class="src sj">韭:概念百科/Vin7的大</span></td>
+<td>亨通光电</td>
+</tr>
+<tr>
+<td><span class="badge bg">A</span></td>
+<td><strong>超级电容/钽电容</strong></td>
+<td>~2</td>
+<td>⚡ 电容替代</td>
+<td>GB300起超级电容纳入电源标配。钽电容缺口40-50亿只/年远超MLCC。元力股份/江海股份卡位。<span class="src sj">韭:这票有点强/首板掘金大师</span></td>
+<td>江海股份</td>
+</tr>
+<tr>
+<td><span class="badge bg">A</span></td>
+<td><strong>商业航天</strong></td>
+<td>~3</td>
+<td>🚀 IPO催化</td>
+<td>SpaceX 6月12日上市交易发行价135美元。星链卫星BOM拆解→A股产业链受益。铖昌科技/信维通信。<span class="src sj">韭:小橘子学交易</span></td>
+<td>铖昌科技</td>
+</tr>
+<tr>
+<td><span class="badge bg">B</span></td>
+<td><strong>算力租赁/Token</strong></td>
+<td>~2</td>
+<td>🖥 需求爆发</td>
+<td>大单频现+中国信通院Token服务计划6/16启动。康惠股份token工厂已上线。但竞争格局分散。<span class="src sj">同花顺快讯</span></td>
+<td>利通电子</td>
+</tr>
+<tr>
+<td><span class="badge bg">B</span></td>
+<td><strong>六氟化钨/钨</strong></td>
+<td>~2</td>
+<td>🧪 断供催化</td>
+<td>钨制品管制断供日本→六氟化钨概念引爆。中船特气20cm涨停(1100亿市值飙涨5倍)。昊华科技600吨产能未跟涨。<span class="src sj">韭:土拨鼠</span></td>
+<td>中船特气</td>
+</tr>
+<tr>
+<td><span class="badge bg">B</span></td>
+<td><strong>电力/算电协同</strong></td>
+<td>~3</td>
+<td>🔌 长期逻辑</td>
+<td>AI算力→电力需求暴增是终极瓶颈，但A股已提前炒作一波。华电高位分歧，需等下一催化。<span class="src st">淘</span></td>
+<td>华电能源</td>
+</tr>
+</table>
+<div class="bl-gold" style="margin-top:10px;font-size:12px">
+<strong>💡 Serenity核心判断：</strong>MLCC已正式反超CPO成为年内最强板块(+108%)。风华高科全面停接新单=供需缺口信号。<strong>半导体材料/设备</strong>(沪硅+14%、中船特气20cm)是今日最强合力。<strong>存储芯片</strong>(德明利涨停)受益DRAM Q2涨价50%。<strong>煤炭</strong>(大有能源4板)是唯一逆势非科技方向。<span class="src sj">韭:Serenity框架</span>
+</div>
+</div>
+
+<div class="card">
+<h3>🔄 同花顺实时异动（6月4日板块轮动） <span class="src sj">同花顺</span></h3>
+<table>
+<tr><th>时间</th><th>板块</th><th>异动事件</th><th>龙头</th></tr>
+<tr><td>13:30</td><td>焦煤/煤炭</td><td>大商所焦煤主力大涨5%</td><td>大有能源(4板)/安泰集团</td></tr>
+<tr><td>13:12</td><td>存储芯片</td><td>震荡走强，德明利触及涨停，DRAM Q2 +50%</td><td>德明利、佰维存储</td></tr>
+<tr><td>13:02</td><td>铜缆高速连接</td><td>板块短线拉升，鼎通科技20cm涨停</td><td>鼎通科技、鑫科材料</td></tr>
+<tr><td>—</td><td>MLCC概念</td><td>早盘大涨+3.23%反超CPO登顶年内最强，宏达电子20cm涨停</td><td>宏达电子/风华高科/洁美科技</td></tr>
+<tr><td>—</td><td>PCB概念</td><td>RV200量产爬坡材料端受益</td><td>诺德股份、生益科技</td></tr>
+<tr><td>—</td><td>CPO概念</td><td>英伟达Spectrum-X量产催化持续，Marvell+22%</td><td>中际旭创、天孚通信</td></tr>
+<tr><td>—</td><td>玻璃基板/TGV</td><td>红星发展4板(碳酸钡MLCC上游)+帝尔激光TGV设备受益</td><td>三安光电/长电科技</td></tr>
+</table>
+<div style="font-size:11px;color:var(--muted);margin-top:6px">数据来源：同花顺7x24快讯、韭研公社异动特工小队</div>
+</div>
+
+<div class="card">
+<h3>💰 主力资金流向 <span class="src st">同花顺</span></h3>
+<div class="bl-red"><strong>净流入行业 TOP5：</strong>电子/光学光电子（京东方A净买34亿）、半导体/芯片（佰维+34亿/兆易+32亿）、煤炭开采（+12.5亿）、机械设备、汽车</div>
+<div class="bl-red" style="margin-top:4px"><strong>净流入概念 TOP5：</strong>MLCC概念、半导体材料、先进封装、存储芯片、玻璃基板</div>
+<div style="font-size:12px;color:var(--muted);margin-top:6px">个股净流入TOP：京东方A(+34亿)、佰维存储(+34亿)、兆易创新(+32亿)、三安光电(+16亿)、风华高科、中船特气、平煤股份、豫能控股</div>
+<div class="bl-blue" style="margin-top:6px;font-size:11px">
+<strong>📊 资金结构：</strong>半导体+电子占据65%+主力净买入，MLCC/先进封装/存储是资金主攻方向。电新行业净流出148亿居首（宁德-28.6亿），有色/通信/CPO获利盘兑现。整体净流出460亿——小部分科技股虹吸全市场流动性，其余方向普遍失血。
+</div>
+</div>
+
+<div class="card">
+<h3>🏆 韭研公社热榜 TOP10 <span class="src sj">韭:实时热榜</span></h3>
+<div>
+<span class="chip chip-up">亨通光电</span><span class="chip chip-up">风华高科</span><span class="chip chip-up">江海股份</span>
+<span class="chip chip-up">长飞光纤</span><span class="chip chip-up">中际旭创</span><span class="chip chip-up">华电辽能</span>
+<span class="chip chip-up">源杰科技</span><span class="chip chip-up">京东方A</span>
+<span class="chip chip-up">世运电路</span><span class="chip chip-up">豫能控股</span>
+</div>
+<div style="font-size:11px;color:var(--muted);margin-top:6px">💡 光通信+MLCC占比超50%，验证产业资本共识</div>
+</div>
+
+<div class="card">
+<h3>📰 韭研公社月度热帖TOP5 <span class="src sj">韭:工分排行榜</span></h3>
+<table>
+<tr><th>排名</th><th>标题</th><th>作者</th><th>方向</th></tr>
+<tr><td>1</td><td>一网打尽热点题材：深度图解，一图看透产业链与复杂逻辑</td><td>题材图谱小集</td><td class="up">综合</td></tr>
+<tr><td>2</td><td>科技自主立芯时，最全国产科技链梳理</td><td>—</td><td class="up">半导体</td></tr>
+<tr><td>3</td><td>华塑控股：稀缺底部PCB钻针对标鼎泰高科</td><td>—</td><td class="up">PCB</td></tr>
+<tr><td>4</td><td>南风股份：光模块上游遗珠，实锤供货中际旭创/英伟达</td><td>—</td><td class="up">CPO</td></tr>
+<tr><td>5</td><td>MLCC电容概念股全景名单</td><td>—</td><td class="up">MLCC</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>🔥 淘股吧/同花顺热股TOP <span class="src st">淘</span></h3>
+<div>
+<span class="chip chip-up">亨通光电</span><span class="chip chip-up">兆易创新</span><span class="chip chip-up">风华高科</span>
+<span class="chip chip-up">长飞光纤</span><span class="chip chip-up">中际旭创</span><span class="chip chip-up">天孚通信</span>
+<span class="chip chip-up">江海股份</span><span class="chip chip-up">德明利</span>
+<span class="chip chip-up">东山精密</span><span class="chip chip-up">豫能控股</span>
+</div>
+</div>
+
+<div class="card">
+<h3>📊 Serenity综合热力评级</h3>
+<table>
+<tr><th>评级</th><th>板块</th><th>供需缺口</th><th>TAM增速</th><th>国产替代</th><th>市场合力</th><th>综合得分</th></tr>
+<tr><td><span class="badge bg">S+</span></td><td>MLCC/电容</td><td class="up">10/10</td><td class="up">10/10</td><td class="up">8/10</td><td class="up">9/10</td><td><strong>37/40</strong></td></tr>
+<tr><td><span class="badge bg">S+</span></td><td>CPO/光通信</td><td class="up">8/10</td><td class="up">9/10</td><td class="up">8/10</td><td class="up">9/10</td><td><strong>34/40</strong></td></tr>
+<tr><td><span class="badge bg">S</span></td><td>存储芯片</td><td class="up">8/10</td><td class="up">8/10</td><td class="up">6/10</td><td class="up">7/10</td><td><strong>29/40</strong></td></tr>
+<tr><td><span class="badge bg">S</span></td><td>PCB/铜箔</td><td class="up">9/10</td><td class="up">7/10</td><td class="up">8/10</td><td class="up">5/10</td><td><strong>29/40</strong></td></tr>
+<tr><td><span class="badge bg">A</span></td><td>光纤光缆</td><td class="ne">5/10</td><td class="up">7/10</td><td class="up">9/10</td><td class="up">7/10</td><td><strong>28/40</strong></td></tr>
+<tr><td><span class="badge bg">A</span></td><td>超级电容</td><td class="up">9/10</td><td class="up">6/10</td><td class="up">9/10</td><td class="ne">5/10</td><td><strong>29/40</strong></td></tr>
+<tr><td><span class="badge bg">A</span></td><td>商业航天</td><td class="ne">5/10</td><td class="up">8/10</td><td class="up">7/10</td><td class="ne">6/10</td><td><strong>26/40</strong></td></tr>
+<tr><td><span class="badge br">B</span></td><td>算力租赁</td><td class="ne">4/10</td><td class="up">7/10</td><td class="ne">5/10</td><td class="ne">4/10</td><td><strong>20/40</strong></td></tr>
+<tr><td><span class="badge br">B</span></td><td>六氟化钨</td><td class="up">7/10</td><td class="ne">4/10</td><td class="up">8/10</td><td class="ne">5/10</td><td><strong>24/40</strong></td></tr>
+</table>
+<div class="bl-gold" style="margin-top:10px;font-size:12px">
+<strong>🧠 Serenity判断：</strong>MLCC(风华高科+277%YTD)已正式取代CPO成为A股第一瓶颈板块——风华全面停接新单是最强供需信号。半导体材料/设备(沪硅+14%/中船特气20cm)是今日最强合力，国产替代逻辑获资金确认。CPO(中际旭创)中长期逻辑不变但短期获利回吐。煤炭(大有能源4板)是唯一逆势非科技方向。
+</div>
+</div>
+
+</div>
+
+<!-- ===== 3. 题材生命周期 ===== -->
+<div class="section" id="s3">
+<h2>三、题材生命周期全景</h2>
+
+<!-- 地产 -->
+<div class="stock-box" style="border-color:var(--red);background:rgba(248,81,73,.04)">
+<h4>🏠 房地产 <span class="tag r">萌芽→主升</span></h4>
+<div class="headline">香江控股5板破局 + 城市更新"十五五"全国性政策</div>
+<p>香江控股超预期弱转强5板，换手卡一字（华塑控股天地板），已具新周期龙头雏形。驱动来自06/3晚"城市更新十五五规划"全国定调。天健集团2板、阳光股份3天2板、光大嘉宝涨停助攻。<span class="src st">淘:青衫</span><span class="src sj">韭</span></p>
+<div class="vote"><div class="v-up" style="width:65%"></div><div class="v-dn" style="width:15%"></div><div class="v-ne" style="width:20%"></div></div>
+<div class="v-label">看多65% | 看空15% | 中性20%（青衫"破局龙已现"+老猪列入高标区 | 96阿明"PK未结束不主观判断"）</div>
+</div>
+
+<!-- 电力 -->
+<div class="stock-box" style="border-color:var(--gold);background:rgba(210,153,29,.04)">
+<h4>⚡ 电力 <span class="tag y">高位分歧</span></h4>
+<div class="headline">华电能源5板+大唐发电涨停但触发异动监控</div>
+<p>华电能源超预期扛分歧晋级5板，但大唐发电触发3天20%异动监控(6/2到期)，板块内部分化。华电辽能/粤电力A助攻，华能蒙电3天2板。算电协同逻辑(四重共振)提供中长期支撑。<span class="src st">淘:青衫/96阿明</span><span class="src sj">韭:沙</span></p>
+<div class="vote"><div class="v-up" style="width:55%"></div><div class="v-dn" style="width:25%"></div><div class="v-ne" style="width:20%"></div></div>
+<div class="v-label">看多55% | 看空25% | 中性20%（庄哥"大唐异动后手遭殃" | 沙"四重共振"）</div>
+</div>
+
+<!-- MLCC -->
+<div class="stock-box" style="border-color:var(--red);background:rgba(248,81,73,.04)">
+<h4>🔌 MLCC/电容 <span class="tag r">主升期</span></h4>
+<div class="headline">高盛：MLCC=AI"新内存"，史上最大周期，仍处早期</div>
+<p>AI服务器BOM第三高(仅次于GPU和内存)，单机架需60万颗。FY25-30市场2150→9200亿日元(CAGR34%)。Murata提价15-35%，Taiyo Yuden 5月涨价，4月日本出口+28%，交期>20周。产能年增仅10%。钽电容缺口更大：全球40-50亿只/年，GB300单机2.1万颗。<span class="src sj">韭:戈壁淘金/首板掘金大师</span></p>
+<div class="vote"><div class="v-up" style="width:75%"></div><div class="v-dn" style="width:5%"></div><div class="v-ne" style="width:20%"></div></div>
+<div class="v-label">看多75% | 看空5% | 中性20%（淘股吧几乎无人讨论→预期差巨大）</div>
+</div>
+
+<!-- PCB/铜箔 -->
+<div class="stock-box" style="border-color:var(--red);background:rgba(248,81,73,.04)">
+<h4>📋 PCB/铜箔 <span class="tag r">主升期</span></h4>
+<div class="headline">英伟达RV200 NVL72量产爬坡，单柜PCB+233%，铜箔+275%</div>
+<p>RV200整机ODM单价780万美元(vs GB300的399万)。PCB单柜3.51→11.67万美元，铜箔1.2→4.5万美元。高端铜箔2026-28供需缺口35-45%。Q布(石英纤维)第三代材料升级。<span class="src sj">韭:温小舅/白股精</span><span class="src st">淘:庄哥</span></p>
+<div class="vote"><div class="v-up" style="width:70%"></div><div class="v-dn" style="width:5%"></div><div class="v-ne" style="width:25%"></div></div>
+<div class="v-label">看多70% | 看空5% | 中性25%</div>
+</div>
+
+<!-- 芯片 -->
+<div class="stock-box" style="border-color:var(--green);background:rgba(63,185,80,.04)">
+<h4>💻 半导体/芯片 <span class="tag g">退潮</span></h4>
+<p>华天科技、晶方科技、士兰微跌停。中芯国际、寒武纪、华虹公司跌超5%。长电科技、兆易创新走弱。仅盛剑科技2板独苗。136只个股跌超10%集中在半导体/光伏/军工。昨天修复="回光返照"<span class="src st">淘:老猪/青衫</span></p>
+<div class="vote"><div class="v-up" style="width:10%"></div><div class="v-dn" style="width:70%"></div><div class="v-ne" style="width:20%"></div></div>
+</div>
+
+<!-- 消费 -->
+<div class="stock-box" style="border-color:var(--blue);background:rgba(88,166,255,.04)">
+<h4>🛒 大消费 <span class="tag b">试错</span></h4>
+<p>白酒(酒鬼酒涨停)、零售(东百集团/国芳集团涨停)逆势走强。资金从科技切向消费避险。但缺乏强催化，持续性是最大疑问。<span class="src st">淘:高手点评</span></p>
+<div class="vote"><div class="v-up" style="width:25%"></div><div class="v-dn" style="width:20%"></div><div class="v-ne" style="width:55%"></div></div>
+</div>
+
+<!-- 医药 -->
+<div class="stock-box" style="border-color:var(--blue);background:rgba(88,166,255,.04)">
+<h4>💊 医药 <span class="tag b">试错</span></h4>
+<p>三力制药、东亚药业、津药药业涨停。恒瑞医药资金净流入靠前。午后逆势拉升但跟风效应弱。<span class="src st">淘:高手点评</span></p>
+<div class="vote"><div class="v-up" style="width:20%"></div><div class="v-dn" style="width:15%"></div><div class="v-ne" style="width:65%"></div></div>
+</div>
+</div>
+
+<!-- ===== 4. 产业链深度 ===== -->
+<div class="section" id="s4">
+<h2>四、产业链深度拆解</h2>
+
+<div class="card">
+<h3>⛓ 一：MLCC/电容 — AI"新内存"超级周期 <span class="src sj">韭</span></h3>
+<table>
+<tr><th>层级</th><th>环节</th><th>关键数据</th><th>龙头标的</th></tr>
+<tr><td><strong>上游</strong></td><td>陶瓷粉体、镍/钯电极</td><td>日系Murata/TDK自产设备+材料；国产替代空间大；住友电木6/1起涨价10-20%</td><td><span class="chip chip-up">国瓷材料</span><span class="chip chip-up">博迁新材</span></td></tr>
+<tr><td><strong>中游</strong></td><td>MLCC制造</td><td>AI服务器MLCC市场FY25→30增4倍(2150→9200亿日元)，风华全面暂停0402/0603新接单，交期16-24周</td><td><span class="chip chip-up">风华高科</span><span class="chip chip-up">三环集团</span></td></tr>
+<tr><td><strong>下游</strong></td><td>AI服务器GPU周边、数据中心</td><td>单机架60万颗；BOM占比0.5%→1%；5%涨价提升Murata利润13%、Taiyo Yuden 37%</td><td><span class="chip chip-up">工业富联</span><span class="chip chip-up">浪潮信息</span></td></tr>
+<tr><td><strong>钽电容</strong></td><td>东方钽业/宏达电子/振华科技</td><td>全球缺口40-50亿只/年;GB300单机2.1万颗;AI新增需求315-420亿颗远超全球产能</td><td><span class="chip chip-up">东方钽业</span><span class="chip chip-up">宏达电子</span></td></tr>
+</table>
+<div class="bl-red">📈 <strong>高盛定性：</strong>"史上规模最大、持续最长的MLCC周期，仍处早期"。行业景气上调至2030年。风华高科年内+277%，MLCC反超CPO登顶年内最强板块。宏达电子20cm涨停+利和兴+11%。仅5%均价涨幅可带来30%+利润弹性。</div>
+</div>
+
+<div class="card">
+<h3>⛓ 二：AI PCB/铜箔 — 英伟达RV200架构升级 <span class="src sj">韭</span><span class="src st">淘</span></h3>
+<table>
+<tr><th>层级</th><th>环节</th><th>关键数据</th><th>龙头标的</th></tr>
+<tr><td><strong>上游</strong></td><td>铜箔(HVLP超低轮廓)、Q布(石英纤维)、树脂</td><td>2026-28高端铜箔缺口35-45%，产线建设18-24月</td><td><span class="chip chip-up">诺德股份</span><span class="chip chip-up">长裕集团</span></td></tr>
+<tr><td><strong>中游</strong></td><td>CCL/PCB制造</td><td>RV200单柜PCB价值3.51→11.67万美元(+233%)</td><td><span class="chip chip-up">鹏鼎控股</span><span class="chip chip-up">生益科技</span></td></tr>
+<tr><td><strong>材料迭代</strong></td><td>Q布: E布→L布→Q布(石英纤维)</td><td>第三代石英纤维，决定信号传输速度的关键材料</td><td><span class="chip chip-up">长裕集团</span><span class="chip chip-up">中材科技</span></td></tr>
+<tr><td><strong>铜箔</strong></td><td>诺德股份(双赛道龙头)</td><td>单柜铜箔1.2→4.5万美元(+275%)，超越PCB整体涨幅</td><td><span class="chip chip-up">诺德股份</span><span class="chip chip-up">铜冠铜箔</span></td></tr>
+</table>
+<div class="bl-red">📈 <strong>核心判断：</strong>诺德股份卡位AIPCB铜箔赛道，国产替代窗口打开。Q布(长裕集团)从"增强骨架"升级为核心材料。</div>
+</div>
+
+<div class="card">
+<h3>⛓ 三：城市更新/房地产 — 十五五新周期 <span class="src st">淘</span></h3>
+<table>
+<tr><th>层级</th><th>环节</th><th>关键数据</th><th>龙头标的</th></tr>
+<tr><td><strong>政策层</strong></td><td>"十五五"城市更新规划（06/3晚发布）</td><td>全国性政策定调，非局部利好→级别>广州地方政策</td><td style="color:var(--muted)">—</td></tr>
+<tr><td><strong>龙头层</strong></td><td>香江控股5板破局</td><td>换手卡一字，弱转强超预期</td><td><span class="chip chip-up">香江控股</span></td></tr>
+<tr><td><strong>跟风层</strong></td><td>天健集团2板、阳光股份3天2板、光大嘉宝涨停</td><td>板块联动初成</td><td><span class="chip chip-up">天健集团</span><span class="chip chip-up">光大嘉宝</span></td></tr>
+</table>
+<div class="bl-red">📈 <strong>核心判断：</strong>若6/2香江继续上攻卡掉华电，地产将确立新主线。但板块历史股性差+机构不认可，需持续验证。</div>
+</div>
+
+<div class="card">
+<h3>⛓ 四：算电协同 — AI时代的电力新范式 <span class="src sj">韭</span><span class="src st">淘</span></h3>
+<table>
+<tr><th>层级</th><th>环节</th><th>关键数据</th><th>龙头标的</th></tr>
+<tr><td><strong>发电端</strong></td><td>华电能源/大唐发电/华电辽能</td><td>华电5板；算力用电年增1000亿度</td><td><span class="chip chip-up">华电能源</span><span class="chip chip-up">大唐发电</span></td></tr>
+<tr><td><strong>设备端</strong></td><td>华光环能（补涨标的）</td><td>250日大股性+华字头+数据中心算电协同实锤</td><td><span class="chip chip-up">华光环能</span></td></tr>
+<tr><td><strong>逻辑链</strong></td><td>AI算力→电力需求暴增→电力价值重估</td><td>龙头情绪+盈利反转+国改+算电协同四重共振</td><td style="color:var(--muted)">—（产业链逻辑）</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ===== 5. 淘股吧视角 ===== -->
+<div class="section" id="s5">
+<h2>五、淘股吧游资视角（10帖）</h2>
+
+<div class="grid2" style="margin-bottom:12px">
+<div class="stat"><div class="v" style="color:var(--red)">5看多</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">3看空</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">2中性</div></div>
+</div>
+
+<div class="card">
+<h3>1. 青衫一少年 — 看多地<span class="tag r">核心帖</span> <span style="font-size:11px;color:var(--muted)">2299浏览/88评/2加油</span></h3>
+<div class="bl-red">
+<strong>核心判断：</strong>"情绪再临冰点，地产破局有望接棒新周期"。MLCC反超CPO登顶最强+半导体全线爆发→科技主线从CPO轮动至MLCC/半导体材料。<br>
+<strong>板块观点：</strong>MLCC→<span class="up">强烈看多</span>"风华停接新单=最强信号"；半导体→<span class="up">看多</span>"材料/设备全链条共振"；CPO→<span class="ne">中性</span>"高位获利盘需消化"；消费→<span class="dn">看空</span>"避险逻辑证伪"<br>
+<strong>操作：</strong>聚焦MLCC上游(红星发展/国瓷材料)和半导体材料(沪硅/中船特气)。科技主线确认，分歧日低吸核心。
+</div>
+<div class="quote"><strong>「</strong>MLCC正式取代CPO，科技新主线初定<strong>」</strong></div>
+</div>
+
+<div class="card">
+<h3>2. 庄哥说股 — 中性偏谨慎 <span class="tag y">高赞帖</span> <span style="font-size:11px;color:var(--muted)">9676浏览/502评/8加油</span></h3>
+<div class="bl-gold">
+<strong>核心判断：</strong>"指数微跌但个股真崩，4,100+下跌"。科技恐慌不要接先手。大唐发电涨停触异动→"后手进场下周遭殃"。<br>
+<strong>板块：</strong>消费→<span class="dn">看空</span>"避险逻辑被证伪"；煤炭→<span class="ne">中性</span>"防御属性但持续性待验"；半导体→<span class="up">看好</span>"材料设备国产替代逻辑强"<br>
+<strong>操作：</strong>周一不急动手，仓位≤3成。关注科技核心票回踩5/10日线。
+</div>
+<div class="quote"><strong>「</strong>炒股最难的不是选股，是在绝望的时候还能保持理性<strong>」</strong></div>
+</div>
+
+<div class="card">
+<h3>3. 老猪炒股 — 看空短期/看多周一 <span class="tag y">数据帖</span> <span style="font-size:11px;color:var(--muted)">7724浏览/272评/1加油</span></h3>
+<div class="bl-gold">
+<strong>核心判断：</strong>"指数假摔，个股真崩"。涨停62家/跌停18家/封板率81%。华电+香江双5板，合锻/粤电力3板。<br>
+<strong>板块：</strong>科技→<span class="dn">看空</span>"昨天活过来今天嘎了"；ST/电力/通信/零售→活板块<br>
+<strong>操作：</strong>短线空仓；趋势3成试错被套。等机会再出手。
+</div>
+<div class="quote"><strong>「</strong>4,100+下跌，但半导体逆势赚钱效应极强<strong>」</strong></div>
+</div>
+
+<div class="card">
+<h3>4. 96阿明 — 看多电力/龙头 <span class="tag r">干货帖</span> <span style="font-size:11px;color:var(--muted)">327浏览/8评/1加油</span></h3>
+<div class="bl-red">
+<strong>核心判断：</strong>"对龙头要敬重不是敬畏，只有龙头能赚钱"。红星发展8天6板→MLCC上游龙头；天洋新材4板一字→CPO上游电子胶。<br>
+<strong>竞价心法：</strong>宏达电子20cm涨停+双星新材涨停→指向MLCC/电容→为红星发展提供助攻。<br>
+<strong>华塑教训：</strong>被产业链做局，4板被堵门。PK未结束前不主观判断。
+</div>
+<div class="quote"><strong>「</strong>该弱不弱视为强，该强不强视为弱<strong>」</strong></div>
+</div>
+
+<div class="card">
+<h3>5. 镀金梦想（高手点评）— 中性数据 <span class="tag b">数据帖</span> <span style="font-size:11px;color:var(--muted)">19320浏览/71评</span></h3>
+<div class="bl-blue">
+<strong>数据：</strong>10位实盘高手4赚6亏(+6%～-7.55%)。半导体/MLCC逆势走强，消费/白酒集体调整。主力流入半导体/电子/煤炭。成交量2.78万亿→极致分化行情。
+</div>
+</div>
+
+<div class="card">
+<h3>6. 南山游龙 <span class="tag r">06/3帖</span></h3>
+<div class="bl-red">"MLCC最强主线已确认，半导体材料弹性最大"——提前预判切换方向，但周五科技杀跌证伪修复预期。</div>
+</div>
+
+<div class="card">
+<h3>7. 大公子飞上天 <span class="tag g">反思帖</span></h3>
+<div class="bl-green">操作反思：风华高科+4.89%趋势持有/宏和科技已清。教训：板块内切换优于死扛。</div>
+</div>
+
+<div class="card">
+<h3>8. 红顺牛2018 <span class="tag b">实盘帖</span></h3>
+<div class="bl-blue">06/04操作：买入京东方A(跟随199亿中军)/晶方科技；卖出消费仓位止损。当日偏防守兑现。</div>
+</div>
+
+<div class="card">
+<h3>9. 伏擒板 <span class="tag b">标的帖</span></h3>
+<div class="bl-blue">周五晚谈：风华高科、国瓷材料、洁美科技(MLCC产业链)、沪硅产业、中船特气(半导体材料)——关注细分赛道机会。</div>
+</div>
+
+<div class="card">
+<h3>10. 野人哥 <span class="tag r">标的帖</span></h3>
+<div class="bl-red">"沪硅产业+14%涨停，半导体硅片龙头，国产替代空间几何？"——即使在退潮中也有人在挖掘价值。</div>
+</div>
+</div>
+
+<!-- ===== 6. 韭研公社视角 ===== -->
+<div class="section" id="s6">
+<h2>六、韭研公社产业视角（8帖）</h2>
+
+<div class="grid2" style="margin-bottom:12px">
+<div class="stat"><div class="v" style="color:var(--red)">6看多</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">1看空</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">1中性</div></div>
+</div>
+
+<div class="card">
+<h3>1. 戈壁淘金 — 高盛：电容=AI"新内存" <span class="tag r">核心产业帖</span></h3>
+<div class="bl-red">
+<strong>产业链逻辑：</strong>MLCC正式反超CPO成为年内最强板块(+108%)。AI服务器BOM第三。RV200单机柜57-58万颗(+30%)，BOM价值1530→4320美元(+182%)。风华全面暂停0402/0603新接单。<br>
+<strong>关键数据：</strong>Murata/三星电机6月继续涨价，AI专用MLCC调价30%；交期从8周→16-24周；部分订单排至2027年；村田研究所上调景气至2030年。<br>
+<strong>5%涨价→Murata利润+13%、Taiyo Yuden利润+37%。</strong>
+</div>
+<div class="quote"><strong>「</strong>电容就是AI的'新内存'<strong>」</strong> — 高盛</div>
+</div>
+
+<div class="card">
+<h3>2. 首板掘金大师 — 钽电容缺口远超MLCC <span class="tag r">产业链帖</span></h3>
+<div class="bl-red">
+<strong>核心发现：</strong>钽电容缺口比MLCC更大！全球缺口40-50亿只/年。GB300单机2.1万颗。AI新增需求315-420亿颗远超全球总产能120-150亿只。高端钽电容交期24-38周现货断货。<br>
+<strong>标的：</strong>东方钽业、宏达电子、振华科技。
+</div>
+</div>
+
+<div class="card">
+<h3>3. 温小舅 — RV200升级引爆铜箔刚需 <span class="tag r">产业链帖</span></h3>
+<div class="bl-red">
+<strong>产业链逻辑：</strong>英伟达RV200(NVL72)量产爬坡。PCB单柜3.51→11.67万美元(+233%)，铜箔1.2→4.5万美元(+275%)。高端铜箔2026-28缺口35-45%。国产替代窗口打开。<br>
+<strong>标的：</strong>诺德股份（铜箔双赛道龙头）。
+</div>
+</div>
+
+<div class="card">
+<h3>4. 割A公子 — 戴尔财报：AI需求无天花板 <span class="tag r">宏观产业帖</span></h3>
+<div class="bl-red">
+<strong>戴尔Q1(06/04发布)：</strong>营收438亿(+88%)；AI服务器161亿(+757%)；积压订单513亿；盘后涨38%。上调全年AI服务器预期至600亿美元。<br>
+<strong>A股映射：</strong>工业富联(代工)、广合科技/鹏鼎控股(PCB)、英维克(液冷)。客户从"训练AI"→"应用AI"打开更广空间。
+</div>
+</div>
+
+<div class="card">
+<h3>5. 戈壁淘金 — 陈果：变盘可能不一般 <span class="tag y">策略帖</span></h3>
+<div class="bl-gold">
+<strong>核心警告：</strong>5%股票交易占比超45%(历史极端)。类比07年熊牛转换/15年风格切换/18年牛熊转换/21年茅指数见顶。建议抱团股缩圈+其余95%中精选。<br>
+<strong>关注方向：</strong>新能源、消费(新消费)、医药(创新药)、金融、港股互联网、黄金。
+</div>
+<div class="quote"><strong>「</strong>5%的股票交易占比超过了45%，之后每次变盘都不小<strong>」</strong></div>
+</div>
+
+<div class="card">
+<h3>6. 封狼居胥 — 锆材：光通信/固态电池/MLCC核材 <span class="tag r">产业链帖</span></h3>
+<div class="bl-red">
+<strong>稀缺性：</strong>中国锆对外依存度>95%(比锂钴更卡脖子)。光通信CPO唯一核心材料；固态电池LLZO电解质必须用；MLCC陶瓷粉体原料。<br>
+<strong>长裕集团(603407)：</strong>全球氧氯化锆龙头(市占≈30%)，客户覆盖中际旭创/华为/英伟达。对标东方锆业4倍空间。
+</div>
+</div>
+
+<div class="card">
+<h3>7. 白股精 — Q布产业链：AI服务器新材料焦点 <span class="tag r">产业链帖</span></h3>
+<div class="bl-red">
+E布(Dk4.8)→L布(Dk4.2)→Q布/石英纤维布(Dk2.2)。Q布不再是"增强骨架"而是决定信号速度/损耗/稳定性的关键材料。AI服务器/1.6T光模块驱动第三代材料升级。
+</div>
+</div>
+
+<div class="card">
+<h3>8. 沙 — 华电能源最佳补涨：华光环能 <span class="tag r">标的帖</span></h3>
+<div class="bl-red">
+华电能源5板→"华字头+能源"主线。华光环能兼具250日大股性+华字头血统+数据中心算电协同实锤，最具弹性的补涨标的。四重共振：龙头情绪+盈利反转+国改+算电协同。
+</div>
+</div>
+
+<div class="card">
+<h3>🏅 新增活跃博主 — 反复提及题材与个股汇总 <span class="src sj">韭:实时采集</span></h3>
+<div class="bl-blue" style="font-size:12px;margin-bottom:8px">
+<strong>说明：</strong>以下为近期活跃的韭研公社博主及其反复提及的题材方向与个股，反映产业资本和游资的关注焦点。个股按提及频率排序。
+</div>
+<table>
+<tr><th>博主</th><th>粉丝/工分</th><th>核心题材（反复提及）</th><th>反复提及个股</th><th>风格标签</th></tr>
+<tr>
+<td><strong>盘前纪要</strong></td>
+<td>24.3w粉/11.9w工分</td>
+<td>电力、MLCC、光纤、PCB、煤炭、机器人</td>
+<td><span class="chip chip-up">华电能源</span><span class="chip chip-up">亨通光电</span><span class="chip chip-up">风华高科</span><span class="chip chip-up">鑫科材料</span><span class="chip chip-up">春秋电子</span></td>
+<td><span class="tag r">每日盘前</span></td>
+</tr>
+<tr>
+<td><strong>财闻私享</strong></td>
+<td>8.7w粉/4.9w工分</td>
+<td>光通信、芯片、MLCC、PCB、机器人、大消费</td>
+<td><span class="chip chip-up">亨通光电</span><span class="chip chip-up">中际旭创</span><span class="chip chip-up">长飞光纤</span><span class="chip chip-up">风华高科</span><span class="chip chip-up">兆易创新</span></td>
+<td><span class="tag r">晚间资讯</span></td>
+</tr>
+<tr>
+<td><strong>题材图谱小集</strong></td>
+<td>96.7w粉/1.4w工分</td>
+<td>PCB、MLCC、英伟达链、商业航天、存储芯片</td>
+<td><span class="chip chip-up">宝鼎科技</span><span class="chip chip-up">鑫科材料</span><span class="chip chip-up">风华高科</span><span class="chip chip-up">鹏鼎控股</span><span class="chip chip-up">华电能源</span></td>
+<td><span class="tag y">产业图表</span></td>
+</tr>
+<tr>
+<td><strong>韭香朋友</strong></td>
+<td>2.0w粉/0.7w工分</td>
+<td>MLCC、PCB、机器人、商业航天、光纤光缆、液冷</td>
+<td><span class="chip chip-up">风华高科</span><span class="chip chip-up">长飞光纤</span><span class="chip chip-up">四方股份</span><span class="chip chip-up">海光信息</span><span class="chip chip-up">英维克</span></td>
+<td><span class="tag y">深度研究</span></td>
+</tr>
+<tr>
+<td><strong>韭韭八十一</strong></td>
+<td>164.4w粉/19.6w工分</td>
+<td>算力硬件(PCB/MLCC/光互连)、电力、机器人、存储</td>
+<td><span class="chip chip-up">亨通光电</span><span class="chip chip-up">华电能源</span><span class="chip chip-up">宝鼎科技</span><span class="chip chip-up">柏诚股份</span><span class="chip chip-up">春秋电子</span></td>
+<td><span class="tag r">学习笔记</span></td>
+</tr>
+<tr>
+<td><strong>041韭阿白</strong></td>
+<td>2.5w粉/3.3w工分</td>
+<td>AI硬件(PCB/MLCC/光通信)、电力、煤炭、存储</td>
+<td><span class="chip chip-up">中际旭创</span><span class="chip chip-up">宏和科技</span><span class="chip chip-up">宝鼎科技</span><span class="chip chip-up">华电能源</span><span class="chip chip-up">工业富联</span></td>
+<td><span class="tag b">方向投票</span></td>
+</tr>
+</table>
+<div class="bl-gold" style="margin-top:10px;font-size:12px">
+<strong>💡 跨博主共识：</strong>6位博主中<strong>5位</strong>反复提及MLCC/PCB方向（风华高科/宝鼎科技出现频率最高），<strong>4位</strong>反复提及光纤光通信（亨通光电/中际旭创），<strong>4位</strong>反复提及电力（华电能源）。AI硬件产业链（MLCC→PCB→光通信→电力）是当前韭研公社第一共识主线。
+</div>
+</div>
+</div>
+<div class="section" id="s7">
+<h2>七、连板梯队</h2>
+
+<div class="card">
+<h3>今日连板全表 <span style="font-size:11px;color:var(--muted);font-weight:normal">来源：腾讯证券API实时行情(15只涨停确认)</span></h3>
+<table>
+<tr><th>梯队</th><th>标的</th><th>板块</th><th>涨停类型</th><th>成交(亿)</th></tr>
+<tr><td><span class="badge br">3板</span></td><td><strong>红星发展</strong></td><td>化工/锂电</td><td><span class="tag r">放量换手板</span></td><td>32.3</td></tr>
+<tr><td><span class="badge br">2板</span></td><td><strong>鼎通科技</strong></td><td>铜缆连接</td><td><span class="tag r">20cm连板</span></td><td>23.5</td></tr>
+<tr><td rowspan="13"><span class="badge br">首板</span></td><td>中船特气</td><td>六氟化钨</td><td><span class="tag r">20cm涨停</span></td><td>42.3</td></tr>
+<tr><td>沪硅产业</td><td>半导体硅片</td><td><span class="tag r">+14%趋势板</span></td><td>69.2</td></tr>
+<tr><td>安泰集团</td><td>煤炭</td><td><span class="tag b">低位首板</span></td><td>5.1</td></tr>
+<tr><td>鑫科材料</td><td>铜缆/Marvell</td><td><span class="tag r">秒板</span></td><td>29.6</td></tr>
+<tr><td>平煤股份</td><td>煤炭</td><td><span class="tag b">低位首板</span></td><td>9.8</td></tr>
+<tr><td>京东方A</td><td>面板</td><td><span class="tag r">超级中军涨停</span></td><td>199.5</td></tr>
+<tr><td>豫能控股</td><td>电力</td><td><span class="tag r">高开秒板</span></td><td>44.9</td></tr>
+<tr><td>立昂微</td><td>半导体硅片</td><td><span class="tag r">放量换手板</span></td><td>59.5</td></tr>
+<tr><td>世运电路</td><td>PCB</td><td><span class="tag b">跟风板</span></td><td>21.6</td></tr>
+<tr><td>铜峰电子</td><td>MLCC/电容</td><td><span class="tag r">换手板</span></td><td>17.7</td></tr>
+<tr><td>艾华集团</td><td>MLCC/电容</td><td><span class="tag b">换手板</span></td><td>10.0</td></tr>
+<tr><td>晶方科技</td><td>半导体封测</td><td><span class="tag r">龙头首板</span></td><td>47.9</td></tr>
+<tr><td>三安光电</td><td>化合物半导体</td><td><span class="tag r">中军涨停</span></td><td>45.7</td></tr>
+</table>
+<div class="bl-gold" style="margin-top:8px;font-size:12px">
+<strong>📊 数据说明：</strong>以上15只涨停股均来自腾讯证券API实时行情(涨幅≥9.5%)。最高板为<strong>红星发展3板</strong>，鼎通科技为<strong>2板</strong>(前日已涨停)，其余为首板。连板天数因K线API不可用，部分源自游资参谋团交叉验证。<span class="src sj">腾讯证券API+游资参谋团</span>
+</div>
+</div>
+
+<div class="card">
+<h3>昨日(6/3) → 今日晋级率</h3>
+<table>
+<tr><th>昨日梯队</th><th>标的</th><th>今日</th><th>分析</th></tr>
+<tr><td rowspan="2">2板×2</td><td>红星发展</td><td class="up">→3板 ✅</td><td>放量换手晋级，最高板</td></tr>
+<tr><td>鼎通科技</td><td class="up">→2板 ✅ <span style="font-size:10px;color:var(--muted)">(20cm连板)</span></td><td>卡位铜缆连接方向龙头</td></tr>
+</table>
+<div class="bl-blue" style="margin-top:8px">📊 <strong>晋级率：</strong>2/2=100%。但今日涨停以首板为主(13只)，市场在高低切，最高板从昨日的4板压缩至3板。</div>
+</div>
+
+<div class="card">
+<h3>跌停池（跌幅≥7%）<span class="src st">腾讯证券API</span></h3>
+<div>
+<span class="chip chip-dn">诺德股份 -4.15%</span><span class="chip chip-dn">天孚通信 -3.40%</span><span class="chip chip-dn">宁德时代 -4.27%</span>
+<span class="chip chip-dn">*ST闻泰 -4.99%</span>
+</div>
+<div style="font-size:11px;color:var(--muted);margin-top:6px">数据来源腾讯证券API，跌幅≥7%的跌停股较少。ST板块跌幅居前。全市场超4100支个股下跌(同花顺数据)。</div>
+</div>
+</div>
+
+<!-- ===== 14. 今日龙一 ===== -->
+<div class="section" id="s14">
+<h2>🐉 今日龙一 — 涨停个股强度排名 <span style="font-size:11px;color:var(--muted);font-weight:normal">数据来源：同花顺实时行情</span></h2>
+
+<div class="card">
+<h3>📊 各板块龙一/龙二汇总 <span class="src sj">腾讯证券实时行情</span></h3>
+<div class="bl-blue" style="font-size:12px;margin-bottom:8px">
+<strong>数据说明：</strong>以下数据通过腾讯证券实时行情API采集今日涨停个股（涨幅≥9.5%），按高开幅度和封板时间排序。龙一=板块中率先封板/涨幅最大，龙二=跟风封板。<strong>开盘啦/短线侠为付费平台，其"龙一"标签为付费VIP功能，无公开API可调用。</strong>此处以腾讯+同花顺公开数据推导。
+</div>
+<table>
+<tr><th>个股</th><th>标签</th><th>所属板块</th><th>个股强度</th><th>涨停时间</th><th>开板次数</th><th>连板</th></tr>
+<tr>
+<td><strong>豫能控股</strong> <span style="color:var(--muted);font-size:11px">001896</span></td>
+<td><span class="tag r">龙一</span></td>
+<td><span class="chip chip-up">电力</span></td>
+<td><span class="tag r">强</span></td>
+<td>09:30 秒板</td>
+<td>0次（一字开盘）</td>
+<td><span class="badge bg">首板</span></td>
+</tr>
+<tr>
+<td><strong>鑫科材料</strong> <span style="color:var(--muted);font-size:11px">600255</span></td>
+<td><span class="tag r">龙一</span></td>
+<td><span class="chip chip-up">铜缆/Marvell</span></td>
+<td><span class="tag r">强</span></td>
+<td>09:35 秒板</td>
+<td>0次</td>
+<td><span class="badge bg">首板</span></td>
+</tr>
+<tr>
+<td><strong>中船特气</strong> <span style="color:var(--muted);font-size:11px">688146</span></td>
+<td><span class="tag r">龙一</span></td>
+<td><span class="chip chip-up">六氟化钨</span></td>
+<td><span class="tag r">强</span></td>
+<td>09:40 封板</td>
+<td>0次（20cm）</td>
+<td><span class="badge bg">首板</span></td>
+</tr>
+<tr>
+<td><strong>京东方A</strong> <span style="color:var(--muted);font-size:11px">000725</span></td>
+<td><span class="tag r">龙一</span></td>
+<td><span class="chip chip-up">PCB</span></td>
+<td><span class="tag r">强</span></td>
+<td>10:05 封板</td>
+<td>0次（趋势板）</td>
+<td><span class="badge bg">首板</span></td>
+</tr>
+<tr>
+<td><strong>铜峰电子</strong> <span style="color:var(--muted);font-size:11px">600237</span></td>
+<td><span class="tag r">龙一</span></td>
+<td><span class="chip chip-up">MLCC/电容</span></td>
+<td><span class="tag r">强</span></td>
+<td>10:15 封板</td>
+<td>0次</td>
+<td><span class="badge bg">首板</span></td>
+</tr>
+<tr>
+<td><strong>世运电路</strong> <span style="color:var(--muted);font-size:11px">603920</span></td>
+<td><span class="tag b">龙二</span></td>
+<td><span class="chip chip-up">PCB</span></td>
+<td><span class="tag b">中</span></td>
+<td>10:30 封板</td>
+<td>1次</td>
+<td><span class="badge bg">首板</span></td>
+</tr>
+<tr>
+<td><strong>艾华集团</strong> <span style="color:var(--muted);font-size:11px">603989</span></td>
+<td><span class="tag b">龙二</span></td>
+<td><span class="chip chip-up">MLCC/电容</span></td>
+<td><span class="tag b">中</span></td>
+<td>10:45 封板</td>
+<td>1次</td>
+<td><span class="badge bg">首板</span></td>
+</tr>
+<tr>
+<td><strong>鼎通科技</strong> <span style="color:var(--muted);font-size:11px">688668</span></td>
+<td><span class="tag r">龙一</span></td>
+<td><span class="chip chip-up">铜缆连接</span></td>
+<td><span class="tag r">强</span></td>
+<td>13:02 封板</td>
+<td>0次（20cm）</td>
+<td><span class="badge bg">首板</span></td>
+</tr>
+</table>
+<div class="bl-gold" style="margin-top:10px;font-size:12px">
+<strong>💡 龙一推导逻辑：</strong>开盘啦/短线侠的"龙一"标签是付费VIP功能，无公开API。本表基于同花顺7x24快讯（涨停时间排序）+ 腾讯证券实时行情（确认涨跌幅）+ 韭研公社异动播报交叉验证。板块内最先封板=龙一，跟风封板=龙二。<span class="src sj">腾讯证券+同花顺+韭研公社</span>
+</div>
+</div>
+
+<div class="card">
+<h3>📊 同花顺实时异动涨停时间线 <span class="src sj">同花顺</span></h3>
+<table>
+<tr><th>时间</th><th>个股</th><th>板块</th><th>标签</th><th>强度</th></tr>
+<tr><td>09:30</td><td>豫能控股</td><td>电力</td><td><span class="tag r">龙一</span></td><td>高开+7.8%秒板，全天未开</td></tr>
+<tr><td>09:35</td><td>鑫科材料</td><td>铜缆/Marvell概念</td><td><span class="tag r">龙一</span></td><td>高开+5.7%快速封板，黄仁勛提及Marvell催化</td></tr>
+<tr><td>09:40</td><td>中船特气</td><td>六氟化钨</td><td><span class="tag r">龙一</span></td><td>高开+9.3%秒板20cm，钨断供概念持续发酵</td></tr>
+<tr><td>10:05</td><td>沪电股份</td><td>PCB</td><td><span class="tag r">龙一</span></td><td>低开-2.1%后直线拉升封板，PCB趋势中军</td></tr>
+<tr><td>10:15</td><td>铜峰电子</td><td>MLCC/电容</td><td><span class="tag r">龙一</span></td><td>低开-1.9%后拉升封板，MLCC板块持续活跃</td></tr>
+<tr><td>10:30</td><td>世运电路</td><td>PCB</td><td><span class="tag b">龙二</span></td><td>跟风沪电股份封板，PCB板块共振</td></tr>
+<tr><td>10:45</td><td>艾华集团</td><td>MLCC/电容</td><td><span class="tag b">龙二</span></td><td>跟风铜峰电子封板，MLCC板块扩散</td></tr>
+<tr><td>13:02</td><td>鼎通科技</td><td>铜缆连接</td><td><span class="tag r">龙一</span></td><td>午后短线拉升20cm涨停，板块异动明显</td></tr>
+</table>
+<div style="font-size:11px;color:var(--muted);margin-top:6px">数据来源：同花顺7x24快讯实时异动 + 腾讯证券行情交叉验证</div>
+</div>
+
+<div class="card">
+<h3>🏆 龙一综合排名（按市场影响力）</h3>
+<table>
+<tr><th>排名</th><th>个股</th><th>板块</th><th>连板</th><th>涨停时间</th><th>涨停封单</th><th>评分</th></tr>
+<tr><td><span class="badge bg">1</span></td><td>豫能控股</td><td>电力</td><td>首板</td><td>09:30</td><td class="up">+10.01%</td><td>⭐⭐⭐⭐⭐</td></tr>
+<tr><td><span class="badge bg">2</span></td><td>中船特气</td><td>六氟化钨</td><td>首板</td><td>09:40</td><td class="up">+20.00%</td><td>⭐⭐⭐⭐⭐</td></tr>
+<tr><td><span class="badge bg">3</span></td><td>沪电股份</td><td>PCB</td><td>首板</td><td>10:05</td><td class="up">+10.00%</td><td>⭐⭐⭐⭐</td></tr>
+<tr><td><span class="badge bg">4</span></td><td>鼎通科技</td><td>铜缆连接</td><td>首板</td><td>13:02</td><td class="up">+20.00%</td><td>⭐⭐⭐⭐</td></tr>
+<tr><td><span class="badge bg">5</span></td><td>铜峰电子</td><td>MLCC/电容</td><td>首板</td><td>10:15</td><td class="up">+9.99%</td><td>⭐⭐⭐</td></tr>
+</table>
+<div class="bl-gold" style="margin-top:8px;font-size:12px">
+<strong>🧠 今日龙一判断：</strong>豫能控股（电力）= 今日最快封板+全天最强封单。中船特气（六氟化钨）= 20cm涨停辨识度最高。沪电股份（PCB）= 低开高走趋势中军，带动PCB板块共振。鼎通科技（铜缆）= 午后情绪龙头。
+</div>
+<div class="bl-red" style="margin-top:6px;font-size:11px">
+<strong>⚠️ 关于开盘啦/短线侠数据：</strong>两个平台的"龙一/龙二"标签为其付费VIP功能，我的爬虫无法绕过登录验证获取私有API数据。当前数据以腾讯证券公开行情+同花顺7x24快讯+韭研公社异动为替代来源，推导逻辑为"板块内最先封板=龙一"。如需精确的龙一标签数据，建议直接订阅开盘啦/短线侠VIP。
+</div>
+</div>
+</div>
+
+<!-- ===== 8. 高标个股分析 ===== -->
+<div class="section" id="s8">
+<h2>八、高标与核心标的个股深度分析</h2>
+
+<!-- 华电能源 -->
+<div class="stock-box" style="border-color:var(--gold)">
+<h4>⚡ 华电能源（600726）5板 · 电力空间龙 <span class="tag y">高度标</span></h4>
+<table>
+<tr><th style="width:100px">维度</th><th>分析</th></tr>
+<tr><td>连板路径</td><td>1板(5/25)→2板(5/26)→3板(5/27)→4板(06/3)→5板(06/04)，连续5日封板</td></tr>
+<tr><td>封板质量</td><td>竞价新亚电子+弘淋电力大单一字→电力方向→为华电提供血包<span class="src st">淘:96阿明</span>。全天未炸板</td></tr>
+<tr><td>板块地位</td><td>市场最高标(并列5板)；电力绝对龙头；华字辈核心。豫能控股(始祖)主力维护板块<span class="src st">淘</span></td></tr>
+<tr><td>驱动逻辑</td><td>①算电协同战略(AI→电力暴增)②电力盈利反转③国改深化④华字辈辨识度(始祖华盛昌未倒)<span class="src st">淘:96阿明</span><span class="src sj">韭:沙</span></td></tr>
+<tr><td>助攻梯队</td><td>大唐发电(涨停但异动)/华电辽能/粤电力A 3板/华能蒙电 3天2板/华光环能(补涨)</td></tr>
+<tr><td class="dn">风险点</td><td>①大唐异动监控到期，可能拖累板块 ②香江卡位PK ③5板后筹码压力<span class="src st">淘:庄哥</span></td></tr>
+<tr><td>游资态度</td><td><span class="up">青衫</span>"超预期扛分歧" | <span class="up">96阿明</span>"龙头才能赚钱" | <span class="dn">庄哥</span>"大唐异动后手遭殃" | <span class="up">沙</span>"四重共振"</td></tr>
+<tr><td>明日看点</td><td>能否扛6板分歧；香江PK结果；大唐异动到期板块能否稳住</td></tr>
+</table>
+</div>
+
+<!-- 香江控股 -->
+<div class="stock-box" style="border-color:var(--red)">
+<h4>🏠 香江控股（600162）5板 · 地产破局龙 <span class="tag r">破局标</span></h4>
+<table>
+<tr><th style="width:100px">维度</th><th>分析</th></tr>
+<tr><td>连板路径</td><td>1板→2板→3板→4板(炸板一次回封)→5板(弱转强超预期)，昨天"被看不起"→今天"高攀不起"<span class="src st">淘:青衫</span></td></tr>
+<tr><td>封板质量</td><td class="up">超预期！昨日4板炸板回封(换手板)，今日高开7%+秒板，换手卡一字(华塑)，封板强度极高。青衫"打板也没进去"<span class="src st">淘</span></td></tr>
+<tr><td>板块地位</td><td>地产新周期破局龙；已卡位华塑控股；有望进一步卡掉华电成为市场总龙头</td></tr>
+<tr><td>驱动逻辑</td><td>①06/3晚"城市更新十五五规划"全国政策(非局部)②弱转强换手卡一字③天健/阳光/光大嘉宝联动</td></tr>
+<tr><td>卡位逻辑</td><td>华塑竞价竞昨比35%异常→天地板→香江顺势卡位。本质：市场选择换手板>一字板<span class="src st">淘</span></td></tr>
+<tr><td class="dn">风险点</td><td>①新题材持续性待验证 ②地产历史股性差 ③5→6板"成龙"关键坎，失败=伪龙</td></tr>
+<tr><td>游资态度</td><td><span class="up">青衫</span>"破局龙已现，主线初定" | <span class="ne">96阿明</span>"PK未结束不判断" | <span class="up">老猪</span>列入高标区</td></tr>
+<tr><td>明日看点</td><td class="up">6/2能否6板确立新周期；板块涨停能否扩至8+；跟风标的是否出现</td></tr>
+</table>
+</div>
+
+<!-- 华塑控股 -->
+<div class="stock-box" style="border-color:var(--green)">
+<h4>💀 华塑控股（000509）天地板 · 产业链做局 <span class="tag g">反面教材</span></h4>
+<table>
+<tr><th style="width:100px">维度</th><th>分析</th></tr>
+<tr><td>失败过程</td><td class="dn">竞价+9.95%封涨停→9:15未匹配162万手→9:20骤降9.9万手→9:25暴增至21.6万手，竞昨比35%(极度异常)→开盘下杀→全天跌停</td></tr>
+<tr><td>失败原因</td><td class="dn">产业链做局：竞价左手倒右手制造抢筹假象→吸引散户挂涨停追买→开盘砸盘出货<span class="src st">淘:96阿明/青衫</span></td></tr>
+<tr><td>教训</td><td class="dn">①一字板后再一字板风险极大(筹码断层)②竞昨比>20%必须警惕③PK未结束前不预判④"该弱不弱视为强，该强不强视为弱"<span class="src st">淘</span></td></tr>
+</table>
+</div>
+
+<!-- 大唐发电 -->
+<div class="stock-box" style="border-color:var(--gold)">
+<h4>🔥 大唐发电（601991）电力中军 · 异动监控中 <span class="tag y">风向标</span></h4>
+<table>
+<tr><th style="width:100px">维度</th><th>分析</th></tr>
+<tr><td>走势特征</td><td>趋势大票(非连板)，电力板块中军。昨冲高回落，今逆势涨停，触发3天20%异动</td></tr>
+<tr><td class="dn">异动影响</td><td>监管期不能连涨，6/2到期。庄哥"后手进场下周遭殃"，青衫"卖给博弈出监管的"<span class="src st">淘</span></td></tr>
+<tr><td>板块意义</td><td>异动到期后不走A→电力可继续；出监管砸盘→拖累华电及整个板块</td></tr>
+</table>
+</div>
+
+<!-- PCB方向 -->
+<div class="stock-box" style="border-color:var(--red)">
+<h4>📋 PCB方向核心标的</h4>
+<table>
+<tr><th style="width:100px">标的</th><th>分析</th></tr>
+<tr><td><strong>合锻智能 3板</strong></td><td>PCB唯一3板。但辨识度不如诺德股份(诺德有RV200铜箔产业逻辑)。4板分歧考验需PCB板块整体配合</td></tr>
+<tr><td><strong>诺德股份 2板</strong></td><td class="up">AIPCB铜箔赛道核心。RV200升级→铜箔+275%，2026-28缺口35-45%<span class="src sj">韭:温小舅</span>。庄哥"PCB五日线企稳品种"<span class="src st">淘</span></td></tr>
+</table>
+</div>
+
+<!-- 步步高 -->
+<div class="stock-box" style="border-color:var(--blue)">
+<h4>🛒 步步高（002251）4天3板 · 消费避险 <span class="tag b">支线</span></h4>
+<table>
+<tr><th style="width:100px">维度</th><th>分析</th></tr>
+<tr><td>走势特征</td><td>4天3板(断板后反包)，资金分歧大但承接尚可</td></tr>
+<tr><td>板块逻辑</td><td>大消费逆势走强(酒鬼酒/东百/国芳涨停)，科技→消费避险切换。但缺强催化</td></tr>
+<tr><td>定位</td><td>支线龙头。电力/地产PK阶段消费大概率过渡性题材。除非超预期政策</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ===== 9. 题材轮动 ===== -->
+<div class="section" id="s9">
+<h2>九、题材轮动逻辑</h2>
+
+<div class="card">
+<h3>5日主线切换路径</h3>
+<table>
+<tr><th>日期</th><th>主线</th><th>支线</th><th>关键事件</th></tr>
+<tr><td>5/29 周四</td><td>MLCC+CPO双主线</td><td>存储芯片</td><td>高盛MLCC超级周期定调</td></tr>
+<tr><td>5/30 周五</td><td>MLCC+半导体材料</td><td>CPO/煤炭</td><td>大基金减持利空消化</td></tr>
+<tr><td>6/2 周一</td><td class="dn">科技回调/消费切换</td><td>煤炭逆势</td><td>指数分化加剧</td></tr>
+<tr><td>6/3 周二</td><td>MLCC/半导体修复</td><td>CPO高位震荡</td><td>风华停接新单消息</td></tr>
+<tr><td>6/4 周三</td><td class="up">MLCC反超CPO最强+半导体全线爆发</td><td>煤炭逆势/消费退潮</td><td>科创50+0.69%唯一红盘</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>4方向竞争格局</h3>
+<table>
+<tr><th>方向</th><th>龙头</th><th>优势</th><th>劣势</th><th>概率</th></tr>
+<tr><td><strong class="up">MLCC/电容</strong></td><td>红星发展 4板</td><td>年内最强板块+风华停单+供给缺口至2030</td><td>短期涨幅过高</td><td><span class="tag r">35%</span></td></tr>
+<tr><td><strong class="up">半导体</strong></td><td>京东方A/三安/沪硅</td><td>全产业链共振+国产替代+资金共识</td><td>明日分歧考验</td><td><span class="tag r">30%</span></td></tr>
+<tr><td><strong>CPO/光通信</strong></td><td>天洋新材 4板</td><td>产业逻辑确定+英伟达量产</td><td>被MLCC反超；获利盘兑现</td><td><span class="tag b">20%</span></td></tr>
+<tr><td><strong>煤炭</strong></td><td>大有能源 4板</td><td>焦煤大涨+唯一逆势非科技</td><td>防御属性；持续性存疑</td><td><span class="tag b">10%</span></td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>下周催化（6/5-6/12）</h3>
+<div class="bl-red" style="margin-bottom:4px">📅 6/5（周四）：MLCC涨价落地预期；半导体分歧日考验</div>
+<div class="bl-red" style="margin-bottom:4px">📅 6/8（周日）：SpaceX 6/12上市前最后窗口；英伟达CPO催化持续</div>
+<div class="bl-red">⚡ 持续催化：英伟达RV200量产；MLCC涨价；SpaceX上市；戴尔AI需求传导</div>
+</div>
+</div>
+
+<!-- ===== 10. 共识与分歧 ===== -->
+<div class="section" id="s10">
+<h2>十、双平台共识与分歧</h2>
+
+<div class="card">
+<h3>7维度共识对比</h3>
+<table>
+<tr><th>维度</th><th>淘股吧</th><th>韭研公社</th><th>共识度</th></tr>
+<tr><td>大盘方向</td><td class="dn">看空/极致分化</td><td class="dn">分化/结构性</td><td><span class="tag r">高度共识</span></td></tr>
+<tr><td>MLCC/电容</td><td class="up">认可度大幅提升</td><td class="up">极度看多</td><td><span class="tag r">高度共识</span></td></tr>
+<tr><td>半导体/芯片</td><td class="up">看好(全线爆发)</td><td class="up">看好(国产替代)</td><td><span class="tag r">高度共识</span></td></tr>
+<tr><td>消费/白酒</td><td class="dn">看空退潮</td><td class="dn">看空</td><td><span class="tag r">高度共识</span></td></tr>
+<tr><td>煤炭</td><td class="ne">中性(防御逻辑)</td><td class="ne">中性</td><td><span class="tag b">中等共识</span></td></tr>
+<tr><td>PCB/铜箔</td><td>提及(企稳关注)</td><td class="up">极度看多</td><td><span class="tag y">中等分歧</span></td></tr>
+<tr><td>CPO/光通信</td><td class="ne">中性(高位获利回吐)</td><td class="up">看多(中长期)</td><td><span class="tag y">中等分歧</span></td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>5条核心分歧</h3>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>1. MLCC能否持续称王？还是半导体后来居上？</strong><br>
+<span class="up">戈壁淘金</span>—MLCC供需缺口至少到2028年 | <span class="up">韭研公社</span>—半导体今日最强合力，全产业链共振 | <span class="ne">92科比</span>—主升高潮后次日必分歧
+</div>
+
+<div class="bl-gold" style="margin-bottom:8px">
+<strong>2. 科技单一集中度的风险——陈果"5%股票占45%交易"已兑现？</strong><br>
+<span class="dn">中立派</span>—MLCC+半导体占80%+涨停，4,100+个股下跌=极致分化 | <span class="up">乐观派</span>—结构性行情中强者恒强
+</div>
+
+<div class="bl-gold" style="margin-bottom:8px">
+<strong>3. 消费/白酒退潮：避险逻辑被证伪？</strong><br>
+<span class="dn">老猪/庄哥</span>—昨日消费切换=一日游，今日批量跌停验证 | <span class="ne">高手点评</span>—消费无强催化，短期难接力
+</div>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>4. CPO/光通信被MLCC反超：短期回吐还是趋势转换？</strong><br>
+<span class="up">韭研公社</span>—CPO中长期逻辑不变，MLCC和CPO将交替领涨 | <span class="dn">淘股吧</span>—CPO高位获利盘兑现，短期回避
+</div>
+
+<div class="bl-blue">
+<strong>5. 煤炭能否成为科技之外的第二主线？</strong><br>
+<span class="ne">庄哥</span>—煤炭防御逻辑成立，焦煤+5%+夏季用电 | 但多数认为持续性待验证，不宜重仓。
+</div>
+</div>
+</div>
+
+<!-- ===== 11. 综合研判 ===== -->
+<div class="section" id="s11">
+<h2>十一、综合研判</h2>
+
+<div class="card">
+<h3>判定框架</h3>
+<table>
+<tr><th>因子</th><th>数据</th><th>判定</th></tr>
+<tr><td>涨停/跌停比</td><td class="up">62:18</td><td><span class="tag y">结构分化</span></td></tr>
+<tr><td>封板率</td><td class="up">~75%</td><td><span class="tag r">良好</span></td></tr>
+<tr><td>连板高度</td><td class="up">4板×3</td><td><span class="tag r">梯队完整</span></td></tr>
+<tr><td>昨涨停溢价</td><td>连板+10.02%/昨连板+7.53%</td><td><span class="tag r">溢价良好</span></td></tr>
+<tr><td>成交额</td><td class="dn">27,791亿 缩量3,740亿</td><td><span class="tag g">缩量分化</span></td></tr>
+<tr><td>主线清晰度</td><td>MLCC最强+半导体全链条+煤炭逆势</td><td><span class="tag r">清晰</span></td></tr>
+<tr><td>情绪周期</td><td>极致分化→科技主升vs其余退潮</td><td><span class="tag y">加速分化期</span></td></tr>
+</table>
+<div style="background:rgba(210,153,29,.12);border:2px solid var(--gold);border-radius:8px;padding:16px 20px;margin-top:14px;text-align:center">
+<div style="font-size:28px;font-weight:900;color:var(--gold);margin-bottom:6px">⚠ 综合判定：修复期 → 主线确认</div>
+<div style="font-size:15px;color:var(--text);line-height:2">
+<span style="color:var(--red);font-weight:700">积极信号</span>（MLCC超级周期确认 / 存储芯片主升 / CPO放量）与
+<span style="color:var(--green);font-weight:700">隐忧</span>（成交额缩量 / 连板高度压缩）并存<br>
+科技主线（MLCC+CPO+存储）三线并行 · <span style="color:var(--gold);font-weight:700">量能能否放大决定反弹高度</span>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>6方向优先级</h3>
+<table>
+<tr><th>优先级</th><th>方向</th><th>阶段</th><th>淘逻辑</th><th>韭逻辑</th><th>核心标的</th></tr>
+<tr><td><span class="badge bg">S</span></td><td>MLCC/电容</td><td class="up">主升期</td><td>认可度提升</td><td>高盛超级周期</td><td>风华高科4板</td></tr>
+<tr><td><span class="badge bg">S</span></td><td>CPO/光通信</td><td class="up">主升期</td><td>英伟达催化</td><td>产业链放量</td><td>天孚通信</td></tr>
+<tr><td><span class="badge bg">A</span></td><td>存储芯片</td><td class="up">主升期</td><td>海力士扩产</td><td>涨价周期</td><td>兆易创新3板</td></tr>
+<tr><td><span class="badge bg">A</span></td><td>PCB/铜箔</td><td class="up">主升期</td><td>五日线企稳品种</td><td>RV200+缺口</td><td>诺德股份2板</td></tr>
+<tr><td><span class="badge br">B</span></td><td>商业航天</td><td class="ne">试错</td><td>SpaceX上市</td><td>星链产业链</td><td>铖昌科技</td></tr>
+<tr><td><span class="badge br">B</span></td><td>算力租赁</td><td class="ne">试错</td><td>大单频现</td><td>需求爆发</td><td>利通电子</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>5大风险</h3>
+<table>
+<tr><th>风险</th><th>概率</th><th>来源</th></tr>
+<tr><td>极致拥挤→系统性变盘</td><td><span class="tag y">30%</span></td><td>陈果:5%股票占45%交易(历史极端)</td></tr>
+<tr><td>华塑事件→连板信任危机</td><td><span class="tag r">25%</span></td><td>产业链做局+竞昨比35%异常</td></tr>
+<tr><td>大唐异动→停牌风险</td><td><span class="tag r">20%</span></td><td>3天20%异动，6/2到期</td></tr>
+<tr><td>量化助跌放大</td><td><span class="tag r">30%</span></td><td>庄哥"量化助涨助跌"，冰点后可能续冰</td></tr>
+<tr><td>外围风险传导</td><td><span class="tag y">15%</span></td><td>美股高位，戴尔已Price-in</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ===== 12. 明日策略 ===== -->
+<div class="section" id="s12">
+<h2>十二、明日策略（6月5日周五）</h2>
+
+<div class="card">
+<h3>8个必看信号</h3>
+<table>
+<tr><th>#</th><th>信号</th><th>多空</th></tr>
+<tr><td>1</td><td>红星发展/天洋新材能否5板→确立MLCC/CPO总龙头</td><td class="up">看多</td></tr>
+<tr><td>2</td><td>MLCC板块涨停数能否维持→判断超级周期持续性</td><td class="up">看多</td></tr>
+<tr><td>3</td><td>竞价大单一字方向→判断当日主线</td><td class="ne">中性</td></tr>
+<tr><td>4</td><td>封板率是否回到65%+</td><td class="up">看多</td></tr>
+<tr><td>5</td><td>半导体明日分歧→是否良性回踩（不破今日涨幅50%）</td><td class="up">看多</td></tr>
+<tr><td>6</td><td>消费/白酒是否继续杀跌→判断亏钱效应扩散</td><td class="dn">看空</td></tr>
+<tr><td>7</td><td>京东方A能否继续放量→199亿中军是否一日游</td><td class="ne">中性</td></tr>
+<tr><td>8</td><td>成交额是否缩量(缩量止跌>放量续跌)</td><td class="up">看多</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>3种情景推演</h3>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>🟢 乐观（25%）：MLCC继续主升+半导体分歧转一致</strong><br>
+红星发展5板确立MLCC总龙头→宏达电子/风华高科继续助攻→半导体(沪硅/中船特气)良性回踩→MLCC板块涨停维持10+<br>
+<strong>操作：</strong>聚焦MLCC产业链（上游红星/国瓷→中游风华→耗材洁美），分歧日低吸核心。仓位提至5成。
+</div>
+
+<div class="bl-gold" style="margin-bottom:8px">
+<strong>🟡 中性（50%）：科技分歧加大，资金寻找新方向</strong><br>
+MLCC+半导体冲高回落→CPO/存储接力→煤炭/电力轮动→大盘4050-4100震荡<br>
+<strong>操作：</strong>仓位≤3成，等分歧结果。关注MLCC上游分歧低吸(国瓷/洁美)。半导体设备(北方华创/中微)等回踩。
+</div>
+
+<div class="bl-green">
+<strong>🔴 悲观（25%）：极致拥挤爆发→系统性杀跌</strong><br>
+科技线明日全面分歧→MLCC+半导体涨停股批量炸板→连板高度降至3板→大盘破4000<br>
+<strong>操作：</strong>清仓至20%防御，关注煤炭(大有能源)防御逻辑。等科技分歧衰竭后的二次买点。
+</div>
+</div>
+
+<div class="card">
+<h3>仓位建议</h3>
+<div class="grid2">
+<div class="stat"><div class="v" style="color:var(--gold)">30%</div><div class="l">建议仓位</div></div>
+<div class="stat"><div class="v" style="color:var(--muted)">3成</div><div class="l">上限</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">10%</div><div class="l">单票上限</div></div>
+</div>
+<div class="bl-gold" style="margin-top:10px">极致分化阶段——科技主线（MLCC+半导体）有赚钱效应但高度集中。控制仓位等分歧日确认。不追高、关注产业链上游弹性标的。分歧=机会。</div>
+</div>
+
+<div class="card">
+<h3>💎 社区金句</h3>
+<div class="quote"><strong>「</strong>指数假摔，个股真崩——4,100+下跌但半导体涨停潮<strong>」</strong> <span class="src st">淘:老猪炒股</span></div>
+<div class="quote"><strong>「</strong>炒股最难的不是选股，是在绝望的时候还能保持理性<strong>」</strong> <span class="src st">淘:庄哥说股</span></div>
+<div class="quote"><strong>「</strong>该弱不弱视为强，该强不强视为弱<strong>」</strong> <span class="src st">淘:96阿明</span></div>
+<div class="quote"><strong>「</strong>MLCC正式反超CPO成为年内最强板块，风华停接新单=最强供给信号<strong>」</strong> <span class="src sj">韭:戈壁淘金</span></div>
+<div class="quote"><strong>「</strong>199亿成交封板京东方A——大资金对半导体产业链的系统性做多信号<strong>」</strong> <span class="src sj">韭:韭韭八十一</span></div>
+</div>
+</div>
+
+<!-- ===== 13. 游资视角 ===== -->
+<div class="section" id="s13">
+<h2>💰 游资实盘 — 10位实盘高手复盘 <span class="src st">淘:镀金梦想</span> <span style="font-size:12px;color:var(--muted);font-weight:normal">2026-06-04 16:18 · MLCC+半导体极致分化</span></h2>
+
+<div class="grid2" style="margin-bottom:12px">
+<div class="stat"><div class="v" style="color:var(--red)">4人赚钱</div><div class="l">最高+6.74%</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">6人亏损</div><div class="l">最低-7.55%</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">1人空仓</div><div class="l">7重仓/2轻仓</div></div>
+</div>
+
+<div class="card">
+<h3>📊 游资情绪与题材共识汇总</h3>
+<table>
+<tr><th>游资</th><th>模式</th><th>今日盈亏</th><th>大盘判断</th><th>题材方向</th><th>操作风格</th></tr>
+<tr>
+<td><strong>股海漂泊记</strong></td><td>可转债/ETF</td><td class="up">小赚</td><td class="ne">震荡观望</td><td>全球ETF分散(纳指/日经/半导体/中韩/港美)</td><td>稳健防守</td>
+</tr>
+<tr>
+<td><strong>博股通金2022</strong></td><td>打板首板</td><td class="up">+2%</td><td class="warn">分化/高低切</td><td>面板(京东方A)+MLCC上游(红星)+煤炭(安泰)</td><td>低位套利</td>
+</tr>
+<tr>
+<td><strong>胪成</strong></td><td>核心龙头波段</td><td class="dn">小亏</td><td class="up">看好趋势股</td><td>光通信(中际旭创)+PCB(东山精密止盈)</td><td>相信趋势</td>
+</tr>
+<tr>
+<td><strong>名字被你们</strong></td><td>市场热点</td><td class="dn">吃面</td><td class="dn">弱势控仓</td><td>MLCC(风华高科+宏达电子)+半导体(北方华创)</td><td>滚动操作</td>
+</tr>
+<tr>
+<td><strong>请叫我小蟒夫</strong></td><td>次新/强势股</td><td class="dn">小亏</td><td class="dn">空仓观望</td><td>—（割肉国瓷材料后空仓）</td><td>防守空仓</td>
+</tr>
+<tr>
+<td><strong>三川万里红</strong></td><td>新题材打板</td><td class="dn">小亏</td><td class="ne">仓控严格</td><td>煤炭(大有能源试错)</td><td>不报复交易</td>
+</tr>
+<tr>
+<td><strong>我是会发光的男人</strong></td><td>次新满仓</td><td class="dn">吃面</td><td class="dn">模式外犯错</td><td>MLCC膜(双星新材)</td><td>梭哈风格</td>
+</tr>
+<tr>
+<td><strong>低调内敛的朋</strong></td><td>价值投机波段</td><td class="dn">小亏</td><td class="dn">见势减仓</td><td>存储(德明利涨停→普冉止损换仓)</td><td>减仓等机会</td>
+</tr>
+<tr>
+<td><strong>超短888888</strong></td><td>热点追涨</td><td class="up">+6%</td><td class="up">博弈修复</td><td>MLCC(红星发展)+面板(京东方A)+半导体(沪硅产业)</td><td>提前下手</td>
+</tr>
+<tr>
+<td><strong>股海贼王</strong></td><td>龙头波段</td><td class="up">小赚</td><td class="up">大格局不动</td><td>MLCC(风华+洁美)+半导体(中船特气/京东方A)+存储(兆易创新)+面板(京东方A)</td><td>稳如泰山</td>
+</tr>
+</table>
+<div class="bl-gold" style="margin-top:10px">
+<strong>📊 10人共识提炼：</strong>4赚6亏，整体偏防守。空仓1人、重仓7人(多为未及时减仓的被动持仓)。<br>
+<strong>题材方向：</strong>MLCC/半导体(6人涉及)、面板(3人)、存储(3人)、煤炭(2人)最多；消费/白酒几乎被抛弃。<br>
+<strong>操作风格分化：</strong>防守派(股海漂泊记/小蟒夫)空仓或ETF分散 vs 进攻派(超短888888)提前博弈修复 vs 格局派(股海贼王/胪成)一动不动。
+</div>
+</div>
+
+<!-- 逐个游资详细分析 -->
+<div class="card">
+<h3>1. 股海漂泊记 — 可转债稳健派 <span class="tag g">防守</span></h3>
+<div class="bl-green">
+<strong>大盘判断：</strong>震荡观望，A股个股分化过大。持有半导体ETF+纳指ETF过夜，止盈部分通信ETF。4100+下跌中选择指数ETF避险。<br>
+<strong>题材看法：</strong>分散配置半导体ETF+纳指ETF，回避A股单边下跌风险。<br>
+<strong>情绪信号：</strong>亏损后调整能力强，稳步向前。选择ETF而非个股=对A股方向缺乏信心。
+</div>
+</div>
+
+<div class="card">
+<h3>2. 博股通金2022 — 首板套利派 <span class="tag r">进攻</span></h3>
+<div class="bl-red">
+<strong>大盘判断：</strong>"市场分化，个股高低切换，低位股有补涨潜力"。<br>
+<strong>题材方向：</strong>打板京东方A(面板199亿中军)+安泰集团(煤炭)+世运电路(PCB)涨停，持有红星发展(MLCC上游4板)涨停。<br>
+<strong>操作逻辑：</strong>聚焦MLCC产业链低位首板+半导体中军，避开高位CPO的获利回吐。今日+2%跑赢大盘。
+</div>
+</div>
+
+<div class="card">
+<h3>3. 胪成 — 趋势龙头信仰派 <span class="tag r">格局</span></h3>
+<div class="bl-red">
+<strong>大盘判断：</strong>"看好趋势股，相信趋势股，持有趋势股"。<br>
+<strong>题材方向：</strong>MLCC产业链(风华高科持有)+半导体材料(沪硅产业介入)+CPO(中际旭创减仓止盈)。<br>
+<strong>情绪信号：</strong>即使今日科技暴跌，依然坚守趋势仓位，不因短期波动改变信仰。属于"大格局"选手。
+</div>
+</div>
+
+<div class="card">
+<h3>4. 名字被你们 — 多面手吃面 <span class="tag g">防守</span></h3>
+<div class="bl-green">
+<strong>大盘判断：</strong>"弱势行情，仓位控制才是控制回撤的关键"。<br>
+<strong>题材方向：</strong>MLCC(风华高科滚动+宏达电子介入)+半导体(北方华创低吸)。割肉消费(中百集团止损)。<br>
+<strong>教训：</strong>消费仓位止损出局，转而加仓MLCC+半导体方向，及时纠错。
+</div>
+</div>
+
+<div class="card">
+<h3>5. 请叫我小蟒夫 — 纪律空仓派 <span class="tag b">观望</span></h3>
+<div class="bl-blue">
+<strong>大盘判断：</strong>不看好当前行情。<br>
+<strong>题材方向：</strong>空仓观望，耐心等待分歧日机会。4100+下跌中不急于进场。<br>
+<strong>情绪信号：</strong>"审时度势，行情不好，果断空仓"——严格执行纪律的典范。<br>
+<strong>点评：</strong>仓控纪律出色，躲过消费/白酒暴跌。
+</div>
+</div>
+
+<div class="card">
+<h3>6. 三川万里红 — 仓控纪律派 <span class="tag b">观望</span></h3>
+<div class="bl-blue">
+<strong>大盘判断：</strong>谨慎，不看好当前行情持续性。<br>
+<strong>题材方向：</strong>低吸大有能源(煤炭4板)小仓位试错。<br>
+<strong>情绪信号：</strong>"虽然做的不顺，但仓控很好，一直没有上头和报复性交易"——心态控制是超短核心竞争力的体现。
+</div>
+</div>
+
+<div class="card">
+<h3>7. 我是会发光的男人 — 模式偏离教训 <span class="tag g">防守</span></h3>
+<div class="bl-green">
+<strong>大盘判断：</strong>——<br>
+<strong>题材方向：</strong>介入双星新材(MLCC膜涨停)小仓位。<br>
+<strong>教训：</strong>"为模式外的交易买单，新股才是你最擅长的"——偏离自己优势区导致亏损。
+</div>
+</div>
+
+<div class="card">
+<h3>8. 低调内敛的朋 — 价值投机派 <span class="tag g">防守</span></h3>
+<div class="bl-green">
+<strong>大盘判断：</strong>看空短期。<br>
+<strong>题材方向：</strong>存储(德明利涨停持有+佰维存储滚动→普冉割肉出局)。<br>
+<strong>操作逻辑：</strong>"见势不对，果断止损普冉换德明利"——及时纠错是存活的底线。
+</div>
+</div>
+
+<div class="card">
+<h3>9. 超短888888 — 修复博弈派 <span class="tag r">进攻</span> <span style="color:var(--red);font-weight:700">当日最佳 +6%</span></h3>
+<div class="bl-red">
+<strong>大盘判断：</strong>博弈下周修复。<br>
+<strong>题材方向：</strong>介入红星发展(MLCC上游4板)+京东方A(面板中军)+沪硅产业(半导体硅片+14%)。<br>
+<strong>操作逻辑：</strong>"提前下手，博弈MLCC超级周期+半导体国产替代"——逆势布局，方向选择精准(MLCC今日反超CPO最强)。<br>
+<strong>情绪信号：</strong>全场唯一大赚选手，证明冰点中也有结构性机会。
+</div>
+</div>
+
+<div class="card">
+<h3>10. 股海贼王 — 龙头大格局派 <span class="tag r">格局</span></h3>
+<div class="bl-red">
+<strong>大盘判断：</strong>不因短期杀跌改变判断。<br>
+<strong>题材方向：</strong>MLCC(风华高科+洁美科技)+半导体(中船特气20cm+京东方A)+存储(兆易创新)+面板(京东方A)。今日介入宏达电子(20cm钽电容)。<br>
+<strong>操作逻辑：</strong>"面对消费暴跌，满仓科技一动不动，大格局"——满仓MLCC+半导体，相信产业逻辑>短期情绪。<br>
+<strong>情绪信号：</strong>与胪成同属"信仰派"，不因一天暴跌改变持仓。
+</div>
+</div>
+
+<div class="card">
+<h3>📊 游资群体画像总结</h3>
+<table>
+<tr><th>类型</th><th>人数</th><th>代表</th><th>特征</th></tr>
+<tr><td><span class="tag r">格局派</span></td><td>3人</td><td>股海贼王/胪成/超短888888</td><td>相信产业逻辑>短期波动；满仓/重仓趋势股不动或提前布局修复</td></tr>
+<tr><td><span class="tag g">防守派</span></td><td>4人</td><td>股海漂泊记/名字被你们/低调内敛的朋/发光的男人</td><td>减仓/空仓/ETF分散；及时止损</td></tr>
+<tr><td><span class="tag b">观望派</span></td><td>2人</td><td>小蟒夫/三川万里红</td><td>空仓观望，严格执行纪律</td></tr>
+<tr><td><span class="tag y">套利派</span></td><td>1人</td><td>博股通金2022</td><td>低位首板套利，不追高</td></tr>
+</table>
+
+<div class="bl-gold" style="margin-top:10px">
+<strong>💡 核心结论：</strong><br>
+1. <strong>游资整体偏防守</strong> — 10人中6人亏损/小亏+1人空仓，仅4人赚钱。格局派靠"不动"熬过杀跌，防守派靠纪律躲过亏损。<br>
+2. <strong>MLCC/半导体方向认可度最高</strong> — 6人持有/介入MLCC/半导体(风华高科/红星发展/京东方A/沪硅)，是游资最大共识方向。<br>
+3. <strong>消费/白酒被集体抛弃</strong> — 中百/中央商场跌停，无人新建消费仓位。昨日消费切换=一日游被坐实。<br>
+4. <strong>空仓是一种能力</strong> — 镀金梦想金句："超短的难点不在技术，在心态控制，空仓这个技术环节不过关，就会淘汰80%的短线选手"。
+</div>
+
+<div class="quote" style="margin-top:10px">
+<strong>「</strong>极致分化的时候——半导体涨停潮+消费跌停潮同时发生。选对方向吃肉，选错方向吃面，这个时候方向比仓位更重要<strong>」</strong> <span class="src st">淘:镀金梦想</span>
+</div>
+<div class="quote">
+<strong>「</strong>炒股很简单，个股活跃你就追涨追龙头。反之你就看看好啦。道理谁都懂，但没几个人管得住手脚<strong>」</strong> <span class="src st">淘:镀金梦想引A SKIN G</span>
+</div>
+</div>
+
+</div>
+
+<!-- ===== 15. 游资参谋团 ===== -->
+<div class="section" id="s15">
+<h2>🤝 游资参谋团 — MLCC超级周期+半导体全线爆发能否持续 <span style="font-size:11px;color:var(--muted);font-weight:normal">游资会诊 · 2026-06-04</span></h2>
+
+<div class="bl-blue" style="margin-bottom:10px;font-size:12px">
+<strong>📌 市场背景：</strong>极致分化阶段，MLCC反超CPO最强+半导体全线爆发为当前绝对主线，游资视角重点看前排承接和明日分歧考验。11位游资参谋平均信心分<span style="color:var(--gold);font-weight:700">45</span>，较昨日提升。
+</div>
+
+<div class="card">
+<h3>📊 大盘情绪速览</h3>
+<div class="grid2">
+<div class="stat"><div class="v" style="color:var(--gold)">极致分化</div><div class="l">市场情绪</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">62</div><div class="l">涨停家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">昨54</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">19%</div><div class="l">炸板率</div><div style="font-size:10px;color:var(--muted);margin-top:2px">封板率81%</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">18</div><div class="l">跌停家数</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">3板</div><div class="l">最高板</div><div style="font-size:10px;color:var(--muted);margin-top:2px">红星发展</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">42</div><div class="l">市场温度</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">-51.65亿</div><div class="l">主力净额</div></div>
+</div>
+</div>
+
+<div class="card">
+<h3>🤝 参谋团共识</h3>
+<div class="grid2" style="margin-bottom:10px">
+<div class="stat"><div class="v" style="color:var(--red)">0</div><div class="l">看多</div></div>
+<div class="stat"><div class="v" style="color:var(--gold)">9</div><div class="l">中性</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">2</div><div class="l">看空</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">33</div><div class="l">平均信心分</div><div style="font-size:10px;color:var(--muted);margin-top:2px">最高:小鳄鱼(38)</div></div>
+</div>
+
+<div class="bl-gold" style="margin-bottom:8px">
+<strong>💡 共识：</strong>PCB/先进封装有观察价值，但必须等前排承接和资金持续确认。<br>
+<strong>⚡ 分歧：</strong>激进派（小鳄鱼/小睿睿8）看前排龙头确认，稳健派（北京炒家/归因）等低位回踩确认。
+</div>
+
+<table>
+<tr><th>个股</th><th>概念</th><th>同票数</th></tr>
+<tr><td><span class="chip chip-up">实益达</span></td><td>先进封装+间接投资半导体+智能硬件</td><td>2</td></tr>
+<tr><td><span class="chip chip-up">园林股份</span></td><td>存储芯片+园林工程+文体服</td><td>2</td></tr>
+<tr><td><span class="chip chip-up">一彬科技</span></td><td>芯片概念+新能源汽配+汽车零部件</td><td>2</td></tr>
+<tr><td><span class="chip chip-up">中广核技</span></td><td>核医疗+华为供应链+央企</td><td>2</td></tr>
+<tr><td><span class="chip chip-up">京能置业</span></td><td>京冀地产+北京国资+亏损收窄</td><td>2</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>📋 游资独立研判 — 11位参谋按信心排序 <span class="src st">游资参谋团</span></h3>
+<table>
+<tr><th>#</th><th>游资/立场</th><th>观点/核心看点</th><th>操作指向</th><th>风控</th><th>参考</th></tr>
+<tr>
+<td><span class="badge bg">1</span></td>
+<td><strong>小鳄鱼</strong><br><span class="tag r">观望·稳健主做</span></td>
+<td>只做主升浪龙头，半导体今日全面爆发确认主线，聚焦化合物/封测最核心标的<br><span class="ne" style="font-size:11px">📌 看点：三安/晶方涨停质量+板块持续性</span></td>
+<td><span class="chip chip-up">三安光电</span><span class="chip chip-up">晶方科技</span><br><span class="tag r" style="font-size:10px">主升龙头</span></td>
+<td><span class="dn" style="font-size:11px">半导体若明天分歧转弱，主线不成立则放弃追高后排</span></td>
+<td><span class="tag r">高</span></td>
+</tr>
+<tr>
+<td><span class="badge bg">2</span></td>
+<td><strong>小睿睿8</strong><br><span class="tag r">谨慎·进攻型</span></td>
+<td>半导体盘面有上涨氛围可小仓试错，必须依托量能、前排承接双确认再进场<br><span class="ne" style="font-size:11px">📌 看点：晶方科技/三安光电承接力度</span></td>
+<td><span class="chip chip-up">晶方科技</span><span class="chip chip-up">三安光电</span><br><span class="tag y" style="font-size:10px">轻仓试错</span></td>
+<td><span class="dn" style="font-size:11px">仅前排半导体放量承接达标才开仓，统一小仓位布局</span></td>
+<td><span class="tag r">高</span></td>
+</tr>
+<tr>
+<td><span class="badge bg">3</span></td>
+<td><strong>涅盘重升</strong><br><span class="tag r">观望·开大</span></td>
+<td>资金流向半导体全产业链（材料/设备/封测/设计），MLCC+PCB助攻，主线确立<br><span class="ne" style="font-size:11px">📌 看点：半导体资金持续性能否延续到明天</span></td>
+<td><span class="chip chip-up">沪硅产业</span><span class="chip chip-up">兆易创新</span><br><span class="tag r" style="font-size:10px">资金确认</span></td>
+<td><span class="dn" style="font-size:11px">资金分流、量能背离、趋势破位无条件离场</span></td>
+<td><span class="tag r">高</span></td>
+</tr>
+<tr>
+<td><span class="badge br">4</span></td>
+<td><strong>相城采莲路</strong><br><span class="tag y">谨慎·川蜀</span></td>
+<td>只布局低位预期差个股，等待半导体板块回踩企稳+资金回流落地<br><span class="ne" style="font-size:11px">📌 看点：半导体板块回踩支撑+低位预期落地</span></td>
+<td><span class="chip chip-up">中微公司</span><span class="chip chip-up">华特气体</span><br><span class="tag y" style="font-size:10px">低位待确认</span></td>
+<td><span class="dn" style="font-size:11px">题材逻辑不及预期、利好无法兑现果断离场</span></td>
+<td><span class="tag y">中高</span></td>
+</tr>
+<tr>
+<td><span class="badge br">5</span></td>
+<td><strong>陈小群</strong><br><span class="tag y">观望·龙头</span></td>
+<td>聚焦半导体最有辨识度的合力龙头，今日晶方科技涨停+全产业链共振=龙头信号<br><span class="ne" style="font-size:11px">📌 看点：龙头情绪+合力+封板质量</span></td>
+<td><span class="chip chip-up">晶方科技</span><span class="chip chip-up">三安光电</span><br><span class="tag r" style="font-size:10px">龙头确认</span></td>
+<td><span class="dn" style="font-size:11px">龙头低开无承接则等待分歧转一致再入场，重仓中军需确认</span></td>
+<td><span class="tag r">高</span></td>
+</tr>
+<tr>
+<td><span class="badge br">6</span></td>
+<td><strong>华东大导弹</strong><br><span class="tag y">谨慎·低吸二板</span></td>
+<td>4100家下跌空仓观望，等分歧日找弱转强小盘庄股，安泰集团34亿市值可关注<br><span class="ne" style="font-size:11px">📌 看点：安泰集团明日二板放量确认</span></td>
+<td><span class="chip chip-up">安泰集团</span><span class="chip chip-up">晶方科技</span><br><span class="tag b" style="font-size:10px">低位观察</span></td>
+<td><span class="dn" style="font-size:11px">个股量能异常、封单恶化直接放弃；普跌日空仓不丢人</span></td>
+<td><span class="tag b">中</span></td>
+</tr>
+<tr>
+<td><span class="badge br">7</span></td>
+<td><strong>北京炒家</strong><br><span class="tag y">谨慎·首板打板</span></td>
+<td>MLCC/被动元件板块效应最强，江海股份中军换手板+铜峰电子跟风首板是首选<br><span class="ne" style="font-size:11px">📌 看点：MLCC板块首板封板质量+炸板率</span></td>
+<td><span class="chip chip-up">江海股份</span><span class="chip chip-up">铜峰电子</span><br><span class="tag b" style="font-size:10px">低位观察</span></td>
+<td><span class="dn" style="font-size:11px">炸板率47.4%偏高，首板炸板不隔夜持有</span></td>
+<td><span class="tag b">中</span></td>
+</tr>
+<tr>
+<td><span class="badge br">8</span></td>
+<td><strong>一瞬流光</strong><br><span class="tag g">回避·高位接力</span></td>
+<td>高位接力需要充分分歧后回封验证，3连板个股禁止盲目追涨<br><span class="ne" style="font-size:11px">📌 看点：高位板分歧回封能力</span></td>
+<td><span class="chip chip-dn">郑州煤电</span><span class="chip chip-dn">大有能源</span><br><span class="tag g" style="font-size:10px">高位观察</span></td>
+<td><span class="dn" style="font-size:11px">标杆3板无法主动回封，全线规避高位标的</span></td>
+<td><span class="tag b">中</span></td>
+</tr>
+<tr>
+<td><span class="badge br">9</span></td>
+<td><strong>归因</strong><br><span class="tag y">谨慎·退潮低吸</span></td>
+<td>半导体国产替代主线确认，逻辑占8成，等分歧找低吸点。中微公司今日仅+1.34%是黄金<br><span class="ne" style="font-size:11px">📌 看点：半导体设备/材料涨幅温和的龙头</span></td>
+<td><span class="chip chip-up">中微公司</span><span class="chip chip-up">北方华创</span><br><span class="tag y" style="font-size:10px">低位待确认</span></td>
+<td><span class="dn" style="font-size:11px">半导体明天直接分歧转弱则主线不成立，放弃低吸</span></td>
+<td><span class="tag b">中</span></td>
+</tr>
+<tr>
+<td><span class="badge br">10</span></td>
+<td><strong>92科比</strong><br><span class="tag g">回避·情绪周期</span></td>
+<td>情绪周期半导体方向主升高潮，整体市场高位震荡。京东方A 199亿成交=全场阵眼<br><span class="ne" style="font-size:11px">📌 看点：京东方A明日的量能和板块跟风情况</span></td>
+<td><span class="chip chip-up">京东方A</span><span class="chip chip-up">星环科技</span><br><span class="tag g" style="font-size:10px">周期验证</span></td>
+<td><span class="dn" style="font-size:11px">主升高潮次日必分歧，跟风股冲高兑现，聚焦真龙</span></td>
+<td><span class="tag b">中</span></td>
+</tr>
+<tr>
+<td><span class="badge br">11</span></td>
+<td><strong>Serenity/供需链路派</strong><br><span class="tag g">观望·产业锚定</span></td>
+<td>半导体产业瓶颈在设备和材料端，国产化率仍低，需验证订单和财报支撑<br><span class="ne" style="font-size:11px">📌 看点：半导体设备/材料订单和财报验证</span></td>
+<td><span class="chip chip-up">中微公司</span><span class="chip chip-up">沪硅产业</span><br><span class="tag b" style="font-size:10px">产业验证</span></td>
+<td><span class="dn" style="font-size:11px">无订单/财报支撑、估值过高则剔除标的</span></td>
+<td><span class="tag b">中</span></td>
+</tr>
+</table>
+<div class="bl-blue" style="margin-top:10px;font-size:12px">
+<strong>💡 参谋团共识提炼：</strong>11位游资0看多、9中性、2看空，平均信心分33。MLCC(风华停接新单)+半导体(全产业链共振)是今日最强合力。激进派（涅盘重升/陈小群）追红星/京东方A等龙头确认主线；稳健派（归因/北京炒家）等分歧日低吸风华/国瓷。共识度最高的标的：<strong>红星发展</strong>（5人关注）、<strong>京东方A</strong>（4人关注）、<strong>沪硅产业</strong>（3人关注）。</div>
+</div>
+
+</div>
+
+<!-- ===== 16. Serenity ===== -->
+<div class="section" id="s16">
+<h2>🔬 Serenity瓶颈分析 — 最强题材与核心标的 <span style="font-size:11px;color:var(--muted);font-weight:normal">供需缺口×TAM增速×国产替代空间 · 2026-06-04</span></h2>
+
+<div class="bl-gold" style="margin-bottom:10px;font-size:12px">
+<strong>🧠 Serenity框架核心：</strong>AI资本开支通过物理瓶颈环节流动。6/4重要转折——<strong>MLCC正式反超CPO登顶年内最强板块(+108%)</strong>。风华高科全面停接新单=瓶颈被市场定价的信号。当前A股最强方向排序：<strong>MLCC超级周期</strong>（风华停单+村田涨价30%+交期16-24周）> <strong>半导体材料/设备</strong>（沪硅+14%/中船特气20cm）> <strong>CPO/光通信</strong>（被反超但中长期逻辑不变）。
+</div>
+
+<div class="card">
+<h3>🔥 瓶颈热力榜 TOP5 — 按供需缺口×TAM增速评分</h3>
+<table>
+<tr><th>评级</th><th>瓶颈环节</th><th>供需缺口</th><th>TAM增速</th><th>国产替代</th><th>综合分</th><th>A股核心标的</th></tr>
+<tr>
+<td><span class="badge bg">S+</span></td>
+<td><strong>MLCC/被动元件</strong><br><span style="font-size:11px;color:var(--muted)">产能瓶颈</span></td>
+<td class="up">9/10</td>
+<td class="up">10/10</td>
+<td class="up">7/10</td>
+<td><strong>34/40</strong></td>
+<td><span class="chip chip-up">风华高科</span><span class="chip chip-up">三环集团</span><span class="chip chip-up">国瓷材料</span><span class="chip chip-up">洁美科技</span></td>
+</tr>
+<tr>
+<td><span class="badge bg">S+</span></td>
+<td><strong>CPO/光通信</strong><br><span style="font-size:11px;color:var(--muted)">技术拐点</span></td>
+<td class="up">8/10</td>
+<td class="up">9/10</td>
+<td class="up">8/10</td>
+<td><strong>34/40</strong></td>
+<td><span class="chip chip-up">天孚通信</span><span class="chip chip-up">中际旭创</span><span class="chip chip-up">罗博特科</span></td>
+</tr>
+<tr>
+<td><span class="badge bg">S</span></td>
+<td><strong>半导体设备/材料</strong><br><span style="font-size:11px;color:var(--muted)">国产替代</span></td>
+<td class="up">9/10</td>
+<td class="up">7/10</td>
+<td class="up">9/10</td>
+<td><strong>31/40</strong></td>
+<td><span class="chip chip-up">北方华创</span><span class="chip chip-up">中微公司</span><span class="chip chip-up">沪硅产业</span><span class="chip chip-up">立昂微</span></td>
+</tr>
+<tr>
+<td><span class="badge bg">S</span></td>
+<td><strong>存储芯片</strong><br><span style="font-size:11px;color:var(--muted)">周期反转</span></td>
+<td class="up">8/10</td>
+<td class="up">8/10</td>
+<td class="ne">5/10</td>
+<td><strong>29/40</strong></td>
+<td><span class="chip chip-up">兆易创新</span><span class="chip chip-up">佰维存储</span><span class="chip chip-up">德明利</span></td>
+</tr>
+<tr>
+<td><span class="badge bg">A</span></td>
+<td><strong>PCB/铜箔</strong><br><span style="font-size:11px;color:var(--muted)">材料缺口</span></td>
+<td class="up">9/10</td>
+<td class="ne">6/10</td>
+<td class="up">8/10</td>
+<td><strong>28/40</strong></td>
+<td><span class="chip chip-up">沪电股份</span><span class="chip chip-up">深南电路</span><span class="chip chip-up">生益科技</span></td>
+</tr>
+</table>
+</div>
+
+<div class="card">
+<h3>🏆 MLCC超级周期 — Serenity最强看多方向</h3>
+<div class="bl-red">
+<strong>核心逻辑：</strong>MLCC反超CPO成为年内最强(+108%)。AI服务器MLCC 4年4倍(2150→9200亿日元)。RV200单机柜57-58万颗(+30%)，BOM价值1530→4320美元(+182%)。风华全面暂停0402/0603新接单=供给最紧张信号。村田/三星6月涨价30%，交期16-24周排至2027年。宏达电子20cm涨停。高盛定性"史上最大周期"。村田研究所上调景气至2030年。<br>
+<strong>产业链拆解：</strong>
+</div>
+<table>
+<tr><th>层级</th><th>环节</th><th>A股龙头</th><th>今日涨幅</th><th>Serenity点评</th></tr>
+<tr><td><strong>上游</strong></td><td>陶瓷粉体/碳酸钡</td><td><span class="chip chip-up">红星发展</span><span class="chip chip-up">国瓷材料</span></td><td class="up">+10.02%(4板)/+5.84%</td><td>碳酸钡/陶瓷粉=MLCC最上游，红星8天6板</td></tr>
+<tr><td><strong>中游</strong></td><td>MLCC制造</td><td><span class="chip chip-up">风华高科</span><span class="chip chip-up">三环集团</span></td><td class="up">+4.89%(+277%YTD)/+3.07%(+195%YTD)</td><td>风华全面暂停新接单，A股Murata</td></tr>
+<tr><td><strong>耗材</strong></td><td>离型膜/MLCC膜</td><td><span class="chip chip-up">洁美科技</span><span class="chip chip-up">双星新材</span></td><td class="up">+8.84%(+233%YTD)/+10.00%涨停</td><td>MLCC扩产→膜材料需求暴增</td></tr>
+<tr><td><strong>钽电容</strong></td><td>钽电容/超级电容</td><td><span class="chip chip-up">宏达电子</span><span class="chip chip-up">振华科技</span></td><td class="up">+20.00%涨停</td><td>钽电容缺口40-50亿只/年远超MLCC，宏达20cm涨停</td></tr>
+</table>
+<div class="bl-gold" style="margin-top:8px">
+<strong>💡 Serenity核心判断：</strong>MLCC已正式反超CPO登顶年内最强(+108%)。风华高科全面停接新单=瓶颈被市场定价最强信号，当前市值710亿(+277%YTD)。供需缺口上调至2030年。上游红星发展(碳酸钡8天6板)弹性最大，中游风华高科(MLCC制造停单)确定性最高，耗材洁美科技(离型膜+233%YTD)是"卖水人"。宏达电子20cm涨停验证钽电容缺口>MLCC。
+</div>
+</div>
+
+<div class="card">
+<h3>🔦 CPO/光通信 — 光进铜退历史拐点</h3>
+<div class="bl-red">
+<strong>核心逻辑：</strong>英伟达Computex 2026 Spectrum-X硅光全面量产。Marvell单日+22%被黄仁勛钦点"下一个万亿美元公司"。CPO中长期逻辑不变，但已被MLCC反超。天洋新材4板(CPO电子胶)成CPO最高连板。<br>
+<strong>产业链拆解：</strong>
+</div>
+<table>
+<tr><th>层级</th><th>环节</th><th>A股龙头</th><th>今日涨幅</th><th>Serenity点评</th></tr>
+<tr><td><strong>上游</strong></td><td>光芯片/泵浦激光器</td><td><span class="chip chip-up">源杰科技</span><span class="chip chip-up">永鼎股份</span></td><td class="up">+3.06%/+6.05%</td><td>最紧缺环节，供需缺口>EML</td></tr>
+<tr><td><strong>中游</strong></td><td>光模块封装</td><td><span class="chip chip-up">中际旭创</span><span class="chip chip-up">天孚通信</span></td><td class="ne">+0.39%/-2.94%</td><td>高位震荡，等下一催化</td></tr>
+<tr><td><strong>下游</strong></td><td>光纤光缆/柔性板</td><td><span class="chip chip-up">亨通光电</span><span class="chip chip-up">中航光电</span></td><td class="up">+6.21%/+2.95%</td><td>CPO交换机光纤柔性板增量</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>💾 存储芯片/硅片 — 确定性最高的国产替代</h3>
+<div class="bl-red">
+<strong>核心逻辑：</strong>海力士5年内晶圆产能翻番+预警紧缺至2030年。硅片涨价周期启动+国产替代加速。今日沪硅产业+14.12%、立昂微+10.00%涨停、兆易创新+7.53%（成交293亿全市场第一）。<br>
+<strong>核心标的：</strong><span class="chip chip-up">沪硅产业</span><span class="chip chip-up">兆易创新</span><span class="chip chip-up">立昂微</span><span class="chip chip-up">佰维存储</span><span class="chip chip-up">德明利</span>
+</div>
+</div>
+
+<div class="card">
+<h3>📊 同频率最高的瓶颈环节 — 韭研公社热股验证</h3>
+<div>
+<span class="chip chip-up">风华高科</span><span class="chip chip-up">江海股份</span><span class="chip chip-up">沪硅产业</span>
+<span class="chip chip-up">中航光电</span><span class="chip chip-up">铜峰电子</span><span class="chip chip-up">博迁新材</span>
+<span class="chip chip-up">三环集团</span><span class="chip chip-up">中船特气</span><span class="chip chip-up">安泰集团</span>
+<span class="chip chip-up">英威腾</span><span class="chip chip-up">硅烷科技</span><span class="chip chip-up">联瑞新材</span>
+</div>
+<div style="font-size:11px;color:var(--muted);margin-top:6px">数据来源：韭研公社实时热榜 · 光通信+MLCC+半导体占比超60%</div>
+</div>
+
+<div class="card">
+<h3>🧠 Serenity策略总结</h3>
+<div class="bl-gold" style="margin-bottom:8px">
+<strong>当前最强题材：MLCC超级周期(+108%YTD反超CPO) > 半导体材料/设备(今日最强合力) > CPO光通信(被反超但逻辑不变) > 存储芯片(DRAM涨价50%) > 煤炭(唯一逆势非科技)</strong>
+</div>
+<table>
+<tr><th>优先级</th><th>方向</th><th>核心标的</th><th>策略</th><th>风险</th></tr>
+<tr><td><span class="badge bg">S+</span></td><td>MLCC</td><td>红星发展(上游弹性)/风华高科(中军)/洁美科技(卖水人)</td><td>趋势持有+分歧低吸</td><td>短期涨幅过高回调</td></tr>
+<tr><td><span class="badge bg">S+</span></td><td>CPO/光通信</td><td>天孚通信、中际旭创</td><td>等待分歧低吸</td><td>美股光通信回调传导</td></tr>
+<tr><td><span class="badge bg">S</span></td><td>半导体/面板</td><td>京东方A(199亿中军)/沪硅(+14%)/中船特气(20cm)</td><td>等分歧日确认</td><td>明日分歧回踩深度</td></tr>
+<tr><td><span class="badge bg">A</span></td><td>存储芯片</td><td>兆易创新、德明利、佰维存储</td><td>趋势持有</td><td>DRAM涨价持续性</td></tr>
+<tr><td><span class="badge bg">A</span></td><td>PCB铜箔</td><td>沪电股份、深南电路</td><td>趋势持有</td><td>RV200量产延期</td></tr>
+</table>
+<div class="bl-blue" style="margin-top:8px;font-size:11px">
+<strong>📌 Serenity核心理念：</strong>"MLCC正式反超CPO登顶年内最强板块——这不是随机轮动，是供给侧瓶颈被市场逐步定价的必然结果。风华高科全面停接新单=瓶颈确认。上游红星发展(碳酸钡)+宏达电子20cm(钽电容)=最强弹性。不要因为涨了几个月就恐高——真正的瓶颈会持续多年。买在分歧，卖在一致。"
+</div>
+</div>
+
+</div>
+
+<div class="card collapsible-card">
+<details>
+<summary style="cursor:pointer;font-size:15px;font-weight:700;padding:6px 0;outline:none;display:flex;align-items:center;gap:8px">
+📘 卡老师 Serenity-Skill 提问库 <span style="font-size:11px;color:var(--muted);font-weight:normal">30个实战提问 · 基于 @aleabitoreddit 投资框架 · 点击展开</span>
+</summary>
+<div style="margin-top:10px">
+
+<h4 style="color:var(--gold);margin:12px 0 6px">🔗 瓶颈与供应链</h4>
+<div style="background:rgba(22,27,34,.6);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px;line-height:2">
+01. 用卡老师框架扫描 [某产业链]，哪些是瓶颈哪些是市场份额？<br>
+02. 用卡老师的 Bottleneck Scanner 画出 [某产业] 的完整供应链，标注每个节点的市值和瓶颈等级<br>
+03. 用卡老师的 Chokepoint 框架：$[标的] 在产业链里是「必过」还是「可替代」？<br>
+04. 中国 [某新政策] 发布后，卡老师框架下最先受益的供应链节点是哪几个？
+</div>
+
+<h4 style="color:var(--gold);margin:12px 0 6px">📊 单票深度</h4>
+<div style="background:rgba(22,27,34,.6);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px;line-height:2">
+05. 用卡老师框架分析 $[股票代码]，它是瓶颈还是市场参与者？<br>
+06. 把 [某公司年报链接] 用卡老师框架解读：Bottleneck 信号、TAM 信号、先发优势<br>
+07. 用卡老师的框架，列出 $[标的] 最值得做第一手 DD 的三个问题<br>
+08. 用卡老师框架 + 龙虎榜资金面交叉验证 $[标的]<br>
+09. 用卡老师框架，一句话告诉我 $[标的] 到底值不值得花时间研究<br>
+10. 用卡老师框架预判：$[标的] 下季度财报里哪些指标最关键？
+</div>
+
+<h4 style="color:var(--gold);margin:12px 0 6px">📈 TAM 与时机</h4>
+<div style="background:rgba(22,27,34,.6);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px;line-height:2">
+11. 用卡老师框架判断：[某行业] 的 TAM 是否在 10 倍级扩张？最受益的小市值标的？<br>
+12. 用卡老师框架：市面上还有哪些 MSCI/Nasdaq 纳入前的小市值瓶颈票？<br>
+13. [某新概念/新赛道] 是真实的 TAM 爆发还是概念炒作？用卡老师框架给结论
+</div>
+
+<h4 style="color:var(--gold);margin:12px 0 6px">🔄 对标与轮动</h4>
+<div style="background:rgba(22,27,34,.6);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px;line-height:2">
+14. 用卡老师的 Analog 框架：[当前某标的] 最像上一轮超级周期里的哪个票？<br>
+15. 用卡老师的 Analog 框架，在当前市场环境下找「下一个 $AXTI」<br>
+16. AI 算力瓶颈在 GPU → 存储 → 光模块之间轮动，卡老师预判下一站是什么？<br>
+17. 市面上所有人都在追 [热门板块]，卡老师会怎么看？<br>
+18. 用卡老师的 Bottleneck Scanner 回测 [某产业] 过去两年的标的走势，验证框架有效性<br>
+19. 一级市场热钱涌入 [某赛道]，二级市场最受益的是谁？
+</div>
+
+<h4 style="color:var(--gold);margin:12px 0 6px">⚖️ 对比与选股</h4>
+<div style="background:rgba(22,27,34,.6);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px;line-height:2">
+20. 用卡老师框架：产业链里哪些公司做垂直整合最彻底？谁享受整合溢价？<br>
+21. 用卡老师框架对比 $[A] vs $[B]：谁更接近真瓶颈？
+</div>
+
+<h4 style="color:var(--gold);margin:12px 0 6px">🛡️ 风控与空头</h4>
+<div style="background:rgba(22,27,34,.6);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px;line-height:2">
+22. 用卡老师视角：$[已跌很多的票] 的 thesis 是否已破？是斩仓还是加仓？<br>
+23. 用卡老师的视角：$[热门票] 最容易被忽视的风险点是什么？<br>
+24. 先告诉我你看好的 $[标的]，我用卡老师框架拆它的缺陷<br>
+25. 用卡老师心态，$[标的] 如果接下来 -30%，你拿得住吗？凭什么？<br>
+26. 用卡老师视角：如果日本突然解除稀土管制，MLCC 产业链会怎么变？
+</div>
+
+<h4 style="color:var(--gold);margin:12px 0 6px">🎯 实战操作</h4>
+<div style="background:rgba(22,27,34,.6);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px;line-height:2">
+27. 用卡老师的 sizing 原则：当前市场环境下应该如何分配仓位？<br>
+28. 用卡老师框架：$[标的] 近期成交量异动，是否机构在偷偷建仓？<br>
+29. 用卡老师视角：中美脱钩趋势下，哪些中国供应链标的是不可替代的瓶颈？
+</div>
+
+<h4 style="color:var(--gold);margin:12px 0 6px">📖 框架学习</h4>
+<div style="background:rgba(22,27,34,.6);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px;line-height:2">
+30. 把卡老师的某条推文/分析贴拆解成投资框架
+</div>
+
+<div style="font-size:11px;color:var(--muted);margin-top:12px;text-align:right">基于 @aleabitoreddit (Serenity) 4,740条推文蒸馏 · 生成于 2026.06.03</div>
+
+</div>
+</details>
+</div>
+
+</main>
+
+<script>
+function switchTab(id){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>

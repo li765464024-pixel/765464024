@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>双社区全面复盘 · 淘股吧×韭研公社</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header>
+<h1>📊 <span id="header-date">加载中...</span> 双社区全面复盘</h1>
+<div class="meta">淘股吧×韭研公社 | <span id="header-meta">数据加载中</span></div>
+</header>
+
+<div class="tabs-wrap">
+<div class="tab active" onclick="switchTab('s1')">📈 大盘概况</div>
+<div class="tab" onclick="switchTab('s2')">🔥 板块热度</div>
+<div class="tab" onclick="switchTab('s3')">🔄 题材生命周期</div>
+<div class="tab" onclick="switchTab('s9')">🔀 题材轮动</div>
+<div class="tab" onclick="switchTab('s4')">⛓ 产业链深度</div>
+<div class="tab" onclick="switchTab('s5')">🐂 淘股吧视角</div>
+<div class="tab" onclick="switchTab('s6')">🔬 韭研公社视角</div>
+<div class="tab" onclick="switchTab('s7')">🪜 连板梯队</div>
+<div class="tab" onclick="switchTab('s8')">🎯 高标个股分析</div>
+<div class="tab" onclick="switchTab('s10')">🤝 共识与分歧</div>
+<div class="tab" onclick="switchTab('s0')">📰 盘前纪要</div>
+<div class="tab" onclick="switchTab('s13')">💰 游资实盘</div>
+<div class="tab" onclick="switchTab('s15')">🤝 游资参谋团</div>
+<div class="tab" onclick="switchTab('s16')">🔬 Serenity</div>
+<div class="tab" onclick="switchTab('s17')">🔫 92科比</div>
+<div class="tab" onclick="switchTab('s18')">🐲 陈小群</div>
+</div>
+
+<main>
+<!-- ===== s1: 大盘概况 ===== -->
+<div class="section active" id="s1">
+  <div class="loading" id="loading-s1">
+    <div class="spinner"></div>
+    <div>加载大盘数据...</div>
+  </div>
+</div>
+
+<!-- ===== s2: 板块热度 ===== -->
+<div class="section" id="s2">
+  <div class="loading"><div class="spinner"></div><div>加载板块数据...</div></div>
+</div>
+
+<!-- ===== s3: 题材生命周期 ===== -->
+<div class="section" id="s3">
+  <div class="card">
+    <h3>🔄 题材生命周期全景</h3>
+    <div class="bl-blue" style="font-size:12px">
+      <strong>⏳ 数据加载中...</strong> 请确保后端已启动
+    </div>
+  </div>
+</div>
+
+<!-- ===== s9: 题材轮动 ===== -->
+<div class="section" id="s9">
+  <div class="card">
+    <h3>🔀 题材轮动逻辑</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 基于历史数据的时间序列分析</div>
+  </div>
+</div>
+
+<!-- ===== s4: 产业链深度 ===== -->
+<div class="section" id="s4">
+  <div class="card">
+    <h3>⛓ 产业链深度拆解</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 从数据库产业链表动态渲染</div>
+  </div>
+</div>
+
+<!-- ===== s5: 淘股吧视角 ===== -->
+<div class="section" id="s5">
+  <div class="loading"><div class="spinner"></div><div>加载淘股吧数据...</div></div>
+</div>
+
+<!-- ===== s6: 韭研公社视角 ===== -->
+<div class="section" id="s6">
+  <div class="loading"><div class="spinner"></div><div>加载韭研公社数据...</div></div>
+</div>
+
+<!-- ===== s7: 连板梯队 ===== -->
+<div class="section" id="s7">
+  <div class="card">
+    <h3>📊 连板全景表</h3>
+    <div class="bl-blue" style="font-size:12px;margin-bottom:8px">
+      <strong>✅ 数据来源：</strong>悟道A股数据API — 从数据库加载
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
+      <div class="board-tab active" onclick="switchBoardTab('one')" data-board="one">一板</div>
+      <div class="board-tab" onclick="switchBoardTab('two')" data-board="two">二板</div>
+      <div class="board-tab" onclick="switchBoardTab('three')" data-board="three">三板</div>
+      <div class="board-tab" onclick="switchBoardTab('higher')" data-board="higher">更高</div>
+      <div id="board-summary-data" style="display:flex;gap:6px;margin-left:auto"></div>
+    </div>
+    <div style="overflow-x:auto">
+      <div id="board-one" class="board-table-wrap" style="display:block"><div class="loading"><div class="spinner"></div></div></div>
+      <div id="board-two" class="board-table-wrap" style="display:none"><div class="loading"><div class="spinner"></div></div></div>
+      <div id="board-three" class="board-table-wrap" style="display:none"><div class="loading"><div class="spinner"></div></div></div>
+      <div id="board-higher" class="board-table-wrap" style="display:none"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== s8: 高标个股分析 ===== -->
+<div class="section" id="s8">
+  <div class="card">
+    <h3>🎯 高标个股分析</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 调用同花顺+龙虎榜 API</div>
+  </div>
+</div>
+
+<!-- ===== s10: 共识与分歧 ===== -->
+<div class="section" id="s10">
+  <div class="card">
+    <h3>🤝 共识与分歧</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 淘股吧+韭研公社数据综合</div>
+  </div>
+</div>
+
+<!-- ===== s0: 盘前纪要 ===== -->
+<div class="section" id="s0">
+  <div class="card">
+    <h3>📰 盘前纪要</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 每日盘前自动生成</div>
+  </div>
+</div>
+
+<!-- ===== s13: 游资实盘 ===== -->
+<div class="section" id="s13">
+  <div class="card">
+    <h3>💰 游资实盘</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 需要龙虎榜实时数据</div>
+  </div>
+</div>
+
+<!-- ===== s15: 游资参谋团 ===== -->
+<div class="section" id="s15">
+  <div class="card">
+    <h3>🤝 游资参谋团</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 多游资视角综合</div>
+  </div>
+</div>
+
+<!-- ===== s16: Serenity瓶颈分析 ===== -->
+<div class="section" id="s16">
+  <div class="card">
+    <h3>🔬 Serenity瓶颈分析</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 供需缺口×TAM增速×国产替代</div>
+  </div>
+</div>
+
+<!-- ===== s17: 92科比 ===== -->
+<div class="section" id="s17">
+  <div class="card">
+    <h3>🔫 92科比情绪周期</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 情绪四阶段定位</div>
+  </div>
+</div>
+
+<!-- ===== s18: 陈小群 ===== -->
+<div class="section" id="s18">
+  <div class="card">
+    <h3>🐲 陈小群视角</h3>
+    <div class="bl-blue" style="font-size:12px"><strong>⏳ 待开发</strong> — 情绪+合力+龙头</div>
+  </div>
+</div>
+
+</main>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
