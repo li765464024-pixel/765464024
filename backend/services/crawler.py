@@ -157,33 +157,6 @@ def fetch_zt_pool():
 # 3. 大盘数据 (从涨停池推算 + akshare)
 # ════════════════════════════════════════════
 
-def fetch_market_index():
-    """从腾讯证券获取四大指数实时数据"""
-    try:
-        r = requests.get("http://qt.gtimg.cn/q=sh000001,sz399001,sz399006,sh000688", headers=HEADERS, timeout=5)
-        indices = {}
-        for line in r.text.strip().split(';'):
-            if not line.strip(): continue
-            parts = line.split('~')
-            if len(parts) > 32:
-                code = parts[2]
-                price = float(parts[3])
-                change = float(parts[31])
-                change_pct = float(parts[32])
-                
-                if code == '000001': key = 'sh'
-                elif code == '399001': key = 'sz'
-                elif code == '399006': key = 'cy'
-                elif code == '000688': key = 'kc'
-                else: continue
-                
-                indices[key] = {'price': price, 'change': change, 'change_pct': change_pct}
-        return indices
-    except Exception as e:
-        print(f"  ⚠️ 指数获取失败: {e}")
-        return {}
-
-
 def fetch_market_data():
     """大盘概况 — 以悟道API为主, 补充成交额(新浪)+指数(腾讯)"""
     try:
@@ -223,20 +196,31 @@ def fetch_market_data():
                     top_stocks.append(s['name'])
         max_board_stocks = '/'.join(top_stocks[:3])
         
-        # 3. 腾讯证券 → 指数
-        indices = fetch_market_index()
-        
-        # 4. 新浪财经 → 成交额
+        # 3. 新浪财经 → 指数 + 成交额 (替代腾讯证券)
+        indices = {'sh': None, 'sz': None, 'cy': None, 'kc': None}
         volume_str = ''
         try:
-            r3 = requests.get("https://hq.sinajs.cn/list=sh000001,sz399001",
+            r3 = requests.get("https://hq.sinajs.cn/list=sh000001,sz399001,sz399006,sh000688",
                              headers={"User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn"}, timeout=5)
             total_vol = 0
             for line in r3.text.strip().split('\n'):
+                if not line: continue
+                parts = line.split(',')
+                if len(parts) > 10:
+                    name = parts[0].split('=')[1].replace('"','') if '=' in parts[0] else ''
+                    price = float(parts[3])
+                    if name and '上证' in name: indices['sh'] = price
+                    elif name and '深证' in name: indices['sz'] = price
+                    elif name and '创业' in name: indices['cy'] = price
+                    elif name and '科创' in name: indices['kc'] = price
+            # 成交额: 只取上证+深证（全市场）
+            r3b = requests.get("https://hq.sinajs.cn/list=sh000001,sz399001",
+                              headers={"User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn"}, timeout=5)
+            for line in r3b.text.strip().split('\n'):
                 parts = line.split(',')
                 if len(parts) > 10:
                     v = parts[9].strip()
-                    if v and v.replace('.','').replace('+','').replace('-','').isdigit():
+                    if v.replace('.','').isdigit():
                         total_vol += float(v) / 1e8
             if total_vol > 0:
                 volume_str = f"{total_vol:.0f}亿"
@@ -254,10 +238,10 @@ def fetch_market_data():
             'seal_rate': seal_rate, 'volume': volume_str,
             'main_inflow': prev[0]['main_inflow'] if prev else '',
             'max_board': max_board, 'max_board_stocks': max_board_stocks,
-            'index_sh': indices.get('sh', {}).get('price'),
-            'index_sz': indices.get('sz', {}).get('price'),
-            'index_cy': indices.get('cy', {}).get('price'),
-            'index_kc': indices.get('kc', {}).get('price'),
+            'index_sh': indices.get('sh'),
+            'index_sz': indices.get('sz'),
+            'index_cy': indices.get('cy'),
+            'index_kc': indices.get('kc'),
             'temperature': temperature,
             'yesterday_zt_count': prev[0]['zt_count'] if prev else 0,
             'yesterday_seal_rate': prev[0]['seal_rate'] if prev else 0,

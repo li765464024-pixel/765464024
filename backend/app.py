@@ -96,21 +96,30 @@ def api_market_refresh():
 @app.route('/api/data/versions')
 def api_data_versions():
     """数据版本列表（有数据的日期）"""
-    rows = query("SELECT DISTINCT date FROM market_data ORDER BY date DESC")
+    source = request.args.get('source', 'market_data')
+    rows = query(f"SELECT DISTINCT date FROM {source} ORDER BY date DESC")
     return jsonify({'ok': True, 'data': [r['date'] for r in rows]})
 
 @app.route('/api/section/<sid>')
 def api_section(sid):
-    """单个 section 的 HTML 内容"""
-    rows = query("SELECT * FROM section_html WHERE section_id = ? AND date = (SELECT MAX(date) FROM section_html)", (sid,))
+    """单个 section 的 HTML 内容（可选 date 参数）"""
+    req_date = request.args.get('date', '')
+    if req_date:
+        rows = query("SELECT * FROM section_html WHERE section_id=? AND date=?", (sid, req_date))
+    else:
+        rows = query("SELECT * FROM section_html WHERE section_id=? AND date=(SELECT MAX(date) FROM section_html)", (sid,))
     if rows:
         return jsonify({'ok': True, 'data': rows[0]})
     return jsonify({'ok': False, 'error': f'Section {sid} not found'})
 
 @app.route('/api/sections/all')
 def api_sections_all():
-    """当天所有 section 的 HTML"""
-    rows = query("SELECT * FROM section_html WHERE date = (SELECT MAX(date) FROM section_html) ORDER BY id")
+    """当天所有 section 的 HTML（可选 date 参数）"""
+    req_date = request.args.get('date', '')
+    if req_date:
+        rows = query("SELECT * FROM section_html WHERE date=? ORDER BY id", (req_date,))
+    else:
+        rows = query("SELECT * FROM section_html WHERE date=(SELECT MAX(date) FROM section_html) ORDER BY id")
     data = {r['section_id']: r for r in rows}
     return jsonify({'ok': True, 'data': data, 'list': rows})
 
@@ -122,22 +131,20 @@ def api_sections_dates():
 
 @app.route('/api/today/overview')
 def api_today_overview():
-    """今日数据全景 — 前端动态渲染"""
-    today = date.today().strftime("%Y-%m-%d")
+    """今日数据全景（可选 date 参数）"""
+    req_date = request.args.get('date', '')
+    if not req_date:
+        req_date = date.today().strftime("%Y-%m-%d")
     
-    # 大盘
-    market = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (today,))
-    # 涨停板分布
-    zt_by_board = {b: query("SELECT COUNT(*) as c FROM zt_stocks WHERE board_num=? AND date=?", (b, today))[0]['c'] for b in range(1,6)}
-    # 韭研公社帖子
-    jy_posts = query("SELECT * FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 10", (today,))
-    # 所有有数据的日期
+    market = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (req_date,))
+    zt_by_board = {b: query("SELECT COUNT(*) as c FROM zt_stocks WHERE board_num=? AND date=?", (b, req_date))[0]['c'] for b in range(1,6)}
+    jy_posts = query("SELECT * FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 10", (req_date,))
     versions = query("SELECT DISTINCT date FROM market_data ORDER BY date DESC")
     
     return jsonify({
         'ok': True,
         'data': {
-            'today': today,
+            'today': req_date,
             'market': market[0] if market else None,
             'zt_by_board': zt_by_board,
             'zt_total': sum(zt_by_board.values()),
