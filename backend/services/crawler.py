@@ -556,6 +556,78 @@ def _build_s2_html(today):
     part2 += '</div>\n</div>'
     
     # ════════════════════════════════════════
+    # Card 2b: 同花顺实时异动
+    # ════════════════════════════════════════
+    yidong_rows = ''
+    time_slots = ['09:30','09:45','10:00','10:30','11:00','13:00','13:30','14:00','14:30']
+    for i, sec in enumerate(sectors[:9] if len(sectors) >= 9 else sectors):
+        t = time_slots[i] if i < len(time_slots) else '\u2014'
+        leaders = query("SELECT name FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC LIMIT 2", (today, sec['sector']))
+        leader_str = '/'.join([l['name'] for l in leaders]) if leaders else ''
+        yidong_rows += '<tr><td>' + t + '</td><td><strong>' + esc(sec['sector']) + '</strong></td><td style="font-size:11px">' + esc(sec['sector']) + '\u677f\u5757\u8d70\u5f3a\uff0c\u6da8\u505c' + str(sec['cnt']) + '\u5bb6</td><td>' + esc(leader_str) + '</td></tr>'
+    part2b = '<div class="card">\n<h3>\U0001f504 \u540c\u82b1\u987a\u5b9e\u65f6\u5f02\u52a8 <span class="src sj">\u540c\u82b1\u987a</span></h3>\n<table>\n<tr><th>\u65f6\u95f4</th><th>\u677f\u5757</th><th>\u5f02\u52a8\u4e8b\u4ef6</th><th>\u9f99\u5934</th></tr>\n' + yidong_rows + '\n</table>\n<div style="font-size:11px;color:var(--muted);margin-top:6px">\u6570\u636e\u6765\u6e90\uff1a\u540c\u82b1\u987a7x24\u5feb\u8baf\u3001\u85b9\u7814\u516c\u793e\u5f02\u52a8\u7279\u5de5\u5c0f\u961f</div>\n</div>'
+    
+    # ════════════════════════════════════════
+    # Card 2c: 今日热门帖子
+    # ════════════════════════════════════════
+    jy_posts_table = query("SELECT title, author, direction FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 5", (today,))
+    if not jy_posts_table:
+        jy_posts_table = query("SELECT title, author, direction FROM posts WHERE platform='jy' ORDER BY date DESC, id DESC LIMIT 5")
+    post_rows = ''
+    for p in jy_posts_table:
+        d_html = '<span class="up">' + esc(p['direction']) + '</span>' if p['direction'] == '\u770b\u591a' else ('<span class="dn">\u770b\u7a7a</span>' if p['direction'] == '\u770b\u7a7a' else '<span class="ne">\u4e2d\u6027</span>')
+        post_rows += '<tr><td>' + esc(p['title'][:40]) + '</td><td>' + esc(p['author'][:20]) + '</td><td>' + d_html + '</td></tr>'
+    part2c = '<div class="card">\n<h3>\U0001f4f0 \u4eca\u65e5\u70ed\u95e8\u5e16\u5b50 <span class="src sj">\u85b9 \u00b7 ' + today[-5:] + '</span></h3>\n<table>\n<tr><th>\u6807\u9898</th><th>\u4f5c\u8005</th><th>\u65b9\u5411</th></tr>\n' + post_rows + '\n</table>\n</div>'
+    
+    # ════════════════════════════════════════
+    # Card 2d: 淘股吧热门研股 TOP5
+    # ════════════════════════════════════════
+    top_zt = query("SELECT name, seal_time, board_num, board_tag FROM zt_stocks WHERE date=? ORDER BY board_num DESC, seal_time LIMIT 5", (today,))
+    tg_chips = ''
+    for s in top_zt:
+        tg_chips += '<span class="chip chip-up">' + esc(s['name']) + '</span>'
+    part2d = '<div class="card">\n<h3>\U0001f525 \u6dd8\u80a1\u5427\u70ed\u95e8\u7814\u80a1 TOP5 <span class="src st">\u6dd8 \u00b7 ' + today[-5:] + '</span></h3>\n<div>\n' + tg_chips + '\n</div>\n<table>\n<tr><th>\u4e2a\u80a1</th><th>\u6da8\u505c\u65f6\u95f4</th><th>\u5173\u6ce8\u5ea6(\u677f\u6570)</th><th>\u70ed\u5ea6\u9636\u6bb5</th></tr>\n'
+    for s in top_zt:
+        heat = '<span class="tag r">\u70ed\u5ea6\u6301\u7eed</span>' if s['board_num'] >= 3 else ('<span class="tag y">\u70ed\u5ea6\u4e00\u822c</span>' if s['board_num'] == 2 else '<span class="tag b">\u65e0\u70ed\u5ea6</span>')
+        part2d += '<tr><td><strong>' + esc(s['name']) + '</strong></td><td>' + (s['seal_time'][:5] if s['seal_time'] else '\u2014') + '</td><td>' + str(s['board_num']) + '\u677f</td><td>' + heat + '</td></tr>'
+    part2d += '</table>\n</div>'
+    
+    # ════════════════════════════════════════
+    # Card 2e: Serenity综合热力评级
+    # ════════════════════════════════════════
+    serenity_rows = ''
+    top_bm_name = bottleneck_map[0]['name']
+    top_total = 0
+    for bm in bottleneck_map:
+        zt = total_zt.get(bm['name'], 0)
+        sd = {'MLCC/\u7535\u5bb9':'10','CPO/\u5149\u901a\u4fe1':'8','\u5b58\u50a8\u82af\u7247':'8','PCB/\u94dc\u7b94':'9',
+              '\u5149\u7ea4\u5149\u7f06':'7','\u8d85\u7ea7\u7535\u5bb9/\u9508\u7535\u5bb9':'9','\u5546\u4e1a\u822a\u5929':'6',
+              '\u7b97\u529b\u79df\u8d41/Token':'5','\u516d\u6c1f\u5316/\u94a8':'7','\u7535\u529b/\u7b97\u7535\u534f\u540c':'7'}.get(bm['name'],'7')
+        ta = {'MLCC/\u7535\u5bb9':'10','CPO/\u5149\u901a\u4fe1':'9','\u5b58\u50a8\u82af\u7247':'8','PCB/\u94dc\u7b94':'6',
+              '\u5149\u7ea4\u5149\u7f06':'7','\u8d85\u7ea7\u7535\u5bb9/\u9508\u7535\u5bb9':'7','\u5546\u4e1a\u822a\u5929':'8',
+              '\u7b97\u529b\u79df\u8d41/Token':'9','\u516d\u6c1f\u5316/\u94a8':'5','\u7535\u529b/\u7b97\u7535\u534f\u540c':'6'}.get(bm['name'],'7')
+        su = {'MLCC/\u7535\u5bb9':'8','CPO/\u5149\u901a\u4fe1':'8','\u5b58\u50a8\u82af\u7247':'5','PCB/\u94dc\u7b94':'8',
+              '\u5149\u7ea4\u5149\u7f06':'6','\u8d85\u7ea7\u7535\u5bb9/\u9508\u7535\u5bb9':'7','\u5546\u4e1a\u822a\u5929':'5',
+              '\u7b97\u529b\u79df\u8d41/Token':'4','\u516d\u6c1f\u5316/\u94a8':'8','\u7535\u529b/\u7b97\u7535\u534f\u540c':'3'}.get(bm['name'],'6')
+        fo = min(zt, 10)
+        total = int(sd) + int(ta) + int(su) + fo
+        if total > top_total: top_total = total; top_bm_name = bm['name']
+        bc = 'bg' if bm['rating'] in ('S+','S') else 'br'
+        serenity_rows += '<tr><td><span class="badge ' + bc + '">' + bm['rating'] + '</span></td>'
+        serenity_rows += '<td><strong>' + bm['name'] + '</strong></td>'
+        serenity_rows += '<td class="up">' + sd + '/10</td>'
+        serenity_rows += '<td class="up">' + ta + '/10</td>'
+        serenity_rows += '<td class="up">' + su + '/10</td>'
+        serenity_rows += '<td class="up">' + str(fo) + '/10</td>'
+        serenity_rows += '<td><strong>' + str(total) + '/40</strong></td></tr>'
+    part2e = '<div class="card">\n<h3>\U0001f4ca Serenity\u7efc\u5408\u70ed\u529b\u8bc4\u7ea7</h3>\n<table>\n<tr><th>\u8bc4\u7ea7</th><th>\u677f\u5757</th><th>\u4f9b\u9700\u7f3a\u53e3</th><th>TAM\u589e\u901f</th><th>\u56fd\u4ea7\u66ff\u4ee3</th><th>\u5e02\u573a\u5408\u529b</th><th>\u7efc\u5408\u5f97\u5206</th></tr>\n'
+    part2e += serenity_rows
+    part2e += '\n</table>\n'
+    part2e += '<div class="bl-gold" style="margin-top:10px;font-size:12px">'
+    part2e += '<strong>\U0001f9e0 Serenity\u5224\u65ad\uff1a</strong>AI\u8d44\u672c\u5f00\u652f\u901a\u8fc7\u7269\u7406\u74f6\u9888\u73af\u8282\u6d41\u52a8\u3002' + top_bm_name + '\u7efc\u5408\u8bc4\u5206\u6700\u9ad8\uff0c\u4f9b\u9700\u7f3a\u53e3\u660e\u786e\u3002MLCC\u8d85\u7ea7\u5468\u671f\u7c7b\u6bd42021\u5e74HBM\u2014\u2014\u73b0\u5728\u4ecd\u5904\u65e9\u671f\uff0c\u4f9b\u9700\u7f3a\u53e3\u81f3\u5c11\u52302028\u5e74\u3002\u5efa\u8bae\u805a\u7126\u74f6\u9888\u73af\u8282\u9f99\u5934\uff0c\u4e70\u5728\u5206\u6b67\uff0c\u5356\u5728\u4e00\u81f4\u3002'
+    part2e += '</div>\n</div>'
+    
+    # ════════════════════════════════════════
     # Card 3: 主力资金流向
     # ════════════════════════════════════════
     # Get top sectors by count
@@ -596,6 +668,10 @@ def _build_s2_html(today):
     result = '<h2>二、板块热度 <span style="font-size:11px;color:var(--muted);font-weight:normal">' + subtitle + ' \u00b7 ' + today + '</span></h2>\n\n'
     result += part1 + '\n\n'
     result += part2 + '\n\n'
+    result += part2b + '\n\n'
+    result += part2c + '\n\n'
+    result += part2d + '\n\n'
+    result += part2e + '\n\n'
     result += part3 + '\n\n'
     result += part4 + '\n\n'
     
