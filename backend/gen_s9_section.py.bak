@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+⚠️ 已禁用（.bak）。原因：
+- 第 205 行的 `s9_pattern = r'<div class="section" id="s9">.*?</div>\s*</div>'` 有 regex bug
+- 与 gen_s3_section.py 相同问题：在嵌套 div 中提前截断，导致游离内容
+- 用户要求删除 s9 数据且不再生成
+- 如要恢复，必须先修复 regex 逻辑（改用 HTML 解析器或精确定位标记）
+
 Generate s9 (题材轮动) section for index.html
 1:1 structure from backup file, with real data from database + 韭研公社
 """

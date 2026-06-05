@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 """
+⚠️ 警告：此脚本的正则 s3_pattern（第 193 行）有已知 bug！
+使用 `.*?</div>\s*</div>` 匹配 section 边界会导致：
+- 在 stock-box 内部 vote 区域（`</div></div>` 连续结构）提前截断
+- 导致大部分内容变成游离 HTML，跨 tab 显示
+详见记忆 section-container-rule
+
+如要使用，必须先修复正则逻辑（改用 HTML 解析器或精确定位标记）。
+
 Generate s3 (题材生命周期) section with:
 - 涨停家数统计 for each topic
 - 容量趋势票 (红底白字标签)
