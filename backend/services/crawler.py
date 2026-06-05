@@ -296,13 +296,15 @@ def _build_s7_html(today):
     board_tabs += tab_label('one', '一', len(boards[1]), active=True)
     board_tabs += tab_label('two', '二', len(boards[2]))
     board_tabs += tab_label('three', '三', len(boards[3]))
-    higher_cnt = sum(len(boards[b]) for b in [4,5])
+    board_tabs += tab_label('four', '四', len(boards[4]))
+    higher_cnt = sum(len(boards[b]) for b in [5])
     board_tabs += f'<div class="board-tab" onclick="switchBoardTab(\'higher\')" data-board="higher">更高（{higher_cnt}）</div>'
     
     t1 = build_table(boards[1], 'one', '一板')
     t2 = build_table(boards[2], 'two', '二板')
     t3 = build_table(boards[3], 'three', '三板')
-    t4 = build_table(boards[4] + boards[5], 'higher', '更高')
+    t4 = build_table(boards[4], 'four', '四板')
+    t5 = build_table(boards[5], 'higher', '更高')
     
     return f'''<h2>七、连板梯队 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时数据 · 东方财富涨停池</span></h2>
 <div class="card">
@@ -318,6 +320,7 @@ def _build_s7_html(today):
 {t2}
 {t3}
 {t4}
+{t5}
 </div>
 </div>'''
 
