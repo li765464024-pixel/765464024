@@ -102,18 +102,31 @@ def fetch_zt_pool():
         stocks = []
         for _, row in df.iterrows():
             board = int(row.get('连板数', 1))
+            
+            # 格式化涨停时间: 092500 → 09:25
+            raw_time = str(row.get('首次封板时间', ''))
+            fmt_time = raw_time[:2] + ':' + raw_time[2:4] if len(raw_time) >= 4 else raw_time[:5]
+            
+            # 涨停统计: "2/2" → "2天2板"
+            zt_stats = str(row.get('涨停统计', ''))
+            if board >= 2 and '/' in zt_stats:
+                days = zt_stats.split('/')[0]
+                tag = f"{days}天{board}板"
+            else:
+                tag = "首板" if board == 1 else f"{board}板"
+            
             stocks.append({
                 'date': use_date,
                 'code': str(row.get('代码', '')),
                 'name': str(row.get('名称', '')),
                 'price': float(row.get('最新价', 0)),
                 'board_num': board,
-                'seal_time': str(row.get('首次封板时间', ''))[:5],
+                'seal_time': fmt_time,
                 'reason': str(row.get('所属行业', '')),
                 'seal_amount': float(row.get('封板资金', 0)) / 100000000 if row.get('封板资金', 0) else 0,
                 'turnovers': float(row.get('换手率', 0)) if row.get('换手率', 0) else 0,
                 'sector': str(row.get('所属行业', '')),
-                'board_tag': f"{board}板",
+                'board_tag': tag,
             })
         
         if stocks:
@@ -243,13 +256,10 @@ def _build_s7_html(today):
                 rate = f'<div class="rate-bar"><div class="rate-stat"><span class="rate-value">{pct:.0f}%</span><span class="rate-detail">昨{yest}只 → 今{today_c}只</span></div></div>'
                 break
         
-        def board_tag(n):
-            if n == 1: return '首板'
-            return f'{n}板'
-        
         rows = ''
         for s in stocks_list:
-            tag = board_tag(s['board_num'])
+            # 使用数据库中的board_tag (已存储"X天X板"格式)
+            tag = s['board_tag'] or ("首板" if s['board_num'] == 1 else f"{s['board_num']}板")
             p = s['price'] or 0
             t = (s['seal_time'] or '')[:5]
             reason = (s['reason'] or '').replace('<', '&lt;').replace('>', '&gt;')
@@ -292,13 +302,30 @@ def _build_s7_html(today):
         act = ' active' if active else ''
         return f'<div class="board-tab{act}" onclick="switchBoardTab(\'{tab_name}\')" data-board="{tab_name}">{label}板（{cnt}）</div>'
     
+    def rate_label(from_name, to_name, rate, cnt_from, cnt_to):
+        """晋级率文本: 一→二 7/70=10.0%"""
+        if cnt_from == 0:
+            return f'{from_name}→{to_name}: -'
+        pct = f'{rate:.1f}%' if rate > 0 else '0%'
+        return f'{from_name}→{to_name}: {cnt_to}/{cnt_from}={pct}'
+    
+    cnt1, cnt2, cnt3, cnt4, cnt5 = [len(boards[b]) for b in [1, 2, 3, 4, 5]]
+    
+    rate_1_2 = cnt2 / cnt1 * 100 if cnt1 > 0 else 0
+    rate_2_3 = cnt3 / cnt2 * 100 if cnt2 > 0 else 0
+    rate_3_4 = cnt4 / cnt3 * 100 if cnt3 > 0 else 0
+    rate_4_5 = cnt5 / cnt4 * 100 if cnt4 > 0 else 0
+    
+    rates_str = f'{rate_label("一","二",rate_1_2,cnt1,cnt2)} | {rate_label("二","三",rate_2_3,cnt2,cnt3)} | {rate_label("三","四",rate_3_4,cnt3,cnt4)} | {rate_label("四","五",rate_4_5,cnt4,cnt5)}'
+    
     board_tabs = ''
-    board_tabs += tab_label('one', '一', len(boards[1]), active=True)
-    board_tabs += tab_label('two', '二', len(boards[2]))
-    board_tabs += tab_label('three', '三', len(boards[3]))
-    board_tabs += tab_label('four', '四', len(boards[4]))
-    higher_cnt = sum(len(boards[b]) for b in [5])
+    board_tabs += tab_label('one', '一', cnt1, active=True)
+    board_tabs += tab_label('two', '二', cnt2)
+    board_tabs += tab_label('three', '三', cnt3)
+    board_tabs += tab_label('four', '四', cnt4)
+    higher_cnt = cnt5
     board_tabs += f'<div class="board-tab" onclick="switchBoardTab(\'higher\')" data-board="higher">更高（{higher_cnt}）</div>'
+    board_tabs += f'<div class="board-tab" style="margin-left:auto;background:rgba(210,153,29,.1);border-color:var(--gold);color:var(--gold);cursor:default;font-size:11px" title="今日晋级率(上板数/基数)">{rates_str}</div>'
     
     t1 = build_table(boards[1], 'one', '一板')
     t2 = build_table(boards[2], 'two', '二板')
