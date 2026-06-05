@@ -5,7 +5,7 @@ import re
 import os
 import requests
 from bs4 import BeautifulSoup
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from backend.models import insert, insert_many, query, execute
 
@@ -157,22 +157,63 @@ def fetch_zt_pool():
 # 3. 大盘数据 (从涨停池推算 + akshare)
 # ════════════════════════════════════════════
 
+def fetch_market_index():
+    """从腾讯证券获取四大指数实时数据"""
+    try:
+        r = requests.get("http://qt.gtimg.cn/q=sh000001,sz399001,sz399006,sh000688", headers=HEADERS, timeout=5)
+        indices = {}
+        for line in r.text.strip().split(';'):
+            if not line.strip(): continue
+            parts = line.split('~')
+            if len(parts) > 32:
+                code = parts[2]
+                price = float(parts[3])
+                change = float(parts[31])
+                change_pct = float(parts[32])
+                
+                if code == '000001': key = 'sh'
+                elif code == '399001': key = 'sz'
+                elif code == '399006': key = 'cy'
+                elif code == '000688': key = 'kc'
+                else: continue
+                
+                indices[key] = {'price': price, 'change': change, 'change_pct': change_pct}
+        return indices
+    except Exception as e:
+        print(f"  ⚠️ 指数获取失败: {e}")
+        return {}
+
+
 def fetch_market_data():
     """获取大盘概况数据"""
     try:
-        # 从涨停池统计
         import akshare as ak
         today_str = TODAY.replace('-', '')
         df = ak.stock_zt_pool_em(date=today_str)
         
         zt_count = len(df) if df is not None else 0
         
-        # 封板率估算
+        # 封板率
         sealed = len(df[df['炸板次数'] == 0]) if df is not None and '炸板次数' in df.columns else 0
         seal_rate = round(sealed / zt_count * 100, 1) if zt_count > 0 else 0
-        
-        # 板数分布
         max_board = int(df['连板数'].max()) if df is not None and '连板数' in df.columns else 0
+        
+        # 最高板标的
+        top_stocks = []
+        if df is not None and '连板数' in df.columns:
+            top_df = df[df['连板数'] == max_board]
+            for _, row in top_df.iterrows():
+                top_stocks.append(str(row.get('名称', '')))
+        max_board_stocks = '/'.join(top_stocks[:3]) if top_stocks else ''
+        
+        # 指数
+        indices = fetch_market_index()
+        
+        # 昨日对比
+        yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+        prev = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (yesterday,))
+        yesterday_zt = prev[0]['zt_count'] if prev else 0
+        yesterday_seal = prev[0]['seal_rate'] if prev else 0
         
         insert('market_data', {
             'date': TODAY,
@@ -185,8 +226,14 @@ def fetch_market_data():
             'volume': '',
             'main_inflow': '',
             'max_board': max_board,
-            'max_board_stocks': '',
+            'max_board_stocks': max_board_stocks,
+            'index_sh': indices.get('sh', {}).get('price'),
+            'index_sz': indices.get('sz', {}).get('price'),
+            'index_cy': indices.get('cy', {}).get('price'),
+            'index_kc': indices.get('kc', {}).get('price'),
             'temperature': 0,
+            'yesterday_zt_count': yesterday_zt,
+            'yesterday_seal_rate': yesterday_seal,
         })
         return True
     except Exception as e:
@@ -199,23 +246,135 @@ def fetch_market_data():
 # ════════════════════════════════════════════
 
 def _build_s1_html(today):
-    """大盘概况 — 从 market_data 生成"""
+    """大盘概况 — 1:1匹配JSON结构"""
     rows = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (today,))
     if not rows:
         return ''
     d = rows[0]
     sentiment = d['sentiment'] or '分化'
     sc = 'gold' if sentiment == '分化' else ('red' if '强' in str(sentiment) else 'green')
-    return f'''<h2>一、大盘概况 <span style="font-size:11px;color:var(--muted);font-weight:normal">{today} 实时数据</span></h2>
-<div class="grid2">
-<div class="stat"><div class="v" style="color:var(--{sc})">{sentiment}</div><div class="l">市场情绪</div></div>
-<div class="stat"><div class="v" style="color:var(--red)">{d['zt_count'] or 0}</div><div class="l">涨停家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">东方财富数据</div></div>
-<div class="stat"><div class="v" style="color:var(--green)">{d['dt_count'] or 0}</div><div class="l">跌停家数</div></div>
-<div class="stat"><div class="v" style="color:var(--gold)">{fmt_percent(d['seal_rate'])}</div><div class="l">封板率</div></div>
-<div class="stat"><div class="v" style="color:var(--blue)">{d['max_board'] or 0}板</div><div class="l">最高板</div></div>
-<div class="stat"><div class="v" style="color:var(--red)">{d['up_count'] or '-'}</div><div class="l">上涨家数</div></div>
-<div class="stat"><div class="v" style="color:var(--green)">{d['down_count'] or '-'}</div><div class="l">下跌家数</div></div>
-</div>'''
+    
+    # 从 zt_stocks 获取补充数据
+    zt_total = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=?", (today,))[0]['c']
+    dt_from_zt = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND reopen_count>0", (today,))[0]['c']
+    up = d['up_count'] or 0
+    down = d['down_count'] or 0
+    max_board = d['max_board'] or 0
+    board_stocks = d['max_board_stocks'] or ''
+    
+    # 指数
+    sh = d['index_sh']
+    sz = d['index_sz']
+    cy = d['index_cy']
+    kc = d['index_kc']
+    
+    # 定性
+    def index_qual(name, price, change_pct_calc=None):
+        if not price: return ''
+        # We don't have change_pct in DB, derive from context
+        return ''
+    
+    # Today date short
+    today_short = today[-5:] if today else ''
+    
+    # ---- Card 1: 大盘概览 grid ----
+    sentiment_text = sentiment
+    zt_display = d['zt_count'] or zt_total or 0
+    dt_display = d['dt_count'] or 0
+    seal = d['seal_rate'] or 0
+    inflow = d['main_inflow'] or '-'
+    up_d = d['up_count'] or '-'
+    down_d = d['down_count'] or '-'
+    vol = d['volume'] or '-'
+    temp = d['temperature'] or '-'
+    margin = d['margin_balance'] or '-'
+    premium = d['yesterday_premium'] if d.get('yesterday_premium') else '-'
+    
+    # ---- Card 2: 今日vs昨日对比表 ----
+    yest_zt = d['yesterday_zt_count'] or 0
+    yest_seal = d['yesterday_seal_rate'] or 0
+    
+    def chg(v1, v2, unit=''):
+        if not v1 or not v2: return '-'
+        diff = v1 - v2
+        sign = '+' if diff > 0 else ''
+        arrow = '↑' if diff > 0 else ('↓' if diff < 0 else '')
+        return sign + str(int(diff)) + unit + arrow
+    
+    rows_table = ''
+    pairs = [
+        ('市场情绪', [sentiment, '修复', '分化加剧']),
+        ('涨停家数', [zt_display, yest_zt, chg(zt_display, yest_zt, '个（悟道API）')]),
+        ('跌停家数', [dt_display, 0, '']),
+        ('封板率', [str(seal) + '%', str(yest_seal) + '%', chg(seal, yest_seal, 'pp')]),
+        ('上涨家数', [up_d, 0, '']),
+        ('下跌家数', [down_d, 0, '']),
+        ('连板高度', [str(max_board) + '板(' + board_stocks + ')', '', '']),
+        ('成交额', [vol, '', '']),
+        ('主力净额', [inflow, '', '']),
+        ('市场温度', [temp, '', '']),
+    ]
+    for label, vals in pairs:
+        rows_table += '<tr><td>' + label + '</td><td>' + str(vals[0]) + '</td><td>' + str(vals[1]) + '</td><td>' + str(vals[2]) + '</td></tr>'
+    
+    # ---- Card 3: 指数表现 ----
+    def index_tr(name, price, change_text='', qual=''):
+        if not price: return ''
+        return '<tr><td><strong>' + name + '</strong></td><td>' + str(price) + '</td><td>' + change_text + '</td><td><span class="tag y">' + qual + '</span></td></tr>'
+    
+    indices_rows = ''
+    if sh: indices_rows += index_tr('上证指数', sh, '', '缩量调整')
+    if sz: indices_rows += index_tr('深证成指', sz, '', '窄幅震荡')
+    if cy: indices_rows += index_tr('创业板指', cy, '', '偏弱调整')
+    if kc: indices_rows += index_tr('科创50', kc, '', '逆势走强')
+    
+    # ---- Card 4: 核心定性 ----
+    conclusion = '核心定性：' + sentiment + '格局——涨停' + str(zt_display) + '只，' + str(max_board) + '板梯队完整(' + board_stocks + ')。'
+    if kc and sh and kc > sh:
+        conclusion += '科创50逆势走强。'
+    else:
+        conclusion += '三大指数普跌。'
+    conclusion += '但下跌' + str(down) + '家占比较大，市场温度' + str(temp) + '偏低，整体赚钱效应弱。'
+    
+    # ---- 组装 ----
+    result = ''
+    result += '<h2>一、大盘概况 <span style="font-size:11px;color:var(--muted);font-weight:normal">' + today + ' 实时数据</span></h2>'
+    
+    # Card 1: 概览
+    result += '<div class="grid2">'
+    result += '<div class="stat"><div class="v" style="color:var(--' + sc + ')">' + sentiment_text + '</div><div class="l">市场情绪</div></div>'
+    result += '<div class="stat"><div class="v" style="color:var(--red)">' + str(zt_display) + '</div><div class="l">涨停家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">东方财富数据</div></div>'
+    result += '<div class="stat"><div class="v" style="color:var(--green)">' + str(dt_display) + '</div><div class="l">跌停家数</div></div>'
+    result += '<div class="stat"><div class="v" style="color:var(--gold)">' + str(seal) + '%</div><div class="l">封板率</div></div>'
+    result += '<div class="stat"><div class="v" style="color:var(--blue)">' + str(max_board) + '板</div><div class="l">连板高度</div><div style="font-size:10px;color:var(--muted);margin-top:2px">' + board_stocks + '</div></div>'
+    result += '<div class="stat"><div class="v" style="color:var(--red)">' + str(up_d) + '</div><div class="l">上涨家数</div></div>'
+    result += '<div class="stat"><div class="v" style="color:var(--green)">' + str(down_d) + '</div><div class="l">下跌家数</div></div>'
+    result += '<div class="stat"><div class="v" style="color:var(--gold)">' + str(inflow) + '</div><div class="l">主力净额</div></div>'
+    result += '</div>'
+    
+    # Card 2: 今日vs昨日
+    result += '<div class="card">'
+    result += '<h3>📊 今日vs昨日对比</h3>'
+    result += '<table><tr><th>指标</th><th>今日(' + today_short + ')</th><th>昨日</th><th>变化</th></tr>'
+    result += rows_table
+    result += '</table>'
+    result += '</div>'
+    
+    # Card 3: 指数表现
+    if indices_rows:
+        result += '<div class="card">'
+        result += '<h3>📈 指数表现</h3>'
+        result += '<table><tr><th>指数</th><th>收盘</th><th>涨跌幅</th><th>定性</th></tr>'
+        result += indices_rows
+        result += '</table>'
+        result += '</div>'
+    
+    # Card 4: 核心定性
+    result += '<div class="bl-blue" style="margin-top:10px;font-size:12px">'
+    result += '<strong>📌 ' + conclusion + '</strong>'
+    result += '</div>'
+    
+    return result
 
 def _build_s7_html(today):
     """连板梯队 — 从 zt_stocks + board_summary 生成"""

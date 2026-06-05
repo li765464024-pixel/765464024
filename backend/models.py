@@ -39,7 +39,12 @@ def init_db():
         index_sh    REAL,           -- 上证指数
         index_sz    REAL,           -- 深证成指
         index_cy    REAL,           -- 创业板指
+        index_kc    REAL,           -- 科创50
         temperature REAL,           -- 市场温度
+        margin_balance REAL,        -- 两融余额
+        yesterday_zt_count INTEGER DEFAULT 0,
+        yesterday_seal_rate REAL DEFAULT 0,
+        yesterday_premium REAL DEFAULT 0,
         created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
