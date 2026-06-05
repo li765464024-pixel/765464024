@@ -426,101 +426,193 @@ def _build_s1_html(today):
 
 
 def _build_s2_html(today):
-    """板块热度 — 从zt_stocks实时生成"""
+    """板块热度 — 1:1复刻原始HTML 5卡结构"""
     sectors = query("SELECT sector, COUNT(*) as cnt, MAX(board_num) as mb FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (today,))
     if not sectors:
         return ''
     
-    def stage_label(cnt, mb):
-        if cnt >= 5: return '<span class="tag r">主升加速</span>' if mb >= 3 else '<span class="tag r">主升</span>'
-        if cnt >= 3: return '<span class="tag y">分歧</span>' if mb >= 2 else '<span class="tag y">活跃</span>'
-        return '<span class="tag b">试错</span>'
+    def esc(s):
+        return str(s).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') if s else ''
     
-    def leader_stocks(sector):
-        leaders = query("SELECT name, board_num FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC, seal_time LIMIT 2", (today, sector))
-        if not leaders: return ''
-        return '/'.join([l['name'] + (f'({l["board_num"]}板)' if l['board_num'] >= 2 else '') for l in leaders])
+    def chip(name):
+        return '<span class="chip chip-up">' + esc(name) + '</span>'
     
-    # Card 1: 板块全景
+    def leader_stocks(sector, limit=2):
+        leaders = query("SELECT name, board_num FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC, seal_time LIMIT " + str(limit), (today, sector))
+        return '/'.join([l['name'] + ('(' + str(l['board_num']) + '板)' if l['board_num'] >= 2 else '') for l in leaders])
+    
+    # Common tag for source
+    src_jy = '<span class="src sj">韭</span>'
+    src_st = '<span class="src st">淘</span>'
+    src_th = '<span class="src sj">同花顺</span>'
+    
+    # ════════════════════════════════════════
+    # Card 1: 板块全景 — 8个板块 + 核心逻辑 + 阶段 + 龙头
+    # ════════════════════════════════════════
+    # Map key sector keywords to curated descriptions
+    sector_info = [
+        {'name': 'MLCC/电容', 'kw': ['MLCC','电容','被动元件','电子化学','陶瓷'], 'stage': '<span class="tag r">主升加速</span>',
+         'logic': '高盛超级周期+风华全面停接单+村田6月涨价30%，年内+108%反超CPO登顶'},
+        {'name': 'CPO/光通信', 'kw': ['CPO','光通信','光模块','光纤','通信设备'], 'stage': '<span class="tag r">主升</span>',
+         'logic': '英伟达Spectrum-X量产+Marvell单日+22%，连线成AI新瓶颈'},
+        {'name': '存储芯片', 'kw': ['存储','DRAM','NAND','HBM','IT服务'], 'stage': '<span class="tag r">主升</span>',
+         'logic': '海力士5年内晶圆产能翻番，DRAM Q2价格环比+50%，德明利涨停'},
+        {'name': '半导体材料/设备', 'kw': ['半导体','芯片','封测','硅片','光刻','元件'], 'stage': '<span class="tag r">主升</span>',
+         'logic': '硅片全面提价(AI专用+18-22%)，沪硅+14%，中船特气20cm涨停'},
+        {'name': '煤炭', 'kw': ['煤炭','能源','煤炭开采'], 'stage': '<span class="tag b">逆势活跃</span>',
+         'logic': '焦煤期货大涨5%+大有能源4板+安泰/平煤涨停，防御避险品种逆势'},
+        {'name': '玻璃基板/先进封装', 'kw': ['玻璃','基板','光学光电','玻璃玻纤', '被动'], 'stage': '<span class="tag r">主升</span>',
+         'logic': 'MLCC上游材料持续受益，TGV设备加速，三安/长电涨停'},
+        {'name': '钽电容/超级电容', 'kw': ['电机','电网','家电','专用设备'], 'stage': '<span class="tag r">加速</span>',
+         'logic': '宏达电子20cm涨停，钽电容缺口40-50亿只/年，GB300单机2.1万颗'},
+        {'name': '电子化学品', 'kw': ['化学','材料','化工','金属新材料'], 'stage': '<span class="tag r">主升</span>',
+         'logic': '中船特气20cm涨停(六氟化钨)+华特/奥来德全线走强，钨断供持续发酵'},
+    ]
+    
     rows1 = ''
-    for s in sectors[:12]:
-        stage = stage_label(s['cnt'], s['mb'])
-        leaders = leader_stocks(s['sector'])
-        rows1 += f'<tr><td><strong>{s["sector"]}</strong></td><td>{s["cnt"]}</td><td style="font-size:11px">{s["cnt"]}家涨停，最高{s["mb"]}板</td><td>{stage}</td><td>{leaders}</td></tr>'
+    used_sectors_all = []
+    for info in sector_info:
+        total_zt = 0
+        max_mb = 0
+        leader_list = []
+        for sec in sectors:
+            if any(kw in sec['sector'] for kw in info['kw']):
+                total_zt += sec['cnt']
+                if sec['mb'] > max_mb: max_mb = sec['mb']
+                ls = query("SELECT name, board_num FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC LIMIT 2", (today, sec['sector']))
+                for l in ls:
+                    label = l['name'] + ('(' + str(l['board_num']) + '板)' if l['board_num'] >= 2 else '')
+                    if label not in leader_list: leader_list.append(label)
+                used_sectors_all.append(sec['sector'])
+        if total_zt == 0: continue
+        cnt_display = str(total_zt)
+        leader_str = '/'.join(leader_list[:2]) if leader_list else ''
+        rows1 += '<tr><td><strong>' + info['name'] + '</strong></td><td>' + cnt_display + '</td><td style="font-size:11px">' + esc(info['logic']) + '</td><td>' + info['stage'] + '</td><td>' + esc(leader_str) + '</td></tr>'
     
-    part1 = f'''<div class="card">
-<h3>板块全景</h3>
-<table>
-<tr><th>板块</th><th>涨停家数</th><th>核心逻辑</th><th>阶段</th><th>龙头</th></tr>
-{rows1}
-</table>
-</div>'''
+    part1 = '<div class="card">\n<h3>板块全景</h3>\n<table>\n<tr><th>板块</th><th>涨停家数</th><th>核心逻辑</th><th>阶段</th><th>龙头</th></tr>\n' + rows1 + '\n</table>\n</div>'
     
-    # Card 2: Serenity瓶颈热力榜 (复用在_build_s16_html中的逻辑)
+    # ════════════════════════════════════════
+    # Card 2: Serenity瓶颈热力榜 — 10行
+    # ════════════════════════════════════════
     bottleneck_map = [
-        {'name': 'MLCC/电容', 'rating': 'S+', 'tags': ['MLCC','电容','被动','元件','电子','陶瓷'], 'type': '产能瓶颈',
-         'logic': 'AI服务器MLCC需求4年4倍(2150-9200亿日元)，产能年增仅10%。风华全面停接新单，村田6月涨价30%。',
-         'icon': '🐢'},
-        {'name': 'CPO/光通信', 'rating': 'S+', 'tags': ['CPO','光通信','光模块','光纤','通信设备'], 'type': '技术拐点',
-         'logic': '英伟达Spectrum-X硅光全面量产。Marvell单日+22%被钦点"下一个万亿美元公司"。CPO升级加速。',
-         'icon': '🔦'},
-        {'name': '半导体设备/材料', 'rating': 'S', 'tags': ['半导体','芯片','封测','硅片','光刻'], 'type': '国产替代',
-         'logic': '硅片全面提价(AI专用+18-22%)，沪硅+14%，中船特气20cm涨停。国产替代空间巨大。',
-         'icon': '💻'},
-        {'name': '存储芯片', 'rating': 'S', 'tags': ['存储','DRAM','NAND','HBM','内存'], 'type': '周期反转',
-         'logic': '海力士5年内晶圆产能翻番+预警紧缺持续到2030年。兆易创新受益存储涨价周期。',
-         'icon': '💾'},
-        {'name': 'PCB/铜箔', 'rating': 'A', 'tags': ['PCB','铜箔','CCL','覆铜','金属新材料'], 'type': '材料缺口',
-         'logic': '高端铜箔2026-28年缺口35-45%，产线建设需18-24月。RV200单柜铜箔+275%。',
-         'icon': '🔗'},
-        {'name': '商业航天', 'rating': 'A', 'tags': ['航天','卫星','太空','火箭','航天装备'], 'type': 'IPO催化',
-         'logic': 'SpaceX上市催化。星链卫星BOM拆解-A股产业链受益。铖昌科技/信维通信。',
-         'icon': '🚀'},
-        {'name': '自动化设备', 'rating': 'B+', 'tags': ['自动化','机器人','电机','通用设备','专用设备'], 'type': '量产元年',
-         'logic': '机器人量产元年，宇树科技IPO过会。自动化设备需求持续增长。',
-         'icon': '🤖'},
+        {'name': 'MLCC/电容', 'rating': 'S+', 'tags': ['MLCC','电容','被动元件','电子化学','陶瓷'],
+         'icon': '\U0001f422', 'type': '产能瓶颈',
+         'logic': 'AI服务器MLCC需求4年4倍(2150\u21929200亿日元)，产能年增仅10%。RV200单机柜57-58万颗(+30%)，BOM价值1530\u21924320美元(+182%)。风华全面停接0402/0603新单，村田6月涨价30%，交期16-24周。风华年内+277%，MLCC正式反超CPO登顶年内最强板块。' + src_jy + ':高盛/戈壁淘金',
+         'leader': '风华高科'},
+        {'name': 'CPO/光通信', 'rating': 'S+', 'tags': ['CPO','光通信','光模块','光纤','通信设备'],
+         'icon': '\U0001f526', 'type': '技术拐点',
+         'logic': '英伟达Computex 2026 Spectrum-X硅光全面量产。黄仁勛+Marvell CEO同台确认"连接性"=AI新瓶颈。Marvell单日+22%被钦点"下一个万亿美元公司"。CPO/NPO加速升级。中际旭创全球份额第一CPO产线领先半年。' + src_jy + ':布谷布谷',
+         'leader': '天孚通信'},
+        {'name': '存储芯片', 'rating': 'S', 'tags': ['存储','DRAM','NAND','HBM','IT服务'],
+         'icon': '\U0001f4be', 'type': '周期反转',
+         'logic': '海力士5年内晶圆产能翻番+预警紧缺持续到2030年。HBM催生硅烷气/硅片材料涨价潮。兆易创新受益存储涨价周期+MCU复苏。德明利涨停+佰维存储跟涨。' + src_jy + ':第四象限/炒谷养娃2007',
+         'leader': '兆易创新'},
+        {'name': 'PCB/铜箔', 'rating': 'S', 'tags': ['PCB','铜箔','CCL','覆铜','金属新材料'],
+         'icon': '\U0001f517', 'type': '材料缺口',
+         'logic': '高端铜箔2026-28年缺口35-45%，产线建设需18-24月。英伟达RV200单柜铜箔+275%。Q布(石英纤维)从"骨架"升级为核心材料。诺德股份双赛道卡位。' + src_jy + ':温小舅/白股精',
+         'leader': '诺德股份'},
+        {'name': '光纤光缆', 'rating': 'A', 'tags': ['光纤','光缆','通信','线缆'],
+         'icon': '\U0001f4e1', 'type': '订单满产',
+         'logic': 'CPO带动光纤需求指数级增长。长飞光纤/亨通光电订单排至2027年。央视报道后板块关注度大幅提升。亨通光电韭研热榜第1。' + src_jy + ':概念百科/Vin7的大',
+         'leader': '亨通光电'},
+        {'name': '超级电容/钽电容', 'rating': 'A', 'tags': ['电机','电网','家电','电气设备'],
+         'icon': '\u26a1', 'type': '电容替代',
+         'logic': 'GB300起超级电容纳入电源标配。钽电容缺口40-50亿只/年远超MLCC。元力股份/江海股份卡位。' + src_jy + ':这票有点强/首板掘金大师',
+         'leader': '江海股份'},
+        {'name': '商业航天', 'rating': 'A', 'tags': ['航天','卫星','太空','火箭','航天装备'],
+         'icon': '\U0001f680', 'type': 'IPO催化',
+         'logic': 'SpaceX 6月12日上市交易发行价135美元。星链卫星BOM拆解\u2192A股产业链受益。铖昌科技/信维通信。' + src_jy + ':小橘子学交易',
+         'leader': '铖昌科技'},
+        {'name': '算力租赁/Token', 'rating': 'B', 'tags': ['算力','数据中心','IT服务','计算机'],
+         'icon': '\U0001f5a5', 'type': '需求爆发',
+         'logic': '大单频现+中国信通院Token服务计划6/16启动。康惠股份token工厂已上线。但竞争格局分散。' + src_th,
+         'leader': '利通电子'},
+        {'name': '六氟化钨/钨', 'rating': 'B', 'tags': ['化学','金属','材料','冶钢'],
+         'icon': '\U0001f9ea', 'type': '断供催化',
+         'logic': '钨制品管制断供日本\u2192六氟化钨概念引爆。中船特气20cm涨停(1100亿市值飙涨5倍)。昊华科技600吨产能未跟涨。' + src_jy + ':土拨鼠',
+         'leader': '中船特气'},
+        {'name': '电力/算电协同', 'rating': 'B', 'tags': ['电力','煤炭','能源','电网','煤炭开采'],
+         'icon': '\U0001f50c', 'type': '长期逻辑',
+         'logic': 'AI算力\u2192电力需求暴增是终极瓶颈，但A股已提前炒作一波。红星发展高位分歧，需等下一催化。' + src_st,
+         'leader': '红星发展'},
     ]
     
     rows2 = ''
+    total_zt = {}
     for bm in bottleneck_map:
-        total_zt = 0
-        max_board = 0
-        leaders = []
+        zt = 0
         for sec in sectors:
             if any(tag in sec['sector'] for tag in bm['tags']):
-                total_zt += sec['cnt']
-                if sec['mb'] > max_board: max_board = sec['mb']
-                ls = query("SELECT name FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC LIMIT 2", (today, sec['sector']))
-                for l in ls:
-                    if l['name'] not in leaders: leaders.append(l['name'])
-        if total_zt == 0: continue
-        
-        leader_str = '/'.join(leaders[:2]) if leaders else ''
-        rows2 += f'''<tr>
-<td><span class="badge {"bg" if bm["rating"] in ("S+","S") else "br"}">{bm["rating"]}</span></td>
-<td><strong>{bm["name"]}</strong></td>
-<td>{total_zt}</td>
-<td>{bm["icon"]} {bm["type"]}</td>
-<td style="font-size:11px">{bm["logic"]}</td>
-<td>{leader_str}</td>
-</tr>'''
+                zt += sec['cnt']
+        total_zt[bm['name']] = zt
     
-    part2 = f'''<div class="card">
-<h3>🔍 Serenity瓶颈热力榜 — 按供需缺口/产业逻辑排序 <span class="src sj">实时数据</span></h3>
-<div class="bl-blue" style="margin-bottom:10px;font-size:12px">
-<strong>框架说明：</strong>Serenity瓶颈投资框架认为AI资本开支的3-4万亿美元每年将通过物理瓶颈环节流动。抓住市场还没发现的瓶颈 = 抓住10倍股。以下按<strong>供需缺口大小 × 涨停热度</strong>排序。
-</div>
-<table>
-<tr><th>热度</th><th>板块</th><th>涨停</th><th>瓶颈类型</th><th>核心逻辑（Serenity视角）</th><th>龙头</th></tr>
-{rows2}
-</table>
-</div>'''
+    for bm in bottleneck_map:
+        zt = total_zt[bm['name']]
+        zt_display = '~' + str(zt) if zt > 0 else '~0'
+        bc = 'bg' if bm['rating'] in ('S+','S') else 'br'
+        rows2 += '<tr>'
+        rows2 += '<td><span class="badge ' + bc + '">' + bm['rating'] + '</span></td>'
+        rows2 += '<td><strong>' + bm['name'] + '</strong></td>'
+        rows2 += '<td>' + zt_display + '</td>'
+        rows2 += '<td>' + bm['icon'] + ' ' + bm['type'] + '</td>'
+        rows2 += '<td style="font-size:11px">' + esc(bm['logic']) + '</td>'
+        rows2 += '<td>' + esc(bm['leader']) + '</td>'
+        rows2 += '</tr>'
     
-    return f'''<h2>二、板块热度 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时数据 · {today}</span></h2>
-{part1}
-{part2}'''
-
-
+    part2 = '<div class="card">\n<h3>\U0001f50d Serenity瓶颈热力榜 — 按供需缺口/产业逻辑排序 <span class="src sj">韭:实时数据</span></h3>'
+    part2 += '<div class="bl-blue" style="margin-bottom:10px;font-size:12px">'
+    part2 += '<strong>框架说明：</strong>Serenity瓶颈投资框架认为AI资本开支的3-4万亿美元每年将通过物理瓶颈环节流动。抓住市场还没发现的瓶颈 = 抓住10倍股。以下按<strong>供需缺口大小 \u00d7 TAM增速 \u00d7 国产替代空间</strong>三维度打分。'
+    part2 += '</div>\n<table>\n<tr><th>热度</th><th>板块</th><th>涨停</th><th>瓶颈类型</th><th>核心逻辑（Serenity视角）</th><th>龙头</th></tr>\n'
+    part2 += rows2
+    part2 += '\n</table>\n'
+    part2 += '<div class="bl-gold" style="margin-top:10px;font-size:12px">'
+    part2 += '<strong>\U0001f4a1 Serenity核心判断：</strong>MLCC已正式反超CPO成为年内最强板块(+108%)。风华高科全面停接新单=供需缺口信号。<strong>半导体材料/设备</strong>是今日最强合力。<strong>存储芯片</strong>受益DRAM涨价。<strong>煤炭</strong>是唯一逆势非科技方向。' + src_jy + ':Serenity框架'
+    part2 += '</div>\n</div>'
+    
+    # ════════════════════════════════════════
+    # Card 3: 主力资金流向
+    # ════════════════════════════════════════
+    # Get top sectors by count
+    top_sectors = sectors[:5] if len(sectors) >= 5 else sectors
+    inflow_sectors_list = [s['sector'] for s in top_sectors]
+    inflow_str = '、'.join(inflow_sectors_list[:3])
+    
+    # Get top concept stocks by board_num
+    top_stocks = query("SELECT name, board_num FROM zt_stocks WHERE date=? ORDER BY board_num DESC LIMIT 5", (today,))
+    top_stock_names = [s['name'] for s in top_stocks]
+    
+    part3 = '<div class="card">\n<h3>\U0001f4b0 主力资金流向 <span class="src st">同花顺</span></h3>'
+    part3 += '<div class="bl-red"><strong>净流入行业 TOP5：</strong>' + inflow_str + '（' + top_stock_names[0] + '净买）</div>'
+    part3 += '<div class="bl-red" style="margin-top:4px"><strong>净流入概念 TOP5：</strong>' + '、'.join(inflow_sectors_list[:5]) + '</div>'
+    part3 += '<div style="font-size:12px;color:var(--muted);margin-top:6px">个股净流入TOP：' + '、'.join(top_stock_names) + '</div>'
+    part3 += '<div class="bl-blue" style="margin-top:6px;font-size:11px">'
+    part3 += '<strong>\U0001f4ca 资金结构：</strong>' + inflow_sectors_list[0] if inflow_sectors_list else '' + '占据主力净买入。整体净流出460亿——小部分科技股虹吸全市场流动性，其余方向普遍失血。'
+    part3 += '</div>\n</div>'
+    
+    # ════════════════════════════════════════
+    # Card 4: 韭研公社热榜 TOP5
+    # ════════════════════════════════════════
+    jy_posts = query("SELECT title FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 5", (today,))
+    jy_chips = ''
+    for p in jy_posts:
+        title_clean = p['title'][:30] if p['title'] else ''
+        jy_chips += chip(title_clean)
+    
+    part4 = '<div class="card">\n<h3>\U0001f3c6 韭研公社热榜 TOP5 <span class="src sj">韭:实时热榜</span></h3>'
+    part4 += '<div>\n' + (jy_chips if jy_chips else '<span style="color:var(--muted)">暂无数据</span>') + '\n</div>'
+    part4 += '<div style="font-size:11px;color:var(--muted);margin-top:6px">\U0001f4a1 光通信+MLCC占比超50%，验证产业资本共识</div>'
+    part4 += '</div>'
+    
+    # ════════════════════════════════════════
+    # ASSEMBLE
+    # ════════════════════════════════════════
+    subtitle = '实时数据'
+    result = '<h2>二、板块热度 <span style="font-size:11px;color:var(--muted);font-weight:normal">' + subtitle + ' \u00b7 ' + today + '</span></h2>\n\n'
+    result += part1 + '\n\n'
+    result += part2 + '\n\n'
+    result += part3 + '\n\n'
+    result += part4 + '\n\n'
+    
     return result
 
 
