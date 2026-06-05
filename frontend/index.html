@@ -16,7 +16,7 @@
 </div>
 <div style="display:flex;align-items:center;gap:10px">
 <select id="date-selector" style="background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:12px;cursor:pointer" onchange="switchDate(this.value)"></select>
-<span style="font-size:10px;color:var(--muted)"><span id="db-status">数据库</span> · <span id="ver-status">v5.7</span></span>
+<span style="font-size:10px;color:var(--muted)"><span id="db-status">数据库</span> · <span id="ver-status">v5.8</span></span>
 </div>
 </header>
 
@@ -33,7 +33,6 @@
 <div class="tab" onclick="switchTab('s18')">🐲 陈小群</div>
 <div class="tab" onclick="switchTab('s8')">🎯 高标个股分析</div>
 <div class="tab" onclick="switchTab('s10')">🤝 共识与分歧</div>
-<div class="tab" onclick="switchTab('s19')">🧠 AI 智能分析</div>
 <div class="tab" onclick="switchTab('s0')">📰 盘前纪要</div>
 <div class="tab" onclick="switchTab('s13')">💰 游资实盘</div>
 <div class="tab" onclick="switchTab('s15')">🤝 游资参谋团</div>
@@ -156,42 +155,6 @@
 <div class="section" id="s16"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s17"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s18"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
-<div class="section" id="s19">
-  <!-- AI 智能分析 — 由 JS 渲染 -->
-  <h2>🧠 AI 智能分析 <span style="font-size:12px;color:var(--muted);font-weight:normal">基于 FreeLLMAPI 多模型聚合引擎</span></h2>
-
-  <!-- 状态栏 -->
-  <div class="filter-bar" style="margin-bottom:12px">
-    <div class="filter-group">
-      <span id="ai-status-badge" class="tag y">检查连接中...</span>
-    </div>
-    <div class="filter-group">
-      <button id="ai-refresh-btn" class="btn btn-primary btn-sm" onclick="aiRefreshAll()">🔄 刷新分析</button>
-    </div>
-    <div class="filter-group" style="margin-left:auto">
-      <span id="ai-status-msg" style="font-size:11px;color:var(--muted)"></span>
-    </div>
-  </div>
-
-  <!-- 第一行: 大盘研判 -->
-  <div class="card" id="ai-strategy-card">
-    <h3>📋 次日策略研判 <button class="btn btn-sm" onclick="aiRefreshStrategy()" style="float:right">🔄</button></h3>
-    <div id="ai-strategy-content"><div class="loading"><div class="spinner"></div><div>AI 分析中...</div></div></div>
-  </div>
-
-  <!-- 第二行: 题材情绪分析 -->
-  <div class="card">
-    <h3>🔥 热门题材情绪分析 <button class="btn btn-sm" onclick="aiRefreshSentiment()" style="float:right">🔄</button></h3>
-    <div id="ai-sentiment-content"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
-  </div>
-
-  <!-- 第三行: LLM 状态详情 -->
-  <div class="card">
-    <h3>🔌 LLM 服务状态</h3>
-    <div id="ai-llm-status" style="font-size:13px;color:var(--muted)">检测中...</div>
-  </div>
-</div>
-<!-- s0 盘前纪要放最后保持 tab 顺序 -->
 <div class="section" id="s0"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 </main>
 
