@@ -671,166 +671,187 @@ def _build_s5_html(today):
 # ════════════════════════════════════════════
 
 def _build_s16_html(today):
-    """Serenity瓶颈分析 — 从实时涨停数据 + Serenity框架生成"""
-    # 收集行业数据
-    sectors = query("SELECT sector, COUNT(*) as cnt, MAX(board_num) as max_b FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (today,))
+    """Serenity瓶颈分析 — 1:1匹配JSON结构"""
+    sectors = query("SELECT sector, COUNT(*) as cnt, MAX(board_num) as mb FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (today,))
     if not sectors:
         return ''
     
-    # Serenity 瓶颈映射表 (瓶颈名称 → 评级/供需/评分)
-    bottleneck_map = {
-        'MLCC': {'rating': 'S+', 'supply': 9, 'tam': 10, 'substitute': 7, 'desc': '产能瓶颈', 'tags': ['MLCC','电容','被动元件']},
-        'CPO': {'rating': 'S+', 'supply': 8, 'tam': 9, 'substitute': 8, 'desc': '技术拐点', 'tags': ['CPO','光通信','光模块']},
-        '半导体': {'rating': 'S', 'supply': 9, 'tam': 7, 'substitute': 9, 'desc': '国产替代', 'tags': ['半导体','芯片','设备','材料','封测']},
-        '存储芯片': {'rating': 'S', 'supply': 8, 'tam': 8, 'substitute': 5, 'desc': '周期反转', 'tags': ['存储','DRAM','NAND','HBM']},
-        'PCB': {'rating': 'A', 'supply': 9, 'tam': 6, 'substitute': 8, 'desc': '材料缺口', 'tags': ['PCB','铜箔','CCL','封装基板']},
-        'AI服务器': {'rating': 'A', 'supply': 7, 'tam': 9, 'substitute': 4, 'desc': '需求爆发', 'tags': ['AI','服务器','算力','数据中心','光互联']},
-        '机器人': {'rating': 'B+', 'supply': 6, 'tam': 8, 'substitute': 5, 'desc': '量产元年', 'tags': ['机器人','人形','减速器','传感器','电机']},
-        '电力': {'rating': 'B+', 'supply': 7, 'tam': 6, 'substitute': 3, 'desc': '算电协同', 'tags': ['电力','煤炭','能源','电网','核电']},
-    }
+    # === 瓶颈映射表 ===
+    bottleneck_map = [
+        {'name': 'MLCC/被动元件', 'rating': 'S+', 'supply': 9, 'tam': 10, 'substitute': 7, 'desc': '产能瓶颈',
+         'tags': ['MLCC','电容','被动元件','陶瓷','薄膜电容','超级电容'],
+         'chain': [
+            {'level':'上游','link':'陶瓷粉体/镍电极','stocks':['国瓷材料','博迁新材'],'comment':'材料瓶颈，国产替代空间最大'},
+            {'level':'中游','link':'MLCC制造','stocks':['风华高科','三环集团'],'comment':'A股Murata，超级周期主受益'},
+            {'level':'耗材','link':'离型膜/MLCC膜','stocks':['洁美科技','瑞华泰'],'comment':'MLCC扩产->膜材料需求暴增'},
+            {'level':'设备','link':'流延机/烧结炉','stocks':['金明精机','博杰股份'],'comment':'设备交期16月+，最紧缺环节'},
+        ]},
+        {'name': 'CPO/光通信', 'rating': 'S+', 'supply': 8, 'tam': 9, 'substitute': 8, 'desc': '技术拐点',
+         'tags': ['CPO','光通信','光模块','光纤','光缆','光器件'],
+         'chain': [
+            {'level':'上游','link':'光芯片/光器件','stocks':['光迅科技','天孚通信'],'comment':'光芯片国产替代加速'},
+            {'level':'中游','link':'光模块制造','stocks':['中际旭创','新易盛'],'comment':'全球光模块龙头，1.6T放量'},
+            {'level':'下游','link':'光纤光缆','stocks':['亨通光电','长飞光纤'],'comment':'光纤预制棒涨价550%'},
+        ]},
+        {'name': '半导体设备/材料', 'rating': 'S', 'supply': 9, 'tam': 7, 'substitute': 9, 'desc': '国产替代',
+         'tags': ['半导体','芯片','设备','材料','封测','硅片','光刻'],
+         'chain': [
+            {'level':'设备','link':'刻蚀/薄膜/检测','stocks':['北方华创','中微公司'],'comment':'国产替代核心环节'},
+            {'level':'材料','link':'硅片/光刻胶/气体','stocks':['沪硅产业','中船特气'],'comment':'涨价周期+国产替代双驱动'},
+            {'level':'封测','link':'先进封装','stocks':['长电科技','通富微电'],'comment':'Chiplet拉动封装需求'},
+        ]},
+        {'name': '存储芯片', 'rating': 'S', 'supply': 8, 'tam': 8, 'substitute': 5, 'desc': '周期反转',
+         'tags': ['存储','DRAM','NAND','HBM','内存','闪存'],
+         'chain': [
+            {'level':'龙头','link':'DRAM/NAND','stocks':['兆易创新'],'comment':'Nor Flash+DRAM双轮驱动'},
+            {'level':'模组','link':'存储模组','stocks':['佰维存储','江波龙'],'comment':'AI服务器存储需求爆发'},
+        ]},
+        {'name': 'PCB/铜箔', 'rating': 'A', 'supply': 9, 'tam': 6, 'substitute': 8, 'desc': '材料缺口',
+         'tags': ['PCB','铜箔','CCL','封装基板','覆铜板'],
+         'chain': [
+            {'level':'上游','link':'铜箔/Q布','stocks':['诺德股份','长裕集团'],'comment':'HVLP铜箔缺口35-45%'},
+            {'level':'中游','link':'CCL/PCB','stocks':['鹏鼎控股','生益科技'],'comment':'RV200单柜PCB+233%'},
+            {'level':'下游','link':'HDI/封装基板','stocks':['深南电路','沪电股份'],'comment':'AI服务器PCB量价齐升'},
+        ]},
+    ]
     
     # 计算每个瓶颈方向的实际涨停热度
-    bottleneck_scores = []
-    for name, info in bottleneck_map.items():
-        # 统计匹配该方向的涨停数
+    scores = []
+    for bm in bottleneck_map:
         total_zt = 0
         max_board = 0
-        match_stocks = []
+        matched_stocks = []
         for sec in sectors:
-            for tag in info['tags']:
-                if tag in sec['sector']:
+            for tag in bm['tags']:
+                if tag in sec['sector'] or sec['sector'] in tag:
                     total_zt += sec['cnt']
-                    if sec['max_b'] > max_board:
-                        max_board = sec['max_b']
-                    # 获取具体个股
-                    stocks = query("SELECT name, board_num, board_tag FROM zt_stocks WHERE date=? AND sector LIKE ? ORDER BY board_num DESC, seal_time LIMIT 5", (today, f'%{sec["sector"]}%'))
-                    for s in stocks:
-                        if s['name'] not in match_stocks:
-                            match_stocks.append(s['name'])
+                    if sec['mb'] > max_board:
+                        max_board = sec['mb']
+                    ss = query("SELECT name FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC LIMIT 3", (today, sec['sector']))
+                    for s in ss:
+                        if s['name'] not in matched_stocks:
+                            matched_stocks.append(s['name'])
                     break
         
-        # 如果没有直接匹配，尝试模糊匹配
-        if total_zt == 0:
-            for sec in sectors:
-                for tag in info['tags']:
-                    if tag[:2] in sec['sector'] or any(k in sec['sector'] for k in info['tags']):
-                        total_zt += sec['cnt']
-                        if sec['max_b'] > max_board:
-                            max_board = sec['max_b']
-                        stocks = query("SELECT name, board_num FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC LIMIT 3", (today, sec['sector']))
-                        for s in stocks:
-                            if s['name'] not in match_stocks:
-                                match_stocks.append(s['name'])
+        zt_bonus = min(total_zt, 10)
+        total_score = bm['supply'] + bm['tam'] + bm['substitute'] + zt_bonus
         
-        total_score = info['supply'] + info['tam'] + info['substitute'] + min(total_zt, 10)
-        bottleneck_scores.append({
-            'name': name,
-            'rating': info['rating'],
-            'supply': info['supply'],
-            'tam': info['tam'],
-            'substitute': info['substitute'],
+        scores.append({
+            'name': bm['name'],
+            'rating': bm['rating'],
+            'supply': bm['supply'],
+            'tam': bm['tam'],
+            'substitute': bm['substitute'],
             'total': total_score,
-            'desc': info['desc'],
+            'desc': bm['desc'],
             'zt': total_zt,
             'max_b': max_board,
-            'stocks': match_stocks[:3],
+            'stocks': matched_stocks[:3] if matched_stocks else bm['chain'][0]['stocks'],
+            'chain': bm['chain'],
         })
     
-    # 按综合分排序
-    bottleneck_scores.sort(key=lambda x: x['total'], reverse=True)
+    scores.sort(key=lambda x: x['total'], reverse=True)
+    
+    def chip(names):
+        return ' '.join(['<span class="chip chip-up">' + n + '</span>' for n in names]) if names else '<span style="color:var(--muted)">\u2014</span>'
+    
+    def rating_badge(r):
+        rc = 'bg' if r in ('S+','S') else 'br'
+        return '<span class="badge ' + rc + '">' + r + '</span>'
+    
+    def td_class(v, th=7, tl=5):
+        if v >= th: return 'up'
+        if v >= tl: return 'ne'
+        return 'dn'
     
     # Card 1: 瓶颈热力榜 TOP5
-    rating_colors = {'S+': 'bg', 'S': 'bg', 'A+': 'br', 'A': 'br', 'B+': 'br'}
     heat_rows = ''
-    for b in bottleneck_scores[:5]:
-        rc = rating_colors.get(b['rating'], 'br')
-        chips = ' '.join([f'<span class="chip chip-up">{n}</span>' for n in b['stocks']]) if b['stocks'] else '<span style="color:var(--muted)">—</span>'
-        supply_tag = 'up' if b['supply'] >= 7 else ('ne' if b['supply'] >= 5 else 'dn')
-        tam_tag = 'up' if b['tam'] >= 7 else ('ne' if b['tam'] >= 5 else 'dn')
-        sub_tag = 'up' if b['substitute'] >= 7 else ('ne' if b['substitute'] >= 5 else 'dn')
-        heat_rows += f'''<tr>
-<td><span class="badge {rc}">{b['rating']}</span></td>
-<td><strong>{b['name']}</strong><br><span style="font-size:11px;color:var(--muted)">{b['desc']}</span></td>
-<td class="{supply_tag}">{b['supply']}/10</td>
-<td class="{tam_tag}">{b['tam']}/10</td>
-<td class="{sub_tag}">{b['substitute']}/10</td>
-<td><strong>{b['total']}/40</strong></td>
-<td>{chips}</td>
-</tr>'''
+    for b in scores[:5]:
+        heat_rows += '<tr>'
+        heat_rows += '<td>' + rating_badge(b['rating']) + '</td>'
+        heat_rows += '<td><strong>' + b['name'] + '</strong><br><span style="font-size:11px;color:var(--muted)">' + b['desc'] + '</span></td>'
+        heat_rows += '<td class="' + td_class(b['supply']) + '">' + str(b['supply']) + '/10</td>'
+        heat_rows += '<td class="' + td_class(b['tam']) + '">' + str(b['tam']) + '/10</td>'
+        heat_rows += '<td class="' + td_class(b['substitute']) + '">' + str(b['substitute']) + '/10</td>'
+        heat_rows += '<td><strong>' + str(b['total']) + '/40</strong></td>'
+        heat_rows += '<td>' + chip(b['stocks']) + '</td>'
+        heat_rows += '</tr>'
     
-    # Card 2: 最强方向 — 取排名第一的方向
-    top = bottleneck_scores[0] if bottleneck_scores else None
-    top_section = ''
+    # Card 2: 最强方向
+    top = scores[0] if scores else None
+    part2_html = ''
     if top:
-        top_stocks = query("SELECT name, board_num, board_tag FROM zt_stocks WHERE date=? ORDER BY board_num DESC LIMIT 10", (today,))
-        top_zt = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=?", (today,))[0]['c']
+        chain_rows = ''
+        for link in top['chain']:
+            chain_rows += '<tr>'
+            chain_rows += '<td><strong>' + link['level'] + '</strong></td>'
+            chain_rows += '<td>' + link['link'] + '</td>'
+            chain_rows += '<td>' + chip(link['stocks']) + '</td>'
+            chain_rows += '<td>' + link['comment'] + '</td>'
+            chain_rows += '</tr>'
         
-        chip_tag = '<span class="chip chip-up">'
-        chip_end = '</span>'
-        top_section = f'''<div class="card">
-<h3>🏆 {top['name']} — Serenity最强看多方向</h3>
-<div class="bl-red"><strong>核心逻辑：</strong>{top['name']}方向今日涨停{top['zt']}家，最高{top['max_b']}板，供需缺口{top['supply']}/10，TAM增速{top['tam']}/10，国产替代空间{top['substitute']}/10。综合评分{top['total']}/40，为当前市场最强瓶颈方向。</div>
-<table>
-<tr><th>评级</th><th>方向</th><th>涨停数</th><th>最高板</th><th>龙头标的</th></tr>
-{''.join([f'<tr><td><span class="badge {rating_colors.get(b["rating"],"br")}">{b["rating"]}</span></td><td><strong>{b["name"]}</strong></td><td>{b["zt"]}</td><td>{b["max_b"]}板</td><td>{" ".join([chip_tag + n + chip_end for n in b["stocks"][:2]]) if b["stocks"] else "—"}</td></tr>' for b in bottleneck_scores[:3]])}
-</table>
-<div class="bl-gold" style="margin-top:8px"><strong>💡 Serenity核心判断：</strong>AI资本开支通过物理瓶颈环节流动。{top['name']}是当前最明确的瓶颈方向，涨停{top['zt']}家确认资金合力。建议聚焦龙头，分歧日低吸。买在分歧，卖在一致。</div>
-</div>'''
+        part2_html = '<div class="card">'
+        part2_html += '<h3>\U0001f3c6 ' + top['name'] + '\u8d85\u7ea7\u5468\u671f \u2014 Serenity\u6700\u5f3a\u770b\u591a\u65b9\u5411</h3>'
+        part2_html += '<div class="bl-red"><strong>\u6838\u5fc3\u903b\u8f91\uff1a</strong>' + top['name'] + '\u65b9\u5411\u4eca\u65e5\u6da8\u505c' + str(top['zt']) + '\u5bb6\uff0c\u6700\u9ad8' + str(top['max_b']) + '\u677f\u3002AI\u8d44\u672c\u5f00\u652f\u901a\u8fc7\u7269\u7406\u74f6\u9888\u6d41\u52a8\uff0c' + top['name'] + '\u662f\u5f53\u524d\u4f9b\u9700\u7f3a\u53e3\u6700\u660e\u786e\u7684\u73af\u8282\u3002\u4ea7\u80fd\u5e74\u589e\u6709\u9650\uff0c\u9700\u6c42\u7206\u53d1\u5f0f\u589e\u957f\uff0c\u4f9b\u9700\u7f3a\u53e3\u81f3\u5c11\u6301\u7eed\u52302028\u5e74\u3002</div>'
+        part2_html += '<table><tr><th>\u5c42\u7ea7</th><th>\u73af\u8282</th><th>A\u80a1\u9f99\u5934</th><th>Serenity\u70b9\u8bc4</th></tr>'
+        part2_html += chain_rows
+        part2_html += '</table>'
+        part2_html += '<div class="bl-gold" style="margin-top:8px"><strong>\U0001f4a1 Serenity\u6838\u5fc3\u5224\u65ad\uff1a</strong>' + top['name'] + '\u8d85\u7ea7\u5468\u671f\u4ecd\u5904\u65e9\u671f\u9636\u6bb5\uff0c\u4f9b\u9700\u7f3a\u53e3\u81f3\u5c11\u52302028\u5e74\u3002\u5f53\u524d\u6da8\u505c' + str(top['zt']) + '\u5bb6\u786e\u8ba4\u8d44\u91d1\u5408\u529b\uff0c\u5efa\u8bae\u805a\u7126\u9f99\u5934\uff0c\u5206\u6b67\u65e5\u4f4e\u5438\u3002\u4e70\u5728\u5206\u6b67\uff0c\u5356\u5728\u4e00\u81f4\u3002</div>'
+        part2_html += '</div>'
     
     # Card 3: 策略总结
-    strategy_rows = ''
     strategy_map = {
-        'S+': {'strategy': '趋势低吸/持有', 'risk': '短期涨幅过高回调'},
-        'S': {'strategy': '等待分歧低吸', 'risk': '明日分歧回踩深度'},
-        'A': {'strategy': '趋势持有', 'risk': '持续性待验证'},
-        'B+': {'strategy': '观望等待确认', 'risk': '主线切换风险'},
+        'S+': {'strategy': '\u8d8b\u52bf\u4f4e\u5438/\u6301\u6709', 'risk': '\u77ed\u671f\u6da8\u5e45\u8fc7\u9ad8\u56de\u8c03'},
+        'S': {'strategy': '\u7b49\u5f85\u5206\u6b67\u4f4e\u5438', 'risk': '\u660e\u65e5\u5206\u6b67\u56de\u8e29\u6df1\u5ea6'},
+        'A': {'strategy': '\u8d8b\u52bf\u6301\u6709', 'risk': '\u6301\u7eed\u6027\u5f85\u9a8c\u8bc1'},
+        'B+': {'strategy': '\u89c2\u671b\u7b49\u5f85\u786e\u8ba4', 'risk': '\u4e3b\u7ebf\u5207\u6362\u98ce\u9669'},
     }
-    for b in bottleneck_scores[:5]:
-        sm = strategy_map.get(b['rating'], {'strategy': '观察', 'risk': '不确定'})
-        chips = '、'.join(b['stocks'][:3]) if b['stocks'] else '—'
-        strategy_rows += f'''<tr>
-<td><span class="badge {rating_colors.get(b['rating'],'br')}">{b['rating']}</span></td>
-<td>{b['name']}</td>
-<td>{chips}</td>
-<td>{sm['strategy']}</td>
-<td>{sm['risk']}</td>
-</tr>'''
     
-    # 最终框架核心
-    top_direction = bottleneck_scores[0]['name'] if bottleneck_scores else '待确认'
-    top_score = bottleneck_scores[0]['total'] if bottleneck_scores else 0
+    strategy_rows = ''
+    for b in scores[:5]:
+        sm = strategy_map.get(b['rating'], {'strategy': '\u89c2\u5bdf', 'risk': '\u4e0d\u786e\u5b9a'})
+        stock_str = '\u3001'.join(b['stocks'][:3]) if b['stocks'] else '\u2014'
+        strategy_rows += '<tr>'
+        strategy_rows += '<td>' + rating_badge(b['rating']) + '</td>'
+        strategy_rows += '<td>' + b['name'] + '</td>'
+        strategy_rows += '<td>' + stock_str + '</td>'
+        strategy_rows += '<td>' + sm['strategy'] + '</td>'
+        strategy_rows += '<td>' + sm['risk'] + '</td>'
+        strategy_rows += '</tr>'
+    
+    top_dir = scores[0]['name'] if scores else '\u5f85\u786e\u8ba4'
+    top_score = scores[0]['total'] if scores else 0
     zt_total = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=?", (today,))[0]['c']
     max_board = query("SELECT MAX(board_num) as mb FROM zt_stocks WHERE date=?", (today,))[0]['mb']
     
-    return f'''<h2>🔬 Serenity瓶颈分析 — 最强题材与核心标的 <span style="font-size:11px;color:var(--muted);font-weight:normal">供需缺口×TAM增速×国产替代空间 · {today}</span></h2>
+    # 组合输出
+    result = '<h2>\U0001f52c Serenity\u74f6\u9888\u5206\u6790 \u2014 \u6700\u5f3a\u9898\u6750\u4e0e\u6838\u5fc3\u6807\u7684 <span style="font-size:11px;color:var(--muted);font-weight:normal">\u4f9b\u9700\u7f3a\u53e3\u00d7TAM\u589e\u901f\u00d7\u56fd\u4ea7\u66ff\u4ee3\u7a7a\u95f4 \u00b7 ' + today + '</span></h2>'
+    result += '\n\n<div class="bl-gold" style="margin-bottom:10px;font-size:12px">'
+    result += '\n<strong>\U0001f9e0 Serenity\u6846\u67b6\u6838\u5fc3\uff1a</strong>AI\u8d44\u672c\u5f00\u652f\u901a\u8fc7\u7269\u7406\u74f6\u9888\u73af\u8282\u6d41\u52a8\u3002\u4eca\u65e5\u6700\u5f3a\u65b9\u5411\uff1a<strong>' + top_dir + '</strong>\u3002\u6da8\u505c' + str(zt_total) + '\u53ea\uff0c\u6700\u9ad8' + str(max_board) + '\u677f\u3002' + top_dir + '\u7efc\u5408\u8bc4\u5206' + str(top_score) + '/40\u3002'
+    result += '\n</div>'
+    
+    result += '\n\n<div class="card">'
+    result += '\n<h3>\U0001f525 \u74f6\u9888\u70ed\u529b\u699c TOP5 \u2014 \u6309\u4f9b\u9700\u7f3a\u53e3\u00d7TAM\u589e\u901f\u8bc4\u5206</h3>'
+    result += '\n<table>'
+    result += '\n<tr><th>\u8bc4\u7ea7</th><th>\u74f6\u9888\u73af\u8282</th><th>\u4f9b\u9700\u7f3a\u53e3</th><th>TAM\u589e\u901f</th><th>\u56fd\u4ea7\u66ff\u4ee3</th><th>\u7efc\u5408\u5206</th><th>A\u80a1\u6838\u5fc3\u6807\u7684</th></tr>'
+    result += heat_rows
+    result += '\n</table>'
+    result += '\n</div>'
+    
+    result += '\n\n' + part2_html
+    
+    result += '\n\n<div class="card">'
+    result += '\n<h3>\U0001f9e0 Serenity\u7b56\u7565\u603b\u7ed3</h3>'
+    result += '\n<table>'
+    result += '\n<tr><th>\u4f18\u5148\u7ea7</th><th>\u65b9\u5411</th><th>\u6838\u5fc3\u6807\u7684</th><th>\u7b56\u7565</th><th>\u98ce\u9669</th></tr>'
+    result += strategy_rows
+    result += '\n</table>'
+    result += '\n<div class="bl-blue" style="margin-top:8px;font-size:11px"><strong>\U0001f4cc Serenity\u6838\u5fc3\u7406\u5ff5\uff1a</strong>"\u74f6\u9888\u4e0d\u7834\uff0c\u884c\u60c5\u4e0d\u6b62\u3002\u771f\u6b63\u7684\u4f9b\u9700\u7f3a\u53e3\u4f1a\u6301\u7eed\u591a\u5e74\u3002\u4e0d\u8981\u56e0\u4e3a\u6da8\u4e86\u51e0\u4e2a\u6708\u5c31\u6050\u9ad8\u2014\u2014\u74f6\u9888\u73af\u8282\u4f1a\u6301\u7eed\u6570\u5e74\u3002\u4e70\u5728\u5206\u6b67\uff0c\u5356\u5728\u4e00\u81f4\u3002"</div>'
+    result += '\n</div>'
+    
+    return result
 
-<div class="bl-gold" style="margin-bottom:10px;font-size:12px">
-<strong>🧠 Serenity框架核心：</strong>AI资本开支通过物理瓶颈环节流动。今日最强方向：<strong>{top_direction}</strong>。涨停{zt_total}只，最高{max_board}板。{top_direction}综合评分{top_score}/40，领先其他方向。
-</div>
 
-<div class="card">
-<h3>🔥 瓶颈热力榜 TOP5 — 按供需缺口×TAM增速评分</h3>
-<table>
-<tr><th>评级</th><th>瓶颈环节</th><th>供需缺口</th><th>TAM增速</th><th>国产替代</th><th>综合分</th><th>A股核心标的</th></tr>
-{heat_rows}
-</table>
-</div>
-
-{top_section}
-
-<div class="card">
-<h3>🧠 Serenity策略总结</h3>
-<table>
-<tr><th>优先级</th><th>方向</th><th>核心标的</th><th>策略</th><th>风险</th></tr>
-{strategy_rows}
-</table>
-<div class="bl-blue" style="margin-top:8px;font-size:11px"><strong>📌 Serenity核心理念：</strong>"瓶颈不破，行情不止。真正的供需缺口会持续多年。不要因为涨了几个月就恐高——瓶颈环节会持续数年。买在分歧，卖在一致。"</div>
-</div>'''
-
-
-# ════════════════════════════════════════════
-# 6. 统一 rebuild section_html (增强版)
-# ════════════════════════════════════════════
 
 def rebuild_section_html(today=None):
     """用实时数据重建 section_html"""
