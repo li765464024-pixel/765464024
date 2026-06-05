@@ -185,41 +185,54 @@ def fetch_market_index():
 
 
 def fetch_market_data():
-    """获取大盘概况数据 — 含成交额/涨跌家数"""
+    """大盘概况 — 以悟道API为主, 补充成交额(新浪)+指数(腾讯)"""
     try:
-        import akshare as ak
-        today_str = TODAY.replace('-', '')
-        df = ak.stock_zt_pool_em(date=today_str)
+        # 1. 悟道API → 涨停/跌停/上涨/下跌/封板率/温度
+        KEY = os.environ.get('LB_API_KEY', '')
+        if not KEY:
+            try:
+                with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')) as f:
+                    for line in f:
+                        if line.startswith('LB_API_KEY='):
+                            KEY = line.strip().split('=', 1)[1]
+                            break
+            except:
+                pass
+            if not KEY:
+                KEY = "lb_1325c45a076a931746b446eba05812df3fabcfeca35b4655603670999119484b"
         
-        zt_count = len(df) if df is not None else 0
+        r = requests.get(f"https://stock.quicktiny.cn/api/openclaw/market-overview?date={TODAY}",
+                        headers={"Authorization": f"Bearer {KEY}"}, timeout=10)
+        data = r.json()['data']
+        zt_count = data['limit_up_count']
+        dt_count = data['limit_down_count']
+        up_count = data['rise_count']
+        down_count = data['fall_count']
+        seal_rate = round((1 - data['limit_up_broken_ratio']) * 100, 1)
+        temperature = round(data['market_temperature'], 1)
         
-        # 封板率
-        sealed = len(df[df['炸板次数'] == 0]) if df is not None and '炸板次数' in df.columns else 0
-        seal_rate = round(sealed / zt_count * 100, 1) if zt_count > 0 else 0
-        max_board = int(df['连板数'].max()) if df is not None and '连板数' in df.columns else 0
-        
-        # 最高板标的
+        # 2. 悟道API ladder → 最高板
+        r2 = requests.get(f"https://stock.quicktiny.cn/api/openclaw/ladder?date={TODAY}",
+                         headers={"Authorization": f"Bearer {KEY}"}, timeout=10)
+        ladder = r2.json()['data']['dates'][0]
+        max_board = max(b['level'] for b in ladder['boards'])
         top_stocks = []
-        if df is not None and '连板数' in df.columns:
-            top_df = df[df['连板数'] == max_board]
-            for _, row in top_df.iterrows():
-                top_stocks.append(str(row.get('名称', '')))
-        max_board_stocks = '/'.join(top_stocks[:3]) if top_stocks else ''
+        for b in ladder['boards']:
+            if b['level'] == max_board:
+                for s in b['stocks']:
+                    top_stocks.append(s['name'])
+        max_board_stocks = '/'.join(top_stocks[:3])
         
-        # 指数 + 成交额 (from 腾讯证券)
+        # 3. 腾讯证券 → 指数
         indices = fetch_market_index()
-        sh_price = indices.get('sh', {}).get('price')
-        sz_price = indices.get('sz', {}).get('price')
-        cy_price = indices.get('cy', {}).get('price')
-        kc_price = indices.get('kc', {}).get('price')
         
-        # 成交额: 从新浪财经获取（返回正确的全市场总成交额）
+        # 4. 新浪财经 → 成交额
         volume_str = ''
         try:
-            r = requests.get("https://hq.sinajs.cn/list=sh000001,sz399001", 
-                            headers={"User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn"}, timeout=5)
+            r3 = requests.get("https://hq.sinajs.cn/list=sh000001,sz399001",
+                             headers={"User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn"}, timeout=5)
             total_vol = 0
-            for line in r.text.strip().split('\n'):
+            for line in r3.text.strip().split('\n'):
                 parts = line.split(',')
                 if len(parts) > 10:
                     v = parts[9].strip()
@@ -230,41 +243,26 @@ def fetch_market_data():
         except:
             pass
         
-        # 昨日对比
+        # 5. 昨日对比
         yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
         prev = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (yesterday,))
-        yesterday_zt = prev[0]['zt_count'] if prev else 0
-        yesterday_seal = prev[0]['seal_rate'] if prev else 0
-        
-        # 涨跌家数 (使用旧数据作为估算)
-        # 从akshare涨停股数反推全市场
-        up_count = 0
-        down_count = 0
-        if prev:
-            # 用昨日数据保持连续, 实际应从全市场API获取
-            up_count = prev[0]['up_count'] or 0
-            down_count = prev[0]['down_count'] or 0
         
         insert('market_data', {
-            'date': TODAY,
-            'sentiment': '分化',
-            'zt_count': zt_count,
-            'dt_count': 0,
-            'up_count': up_count,
-            'down_count': down_count,
-            'seal_rate': seal_rate,
-            'volume': volume_str,
+            'date': TODAY, 'sentiment': '分化',
+            'zt_count': zt_count, 'dt_count': dt_count,
+            'up_count': up_count, 'down_count': down_count,
+            'seal_rate': seal_rate, 'volume': volume_str,
             'main_inflow': prev[0]['main_inflow'] if prev else '',
-            'max_board': max_board,
-            'max_board_stocks': max_board_stocks,
-            'index_sh': sh_price,
-            'index_sz': sz_price,
-            'index_cy': cy_price,
-            'index_kc': kc_price,
-            'temperature': prev[0]['temperature'] if prev else 0,
-            'yesterday_zt_count': yesterday_zt,
-            'yesterday_seal_rate': yesterday_seal,
+            'max_board': max_board, 'max_board_stocks': max_board_stocks,
+            'index_sh': indices.get('sh', {}).get('price'),
+            'index_sz': indices.get('sz', {}).get('price'),
+            'index_cy': indices.get('cy', {}).get('price'),
+            'index_kc': indices.get('kc', {}).get('price'),
+            'temperature': temperature,
+            'yesterday_zt_count': prev[0]['zt_count'] if prev else 0,
+            'yesterday_seal_rate': prev[0]['seal_rate'] if prev else 0,
         })
+        print(f"  ✅ 大盘(悟道API): 涨停{zt_count} 上涨{up_count} 下跌{down_count} 封板率{seal_rate}% 温度{temperature} 成交额{volume_str}")
         return True
     except Exception as e:
         print(f"  ⚠️ 大盘数据获取失败: {e}")
@@ -309,7 +307,11 @@ def _build_s1_html(today):
         try:
             if isinstance(v, float) and v == 0.0: return '---'
             if isinstance(v, (int, float)) and v >= 1000: return '{:,}'.format(int(v))
-            return str(v)
+            s = str(v)
+            # Format "30692亿" -> "30,692亿"
+            if s[:-1].isdigit() and s[-1] in '亿万%':
+                return '{:,}'.format(int(s[:-1])) + s[-1]
+            return s
         except: return str(v)
     
     def st(v):
