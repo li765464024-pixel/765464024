@@ -298,34 +298,26 @@ def _build_s7_html(today):
 </table>
 </div>'''
     
-    def tab_label(tab_name, label, cnt, active=False):
+    def tab_label(tab_name, label, cnt, active=False, rate_from=None, rate_to=None):
         act = ' active' if active else ''
-        return f'<div class="board-tab{act}" onclick="switchBoardTab(\'{tab_name}\')" data-board="{tab_name}">{label}板（{cnt}）</div>'
+        rate_attrs = ''
+        if rate_from is not None:
+            pct = (rate_to / rate_from * 100) if rate_from > 0 else 0
+            rate_attrs = f' data-rate-from="{rate_from}" data-rate-to="{rate_to}" data-rate-pct="{pct:.1f}" data-rate-label="{label}"'
+        return f'<div class="board-tab{act}" onclick="switchBoardTab(\'{tab_name}\')" data-board="{tab_name}"{rate_attrs}>{label}板（{cnt}）</div>'
     
-    def rate_label(from_name, to_name, rate, cnt_from, cnt_to):
-        """晋级率文本: 一→二 7/70=10.0%"""
-        if cnt_from == 0:
-            return f'{from_name}→{to_name}: -'
-        pct = f'{rate:.1f}%' if rate > 0 else '0%'
-        return f'{from_name}→{to_name}: {cnt_to}/{cnt_from}={pct}'
     
     cnt1, cnt2, cnt3, cnt4, cnt5 = [len(boards[b]) for b in [1, 2, 3, 4, 5]]
     
-    rate_1_2 = cnt2 / cnt1 * 100 if cnt1 > 0 else 0
-    rate_2_3 = cnt3 / cnt2 * 100 if cnt2 > 0 else 0
-    rate_3_4 = cnt4 / cnt3 * 100 if cnt3 > 0 else 0
-    rate_4_5 = cnt5 / cnt4 * 100 if cnt4 > 0 else 0
-    
-    rates_str = f'{rate_label("一","二",rate_1_2,cnt1,cnt2)} | {rate_label("二","三",rate_2_3,cnt2,cnt3)} | {rate_label("三","四",rate_3_4,cnt3,cnt4)} | {rate_label("四","五",rate_4_5,cnt4,cnt5)}'
     
     board_tabs = ''
-    board_tabs += tab_label('one', '一', cnt1, active=True)
-    board_tabs += tab_label('two', '二', cnt2)
-    board_tabs += tab_label('three', '三', cnt3)
-    board_tabs += tab_label('four', '四', cnt4)
+    board_tabs += tab_label('one', '一', cnt1, active=True, rate_from=cnt1, rate_to=cnt2)
+    board_tabs += tab_label('two', '二', cnt2, rate_from=cnt2, rate_to=cnt3)
+    board_tabs += tab_label('three', '三', cnt3, rate_from=cnt3, rate_to=cnt4)
+    board_tabs += tab_label('four', '四', cnt4, rate_from=cnt4, rate_to=cnt5)
     higher_cnt = cnt5
-    board_tabs += f'<div class="board-tab" onclick="switchBoardTab(\'higher\')" data-board="higher">更高（{higher_cnt}）</div>'
-    board_tabs += f'<div class="board-tab" style="margin-left:auto;background:rgba(210,153,29,.1);border-color:var(--gold);color:var(--gold);cursor:default;font-size:11px" title="今日晋级率(上板数/基数)">{rates_str}</div>'
+    board_tabs += f'<div class="board-tab" onclick="switchBoardTab(\'higher\')" data-board="higher" data-rate-from="{cnt5}" data-rate-to="0" data-rate-pct="0" data-rate-label="五">更高（{higher_cnt}）</div>'
+    board_tabs += f'<div id="rate-display" class="board-tab" style="margin-left:auto;background:rgba(210,153,29,.1);border-color:var(--gold);color:var(--gold);cursor:default;font-size:11px">加载中...</div>'
     
     t1 = build_table(boards[1], 'one', '一板')
     t2 = build_table(boards[2], 'two', '二板')

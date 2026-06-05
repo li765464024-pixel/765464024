@@ -35,6 +35,29 @@ function switchBoardTab(tab) {
   if (tabEl) tabEl.classList.add('active');
   var boardEl = document.getElementById('board-' + tab);
   if (boardEl) boardEl.style.display = 'block';
+  
+  // 更新晋级率显示
+  updateRateDisplay(tabEl);
+}
+
+function updateRateDisplay(tabEl) {
+  var display = document.getElementById('rate-display');
+  if (!display || !tabEl) return;
+  
+  var from = parseInt(tabEl.getAttribute('data-rate-from'));
+  var to = parseInt(tabEl.getAttribute('data-rate-to'));
+  var pct = parseFloat(tabEl.getAttribute('data-rate-pct'));
+  var label = tabEl.getAttribute('data-rate-label');
+  if (!label) { display.textContent = ''; return; }
+  
+  var nextMap = {'一':'二','二':'三','三':'四','四':'五','五':'六'};
+  var nextLabel = nextMap[label] || '';
+  
+  if (from <= 0) {
+    display.textContent = label + '→' + nextLabel + ': -';
+  } else {
+    display.textContent = label + '→' + nextLabel + ': ' + to + '/' + from + '=' + pct.toFixed(1) + '%';
+  }
 }
 
 function setupTableSorting() {
@@ -138,6 +161,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // 3. 重新绑定排序
     setupTableSorting();
+    
+    // 4. 初始化晋级率显示 (默认一板)
+    var defaultTab = q('.board-tab.active');
+    if (defaultTab) {
+      updateRateDisplay(defaultTab);
+    }
 
     // 4. 更新 header 显示最新数据日期
     var versionsRes = await apiGet('/data/versions');
