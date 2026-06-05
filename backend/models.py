@@ -61,6 +61,7 @@ def init_db():
         net_inflow  REAL,           -- 主力净额(亿)
         trade_amt   REAL,           -- 成交额(亿)
         is_dragon   INTEGER DEFAULT 0,  -- 龙虎榜
+        reopen_count INTEGER DEFAULT 0, -- 炸板次数(回封标记)
         board_tag   TEXT,            -- 首板/二板等标签
         created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

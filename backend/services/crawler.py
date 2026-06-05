@@ -124,6 +124,7 @@ def fetch_zt_pool():
                 'seal_time': fmt_time,
                 'reason': str(row.get('所属行业', '')),
                 'seal_amount': float(row.get('封板资金', 0)) / 100000000 if row.get('封板资金', 0) else 0,
+                'reopen_count': int(row.get('炸板次数', 0)),
                 'turnovers': float(row.get('换手率', 0)) if row.get('换手率', 0) else 0,
                 'sector': str(row.get('所属行业', '')),
                 'board_tag': tag,
@@ -269,8 +270,13 @@ def _build_s7_html(today):
             limit = fmt_money(s['seal_amount'])
             tover = f"{s['turnovers']:.1f}%" if s['turnovers'] else '-'
             price_str = f"{p:.2f}" if p else '-'
+            reopen_tag = ''
+            rc = s.get('reopen_count', 0) or 0
+            if rc > 0:
+                reopen_tag = f'<span style="display:inline-block;padding:1px 5px;border-radius:2px;font-size:9px;font-weight:700;background:var(--red);color:#fff;margin-left:4px">回封</span>'
+            
             rows += f'''<tr data-sort-price="{p}" data-sort-time="{t}" data-sort-reason="{reason}" data-sort-limit="{s['seal_amount'] or 0}" data-sort-sector="{sector}" data-sort-turnover="{s['turnovers'] or 0}">
-<td>{name}<br><span style="font-size:10px;color:var(--muted)">{code}</span></td>
+<td>{name}<br><span style="font-size:10px;color:var(--muted)">{code}</span>{reopen_tag}</td>
 <td>{price_str}</td>
 <td>{t}<br><span class="board-days-tag">{tag}</span></td>
 <td style="font-size:11px">{reason}</td>
