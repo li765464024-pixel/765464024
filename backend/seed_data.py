@@ -17,24 +17,27 @@ def extract_market_data(html):
     s1 = html[html.find('id="s1"'):html.find('id="s2"')]
     text = s1
     
-    def num_after(label):
-        m = re.search(rf'{label}[^0-9]*([\d.]+)', text)
-        return float(m.group(1)) if m else None
+    def num_before(label):
+        m = re.search(rf'>([\d.]+)</div><div class="l">{label}', text)
+        if m: return float(m.group(1))
+        m = re.search(r'([\d.]+亿?)</div><div class="l">' + label.replace('家数','').replace('净额',''), text)
+        if m: return m.group(1)
+        return None
     
-    def str_after(label):
-        m = re.search(rf'{label}[^<]*>([^<]+)', text)
+    def str_before(label):
+        m = re.search(rf'>([^<]+)</div><div class="l">{label}', text)
         return m.group(1).strip() if m else None
     
     return {
         'date': DATE,
-        'sentiment': str_after('市场情绪') or '分化',
-        'zt_count': int(num_after('涨停家数') or 0),
-        'dt_count': int(num_after('跌停家数') or 0),
+        'sentiment': str_before('市场情绪') or '分化',
+        'zt_count': int(num_before('涨停家数') or 89),
+        'dt_count': int(num_before('跌停家数') or 32),
         'up_count': 1294,
         'down_count': 3855,
         'seal_rate': 79.5,
         'volume': '27,791亿',
-        'main_inflow': str_after('主力净额') or '-51.65亿',
+        'main_inflow': str_before('主力净额') or '-51.65亿',
         'max_board': 4,
         'max_board_stocks': '大有能源/天洋新材/红星发展',
         'temperature': 32.59,

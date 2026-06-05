@@ -107,4 +107,4 @@ if __name__ == '__main__':
         print("首次启动，迁移初始数据...")
         migrate_all()
     print(f"\n🌐 访问地址: http://localhost:5000")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5500, debug=True)

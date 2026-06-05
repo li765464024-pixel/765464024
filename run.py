@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 复盘工具 — 一键启动脚本
-本地访问: http://localhost:5000
+本地访问: http://localhost:5500
 """
 import os
 import sys
@@ -19,7 +19,7 @@ from backend.seed_data import migrate_all
 
 def open_browser():
     time.sleep(1.5)
-    webbrowser.open('http://localhost:5000')
+    webbrowser.open('http://localhost:5500')
 
 if __name__ == '__main__':
     print("╔══════════════════════════════════════════╗")
@@ -40,7 +40,7 @@ if __name__ == '__main__':
         print(f"\n✅ 数据库已有 {existing[0]['c']} 条大盘记录")
     
     print("\n🚀 启动 Web 服务...")
-    print(f"\n🌐 访问地址: http://localhost:5000")
+    print(f"\n🌐 访问地址: http://localhost:5500")
     print("⌨️  按 Ctrl+C 停止服务\n")
     
     # 自动打开浏览器
@@ -48,4 +48,4 @@ if __name__ == '__main__':
     
     # 启动 Flask
     from backend.app import app
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5500, debug=False)

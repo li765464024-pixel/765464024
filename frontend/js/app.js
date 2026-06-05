@@ -2,7 +2,7 @@
  * 复盘工具 — 前端交互逻辑
  * 动态从后端 API 加载数据，渲染各版块
  */
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'http://localhost:5500/api';
 
 // ════════════════════════════════════════════
 // 工具函数
