@@ -129,9 +129,9 @@ async function switchDate(dateStr) {
   currentDate = dateStr;
   q('#header-date').textContent = dateStr;
   
-  // 显示加载状态（s3、s9 除外，各自加载）
+  // 显示加载状态（s3 除外，它自己加载）
   qa('.section').forEach(function(s) {
-    if (s.id === 's3' || s.id === 's9') return;
+    if (s.id === 's3') return;
     s.innerHTML = '<div class="loading"><div class="spinner"></div><div>加载 ' + dateStr + ' 数据...</div></div>';
   });
   
@@ -140,7 +140,7 @@ async function switchDate(dateStr) {
   if (sectionsRes.ok && sectionsRes.data) {
     var count = 0;
     Object.keys(sectionsRes.data).forEach(function(sid) {
-      if (sid === 's3' || sid === 's9') return; // s3 由 v2 API 渲染; s9 由 JSON 渲染
+      if (sid === 's3') return; // s3 由 v2 API 渲染
       var sec = sectionsRes.data[sid];
       var el = document.getElementById(sid);
       if (el && sec.html) {
@@ -160,10 +160,9 @@ async function switchDate(dateStr) {
     }
   }
   
-  // 3. 重新绑定 + 刷新 s3 排行榜 + s9 数据
+  // 3. 重新绑定 + 刷新 s3 排行榜
   setupTableSorting();
   s3refreshRankings();
-  s9LoadData(dateStr.replace(/-/g, ''));
 }
 
 async function initDateSelector() {
@@ -333,100 +332,6 @@ function closeTopicDetail() {
   if (modal) modal.style.display = 'none';
 }
 
-// ════════════════════════════════════════════
-// 题材轮动 — s9 数据渲染
-// ════════════════════════════════════════════
-
-function s9esc(s) {
-  if (s == null) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-async function s9LoadData(dateStr) {
-  var el = document.getElementById('s9-content');
-  if (!el) return;
-  
-  el.innerHTML = '<div class="loading"><div class="spinner"></div><div>加载中...</div></div>';
-  
-  try {
-    var resp = await fetch('/data/s9_' + dateStr + '.json');
-    if (!resp.ok) {
-      el.innerHTML = '<div class="empty-msg">暂无 ' + dateStr + ' 题材轮动数据</div>';
-      return;
-    }
-    var data = await resp.json();
-    renderS9Rotation(data);
-  } catch (e) {
-    el.innerHTML = '<div class="empty-msg">❌ 加载失败: ' + e.message + '</div>';
-  }
-}
-
-function renderS9Rotation(data) {
-  var el = document.getElementById('s9-content');
-  if (!el || !data) return;
-  
-  var html = '';
-  
-  // ── Card 1: 5日主线切换路径 ──
-  var p1 = data.part1;
-  if (p1 && p1.table_data) {
-    var hdrs = p1.table_header || ['日期','主线','支线','关键事件'];
-    var rows = '';
-    p1.table_data.forEach(function(r) {
-      var dn = r['主线'] && /跌|暴跌|下跌/.test(r['主线']) ? ' class="dn"' : '';
-      rows += '<tr><td>' + s9esc(r['日期']) + '</td><td' + dn + '>' + s9esc(r['主线']) + '</td><td>' + s9esc(r['支线']) + '</td><td>' + s9esc(r['关键事件']) + '</td></tr>';
-    });
-    html += '<div class="card">';
-    html += '<h3>📅 5日主线切换路径</h3>';
-    html += '<table><tr>';
-    hdrs.forEach(function(h) { html += '<th>' + s9esc(h) + '</th>'; });
-    html += '</tr>' + rows + '</table></div>';
-  }
-  
-  // ── Card 2: 方向竞争格局 ──
-  var p2 = data.part2;
-  if (p2 && p2.table_data) {
-    var hdrs2 = p2.table_header || ['方向','龙头','优势','劣势','概率'];
-    var rows2 = '';
-    p2.table_data.forEach(function(r) {
-      var probStr = s9esc(r['概率'] || '');
-      var probNum = parseInt(probStr) || 0;
-      var probTag = probNum >= 30 ? 'r' : (probNum >= 15 ? 'y' : 'b');
-      var probHtml = '<span class="tag ' + probTag + '">' + probStr + '</span>';
-      rows2 += '<tr>';
-      rows2 += '<td><strong class="' + (probNum >= 30 ? 'up' : '') + '">' + s9esc(r['方向']) + '</strong></td>';
-      rows2 += '<td>' + s9esc(r['龙头']) + '</td>';
-      rows2 += '<td>' + s9esc(r['优势']) + '</td>';
-      rows2 += '<td>' + s9esc(r['劣势']) + '</td>';
-      rows2 += '<td>' + probHtml + '</td>';
-      rows2 += '</tr>';
-    });
-    html += '<div class="card">';
-    html += '<h3>🎯 方向竞争格局</h3>';
-    html += '<table><tr>';
-    hdrs2.forEach(function(h) { html += '<th>' + s9esc(h) + '</th>'; });
-    html += '</tr>' + rows2 + '</table></div>';
-  }
-  
-  // ── Card 3: 下周催化 ──
-  var p3 = data.part3;
-  if (p3 && p3.catalyst_list) {
-    html += '<div class="card">';
-    html += '<h3>📅 下周催化</h3>';
-    p3.catalyst_list.forEach(function(c) {
-      html += '<div class="bl-red" style="margin-bottom:4px">' + s9esc(c) + '</div>';
-    });
-    html += '</div>';
-  }
-  
-  // ── Fallback if no data rendered ──
-  if (!html) {
-    html = '<div class="empty-msg">数据格式不正确</div>';
-  }
-  
-  el.innerHTML = html;
-}
-
 document.addEventListener('DOMContentLoaded', async function() {
   try {
     // 1. 初始化日期选择器
@@ -443,12 +348,12 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
 
-    // 3. 加载 section HTML（跳过 s3、s9）
+    // 3. 加载 section HTML（跳过 s3）
     var sectionsRes = await apiGet('/sections/all');
     var loadedCount = 0;
     if (sectionsRes.ok && sectionsRes.data) {
       Object.keys(sectionsRes.data).forEach(function(sid) {
-        if (sid === 's3' || sid === 's9') return; // s3 由 v2 API 渲染; s9 由 JSON 渲染
+        if (sid === 's3') return; // s3 由 v2 API 渲染
         var sec = sectionsRes.data[sid];
         var el = document.getElementById(sid);
         if (el && sec.html) {
@@ -471,9 +376,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     s3refreshRankings();
-
-    // 6. 初始化 s9 题材轮动
-    s9LoadData('20260529');
 
   } catch (e) {
     console.error('加载失败:', e);
