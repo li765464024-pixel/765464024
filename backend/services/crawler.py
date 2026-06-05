@@ -213,20 +213,20 @@ def fetch_market_data():
         cy_price = indices.get('cy', {}).get('price')
         kc_price = indices.get('kc', {}).get('price')
         
-        # 成交额: 上证+深证 from 腾讯证券原始数据
+        # 成交额: 从新浪财经获取（返回正确的全市场总成交额）
         volume_str = ''
         try:
-            r = requests.get("http://qt.gtimg.cn/q=sh000001,sz399001", headers=HEADERS, timeout=5)
+            r = requests.get("https://hq.sinajs.cn/list=sh000001,sz399001", 
+                            headers={"User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn"}, timeout=5)
             total_vol = 0
-            for line in r.text.strip().split(';'):
-                parts = line.split('~')
-                if len(parts) > 44:
-                    v = parts[44].replace('"','').strip()
-                    if v and v.replace('.','').replace('-','').isdigit():
-                        total_vol += float(v)
+            for line in r.text.strip().split('\n'):
+                parts = line.split(',')
+                if len(parts) > 10:
+                    v = parts[9].strip()
+                    if v and v.replace('.','').replace('+','').replace('-','').isdigit():
+                        total_vol += float(v) / 1e8
             if total_vol > 0:
-                # 腾讯证券的单位是百万元
-                volume_str = f"{total_vol/100:.0f}亿"
+                volume_str = f"{total_vol:.0f}亿"
         except:
             pass
         
