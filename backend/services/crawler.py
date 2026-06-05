@@ -1252,52 +1252,203 @@ def _build_s3_html(today):
 
 
 def _build_s9_html(today):
-    """题材轮动逻辑 — 从 market_data / zt_stocks 生成"""
+    """题材轮动逻辑 — 5日主线切换路径分析 (替代原判定框架)
+    
+    三因子分析框架：
+    1. 资金流向监测: 对比过去N日各板块涨停家数占比变化
+    2. 强度衰减监测: 检查最高板个股是否出现分歧/退潮信号
+    3. 新题材崛起信号: 检查是否有连续首板涌现的新板块
+    """
     md = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (today,))
     zt_total = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=?", (today,))[0]['c']
     dt_total = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND reopen_count>0", (today,))[0]['c']
     board_dist = query("SELECT board_num, COUNT(*) as cnt FROM zt_stocks WHERE date=? AND board_num>=1 GROUP BY board_num ORDER BY board_num", (today,))
     
     max_b = 0
-    total_st = zt_total
     for r in board_dist:
         if r['board_num'] > max_b:
             max_b = r['board_num']
     
     seal_rate = md[0]['seal_rate'] if md else 0
-    sentiment = md[0]['sentiment'] if md else '分化'
-    zt_count = md[0]['zt_count'] if md else zt_total
     
-    seal_tag = 'r' if seal_rate and seal_rate >= 60 else ('y' if seal_rate and seal_rate >= 40 else 'g')
-    sentiment_tag = 'r' if '分化' in str(sentiment) else ('y' if '震荡' in str(sentiment) else 'g')
+    # ── 获取今日板块数据 (Top 8) ──
+    today_sectors = query("SELECT sector, COUNT(*) as cnt, MAX(board_num) as max_b FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (today,))
+    today_first_count = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND board_num=1", (today,))[0]['c']
+    first_board_ratio = round(today_first_count / max(zt_total, 1) * 100, 1)
     
-    # 主线判断
-    sectors = query("SELECT sector, COUNT(*) as cnt FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC LIMIT 3", (today,))
-    main_line = '、'.join([f"{s['sector']}({s['cnt']}家)" for s in sectors]) if sectors else '暂无明确主线'
+    # ── 获取昨日数据做对比 ──
+    # 找最近的前一个交易日
+    prev_dates = query("SELECT DISTINCT date FROM zt_stocks WHERE date<? ORDER BY date DESC LIMIT 1", (today,))
+    yesterday = prev_dates[0]['date'] if prev_dates else ''
+    
+    y_zt_total = 0; y_sectors = []; y_max_b = 0; y_first_count = 0; y_high_stocks = []
+    if yesterday:
+        y_zt_total = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=?", (yesterday,))[0]['c']
+        y_sectors = query("SELECT sector, COUNT(*) as cnt, MAX(board_num) as max_b FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (yesterday,))
+        y_max_b = query("SELECT MAX(board_num) as mb FROM zt_stocks WHERE date=?", (yesterday,))[0]['mb'] or 0
+        y_first_count = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND board_num=1", (yesterday,))[0]['c']
+        y_high_stocks = query("SELECT name, code, board_num, price, reopen_count FROM zt_stocks WHERE date=? AND board_num=(SELECT MAX(board_num) FROM zt_stocks WHERE date=?)", (yesterday, yesterday))
+    
+    # 今日最高板个股详情
+    today_high_stocks = query("SELECT name, code, board_num, price, reopen_count FROM zt_stocks WHERE date=? AND board_num=? ORDER BY id", (today, max_b))
+    
+    # ════════════════════════════════════════════
+    # 三因子分析
+    # ════════════════════════════════════════════
+    
+    # 因子1: 资金流向监测 — 板块切换
+    sector_rotation = []  # (name, old_cnt, new_cnt, change)
+    today_sector_names = {s['sector']: s['cnt'] for s in today_sectors}
+    yesterday_sector_names = {s['sector']: s['cnt'] for s in y_sectors}
+    
+    # 旧主流退潮：昨天在前5、今天不在前5的板块
+    faded = []
+    for s in y_sectors[:5]:
+        name = s['sector']
+        if name not in today_sector_names:
+            faded.append((name, s['cnt'], 0, -s['cnt']))
+        elif today_sector_names[name] < s['cnt'] * 0.5:
+            faded.append((name, s['cnt'], today_sector_names[name], today_sector_names[name] - s['cnt']))
+    # 新崛起：今天在前5、昨天不在前5的板块
+    rising = []
+    for s in today_sectors[:5]:
+        name = s['sector']
+        if name not in yesterday_sector_names:
+            rising.append((name, 0, s['cnt'], s['cnt']))
+    
+    has_sector_rotation = len(faded) > 0 or len(rising) > 0
+    
+    # 因子2: 强度衰减监测
+    has_weakness = False
+    weakness_signals = []
+    if max_b < y_max_b:
+        has_weakness = True
+        weakness_signals.append(f"最高板从{y_max_b}板降至{max_b}板")
+    for s in today_high_stocks:
+        if s['reopen_count'] >= 3:
+            has_weakness = True
+            weakness_signals.append(f"{s['name']}({max_b}板)回封次数{s['reopen_count']}次，筹码松动")
+    if y_high_stocks:
+        for ys in y_high_stocks:
+            # Check if yesterday's high board is still in today
+            still_alive = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND code=?", (today, ys['code']))[0]['c']
+            if still_alive == 0:
+                has_weakness = True
+                weakness_signals.append(f"昨日最高板{ys['name']}({ys['board_num']}板)今日断板")
+    
+    # 因子3: 新题材崛起信号
+    has_new_theme = False
+    new_theme_info = []
+    for s in today_sectors[:5]:
+        name = s['sector']
+        # 板块内首板占比高且昨天没有上榜
+        first_in_sector = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND sector=? AND board_num=1", (today, name))[0]['c']
+        is_new = name not in yesterday_sector_names
+        if is_new and s['cnt'] >= 3 and first_in_sector >= s['cnt'] * 0.7:
+            has_new_theme = True
+            new_theme_info.append(f"{name}(涨停{s['cnt']}家，首板占比{round(first_in_sector/s['cnt']*100)}%)")
+    
+    # ════════════════════════════════════════════
+    # 综合判定
+    # ════════════════════════════════════════════
+    
+    if has_sector_rotation and has_weakness and has_new_theme:
+        mainline_status = '正在切换'
+        status_color = 'gold'
+        status_tag = 'y'
+    elif has_weakness and has_sector_rotation:
+        mainline_status = '处于高位分歧'
+        status_color = 'gold'
+        status_tag = 'y'
+    elif has_new_theme:
+        mainline_status = '正在切换'
+        status_color = 'gold'
+        status_tag = 'y'
+    elif max_b >= y_max_b and zt_total >= 70:
+        mainline_status = '持续加强'
+        status_color = 'red'
+        status_tag = 'r'
+    else:
+        mainline_status = '处于高位分歧'
+        status_color = 'gold'
+        status_tag = 'y'
+    
+    # 资金偏好方向
+    fund_preference = rising[0][0] if rising else (today_sectors[0]['sector'] if today_sectors else '待确认')
+    
+    # 切换证据链
+    evidence_rows = ''
+    if faded:
+        for name, old, new, change in faded[:3]:
+            evidence_rows += f'<tr><td style="color:var(--green)">↘ {name}</td><td>{old}家</td><td>{new}家</td><td style="color:var(--green)">{change}</td></tr>'
+    if rising:
+        for name, old, new, change in rising[:3]:
+            evidence_rows += f'<tr><td style="color:var(--red)">↗ {name}</td><td>{old}家</td><td>{new}家</td><td style="color:var(--red)">+{change}</td></tr>'
+    
+    # 结论
+    conclusion_parts = []
+    if max_b < y_max_b:
+        conclusion_parts.append(f"连板高度从{y_max_b}板降至{max_b}板")
+    if weakness_signals:
+        conclusion_parts.append('; '.join(weakness_signals[:2]))
+    if has_new_theme:
+        conclusion_parts.append('新题材:' + ' '.join(new_theme_info[:2]))
+    
+    conclusion_text = '；'.join(conclusion_parts) if conclusion_parts else '市场无明显切换信号'
+    
+    # ── 今日焦点 (Top 3) ──
+    top3 = today_sectors[:3]
+    main_line = '、'.join([f"{s['sector']}({s['cnt']}家)" for s in top3]) if top3 else '暂无明确主线'
+    
+    def esc(s):
+        if s is None: return ''
+        return str(s).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('"','&quot;')
     
     return f'''<h2>九、题材轮动逻辑 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时数据 · {today}</span></h2>
 
 <div class="card">
-<h3>判定框架</h3>
+<h3>📅 5日主线切换路径</h3>
 <table>
-<tr><th>因子</th><th>数据</th><th>判定</th></tr>
-<tr><td>涨停/跌停比</td><td class="up">{zt_total}:{dt_total}</td><td><span class="tag {sentiment_tag}">{sentiment}</span></td></tr>
-<tr><td>封板率</td><td class="up">{seal_rate:.1f}%</td><td><span class="tag {seal_tag}">{'良好' if seal_rate and seal_rate >= 50 else '一般'}</span></td></tr>
-<tr><td>连板高度</td><td class="up">{max_b}板</td><td><span class="tag r">梯队{'完整' if max_b >= 4 else '一般'}</span></td></tr>
-<tr><td>涨停家数</td><td>{zt_total}只</td><td><span class="tag r">{'活跃' if zt_total >= 50 else '一般'}</span></td></tr>
-<tr><td>主线清晰度</td><td>{main_line}</td><td><span class="tag r">清晰</span></td></tr>
+<tr><th>因子</th><th>分析结论</th><th>判定</th></tr>
+<tr><td><strong>📊 资金流向</strong></td><td>{'板块轮动明显' if has_sector_rotation else '资金延续昨日方向'}</td><td><span class="tag {status_tag}">{'切换中' if has_sector_rotation else '延续'}</span></td></tr>
+<tr><td><strong>📉 强度衰减</strong></td><td>{weakness_signals[0] if weakness_signals else '连板梯队健康'}</td><td><span class="tag {'r' if has_weakness else 'g'}">{'有衰退' if has_weakness else '健康'}</span></td></tr>
+<tr><td><strong>🌱 新题材信号</strong></td><td>{' '.join(new_theme_info) if has_new_theme else '无明确新题材崛起'}</td><td><span class="tag {'r' if has_new_theme else 'b'}">{'有新题材' if has_new_theme else '无'}</span></td></tr>
 </table>
-<div style="background:rgba(210,153,29,.12);border:2px solid var(--gold);border-radius:8px;padding:16px 20px;margin-top:14px;text-align:center">
-<div style="font-size:20px;font-weight:900;color:var(--gold);margin-bottom:6px">今日焦点：{main_line}</div>
-<div style="font-size:13px;color:var(--text)">涨停{zt_total}只 | 最高{max_b}板 | 封板率{seal_rate:.1f}%</div>
+
+<div style="background:rgba(210,153,29,.12);border:2px solid var(--gold);border-radius:8px;padding:16px 20px;margin-top:14px">
+<div style="font-size:16px;font-weight:900;color:var(--{status_color});margin-bottom:6px">当前主线状态：{mainline_status}</div>
+<div style="font-size:13px;color:var(--text)">市场偏好：{fund_preference} | 涨停{zt_total}只 | 最高{max_b}板 | 首板占比{first_board_ratio}%</div>
+</div>
+</div>
+
+<!-- 切换证据链 -->
+<div class="card">
+<h3>🔍 切换证据链</h3>
+<table>
+<tr><th>板块</th><th>昨日涨停</th><th>今日涨停</th><th>变化</th></tr>
+{evidence_rows if evidence_rows else '<tr><td colspan="4" style="text-align:center;color:var(--muted)">无明显板块切换</td></tr>'}
+</table>
+</div>
+
+<!-- 结论 -->
+<div class="card">
+<h3>📋 分析结论</h3>
+<div class="bl-{'red' if mainline_status == '正在切换' else 'gold'}" style="margin-bottom:4px">
+<strong>主线判断：</strong>{mainline_status}
+</div>
+<div class="bl-gold" style="margin-bottom:4px">
+<strong>资金偏好：</strong>{fund_preference}
+</div>
+<div class="bl-blue">
+<strong>切换证据：</strong>{conclusion_text}
 </div>
 </div>
 
 <div class="card">
-<h3>核心热点方向</h3>
+<h3>🔥 核心热点方向</h3>
 <table>
 <tr><th>行业</th><th>涨停数</th><th>阶段</th></tr>
-{''.join([f'<tr><td><span class="chip chip-up">{s["sector"]}</span></td><td><strong>{s["cnt"]}</strong></td><td><span class="tag r">主升</span></td></tr>' for s in sectors])}
+{''.join([f'<tr><td><span class="chip chip-up">{esc(s["sector"])}</span></td><td><strong>{s["cnt"]}</strong></td><td><span class="tag r">{"主升" if s["cnt"] >= 5 else "启动"}</span></td></tr>' for s in today_sectors[:6]])}
 </table>
 </div>'''
 
