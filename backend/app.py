@@ -98,6 +98,27 @@ def api_data_versions():
     rows = query("SELECT DISTINCT date FROM market_data ORDER BY date DESC")
     return jsonify({'ok': True, 'data': [r['date'] for r in rows]})
 
+@app.route('/api/section/<sid>')
+def api_section(sid):
+    """单个 section 的 HTML 内容"""
+    rows = query("SELECT * FROM section_html WHERE section_id = ? AND date = (SELECT MAX(date) FROM section_html)", (sid,))
+    if rows:
+        return jsonify({'ok': True, 'data': rows[0]})
+    return jsonify({'ok': False, 'error': f'Section {sid} not found'})
+
+@app.route('/api/sections/all')
+def api_sections_all():
+    """当天所有 section 的 HTML"""
+    rows = query("SELECT * FROM section_html WHERE date = (SELECT MAX(date) FROM section_html) ORDER BY id")
+    data = {r['section_id']: r for r in rows}
+    return jsonify({'ok': True, 'data': data, 'list': rows})
+
+@app.route('/api/sections/dates')
+def api_sections_dates():
+    """有 section 数据的日期列表"""
+    rows = query("SELECT DISTINCT date FROM section_html ORDER BY date DESC")
+    return jsonify({'ok': True, 'data': [r['date'] for r in rows]})
+
 # ── 启动 ──
 if __name__ == '__main__':
     init_db()

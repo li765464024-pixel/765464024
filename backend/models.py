@@ -117,6 +117,17 @@ def init_db():
         UNIQUE(date, youzi_name, analysis_type)
     );
 
+    -- ── Section HTML 缓存 (1:1 原始渲染) ──
+    CREATE TABLE IF NOT EXISTS section_html (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        date        TEXT NOT NULL,
+        section_id  TEXT NOT NULL,   -- s0, s1, ...
+        title       TEXT,
+        html        TEXT NOT NULL,   -- 完整的 section div 内部 HTML
+        created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(date, section_id)
+    );
+
     -- ── 产业链分析 ──
     CREATE TABLE IF NOT EXISTS industry_chain (
         id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -137,6 +148,8 @@ def init_db():
     CREATE INDEX IF NOT EXISTS idx_posts_date ON posts(date);
     CREATE INDEX IF NOT EXISTS idx_posts_platform ON posts(platform);
     CREATE INDEX IF NOT EXISTS idx_youzi_date ON youzi_analysis(date);
+    CREATE INDEX IF NOT EXISTS idx_section_date ON section_html(date);
+    CREATE INDEX IF NOT EXISTS idx_section_id ON section_html(section_id);
     """)
     conn.commit()
     conn.close()

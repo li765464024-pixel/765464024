@@ -149,6 +149,58 @@ def extract_posts(html):
         })
     return posts
 
+def extract_sections(html):
+    """提取原始 HTML 中所有 section 的内容，保持 1:1 还原"""
+    sections = []
+    
+    pattern = r'<!-- ===== (\d+)\. (.+?) ===== -->\n<div class="section[^"]*" id="(s\d+)"( active)?>'
+    
+    for m in re.finditer(pattern, html, re.DOTALL):
+        num = m.group(1)
+        name = m.group(2)
+        sid = m.group(3)
+        
+        # 内容从 opening tag 结束之后开始
+        section_start = m.end()
+        
+        # 找到下一个 section 的注释或 </main>
+        remaining = html[section_start:]
+        next_match = re.search(r'\n<!-- ===== \d+\.', remaining)
+        if next_match:
+            section_end = section_start + next_match.start()
+        else:
+            section_end = html.find('</main>', section_start)
+        
+        # inner = opening tag 之后到下一个 section 之间的内容
+        inner = html[section_start:section_end].strip()
+        
+        # 提取标题文本（从 inner 的 h2 中提取）
+        title_match = re.search(r'<h2>(.*?)</h2>', inner)
+        title = re.sub(r'<[^>]+>', '', title_match.group(1)).strip() if title_match else name
+        
+        sections.append({
+            'date': DATE,
+            'section_id': sid,
+            'title': title,
+            'html': inner,
+        })
+    
+    return sections
+
+def migrate_sections():
+    """迁移 section_html 数据"""
+    if not os.path.exists(HTML_PATH):
+        print(f"✗ 找不到 HTML 文件: {HTML_PATH}")
+        return False
+    
+    with open(HTML_PATH, 'r', encoding='utf-8') as f:
+        html = f.read()
+    
+    sections = extract_sections(html)
+    insert_many('section_html', sections)
+    print(f"  ✓ Section HTML: {len(sections)}个板块")
+    return True
+
 def migrate_all():
     """迁移所有数据"""
     if not os.path.exists(HTML_PATH):
@@ -180,6 +232,11 @@ def migrate_all():
     posts = extract_posts(html)
     insert_many('posts', posts)
     print(f"  ✓ 帖子数据: {len(posts)}条")
+    
+    # 5. Section HTML (1:1 还原)
+    sections = extract_sections(html)
+    insert_many('section_html', sections)
+    print(f"  ✓ Section HTML: {len(sections)}个板块 (1:1还原)")
     
     print("\n✅ 数据迁移完成")
     return True
