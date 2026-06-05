@@ -1,0 +1,173 @@
+/* 题材总览页 — 专属样式 */
+.filter-bar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 14px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.filter-group label {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.filter-input {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.filter-input:focus {
+  border-color: var(--blue);
+  outline: none;
+}
+.btn-group {
+  display: flex;
+  gap: 2px;
+}
+.btn-group .btn.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.btn {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: .15s;
+}
+.btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+.btn-primary {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.btn-primary:hover {
+  opacity: .85;
+  color: #fff;
+}
+
+/* 统计摘要行 */
+.stats-row {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+}
+.stat-card span {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* 数据表格 */
+.table-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.table-wrap th {
+  background: rgba(48,54,61,.5);
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 11px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+.table-wrap th:hover {
+  color: var(--gold);
+}
+.table-wrap th.sortable.asc:after {
+  content: " ▲";
+  font-size: 10px;
+}
+.table-wrap th.sortable.desc:after {
+  content: " ▼";
+  font-size: 10px;
+}
+.table-wrap td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.table-wrap tr:hover {
+  background: rgba(48,54,61,.3);
+}
+
+/* 阶段标签 */
+.stage-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* 分页 */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+#page-info {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .filter-bar { flex-direction: column; }
+  .stats-row .stat-card { min-width: 80px; }
+}

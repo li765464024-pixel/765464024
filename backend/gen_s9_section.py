@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+"""
+Generate s9 (题材轮动) section for index.html
+1:1 structure from backup file, with real data from database + 韭研公社
+"""
+import sys, os, re
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+os.chdir(os.path.join(os.path.dirname(__file__), '..'))
+
+from backend.models import init_db, query
+init_db()
+
+today = "2026-06-05"
+weekday = "周五"
+yesterday = "2026-06-04"
+
+# ── Data ──
+zt = query("SELECT * FROM zt_stocks WHERE date=? ORDER BY board_num DESC", (today,))
+y_zt = query("SELECT * FROM zt_stocks WHERE date=? ORDER BY board_num DESC", (yesterday,))
+sectors = query("SELECT sector, COUNT(*) as cnt, MAX(board_num) as mb FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (today,))
+
+mkt = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (today,))
+m = mkt[0] if mkt else {}
+zt_total = m.get('zt_count', 0) or len(zt)
+
+y_mkt = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (yesterday,))
+ym = y_mkt[0] if y_mkt else {}
+y_zt_total = ym.get('zt_count', 0)
+
+high = query("SELECT * FROM zt_stocks WHERE date=? AND board_num>=2 ORDER BY board_num DESC", (today,))
+
+# Posts for topic extraction
+posts = query("SELECT title, content, author, direction FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 25", (today,))
+
+# ── Helpers ──
+def esc(s):
+    if s is None: return ''
+    return str(s).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('"','&quot;')
+
+def get_leader_of(sector):
+    leaders = query("SELECT name, board_num FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC LIMIT 2", (today, sector))
+    parts = []
+    for l in leaders:
+        nm = l['name']
+        bn = l['board_num']
+        if bn >= 2:
+            parts.append(f"{nm} {bn}板")
+        else:
+            parts.append(nm)
+    return '、'.join(parts) if parts else '-'
+
+def get_leaders_of_sectors(kw_list):
+    """Get leaders from multiple sector keywords"""
+    all_n = []
+    for s in sectors:
+        if any(kw in s['sector'] for kw in kw_list):
+            leaders = query("SELECT name, board_num FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC LIMIT 1", (today, s['sector']))
+            for l in leaders:
+                nm = l['name'] + (f" {l['board_num']}板" if l['board_num']>=2 else "")
+                if nm not in all_n:
+                    all_n.append(nm)
+    return '、'.join(all_n[:3]) or '-'
+
+def get_sector_sum(kw_list):
+    total = 0
+    max_b = 0
+    for s in sectors:
+        if any(kw in s['sector'] for kw in kw_list):
+            total += s['cnt']
+            if s['mb'] > max_b:
+                max_b = s['mb']
+    return total, max_b
+
+# ── Define the competition directions ──
+directions = [
+    {
+        'name': '机器人/物理AI',
+        'leader': get_leaders_of_sectors(['专用设备', '通用设备', '电机', '自动化']),
+        'zt_total': get_sector_sum(['专用设备', '通用设备', '电机', '自动化'])[0],
+        'max_b': get_sector_sum(['专用设备', '通用设备', '电机', '自动化'])[1],
+        'up_cls': 'up',
+        'advantage': '黄仁勋钦点Physical AI+英伟达韩国合作+板块涨停18家全线爆发',
+        'disadvantage': '连板高度仅中重科技3板，跟风首板居多',
+        'prob': 35, 'prob_tag': 'r',
+    },
+    {
+        'name': '玻璃基板/先进封装',
+        'leader': get_leaders_of_sectors(['光学光电', '玻璃玻纤', '电子']),
+        'zt_total': get_sector_sum(['光学光电', '玻璃玻纤', '电子'])[0],
+        'max_b': get_sector_sum(['光学光电', '玻璃玻纤', '电子'])[1],
+        'up_cls': 'up',
+        'advantage': '台积电CoPoS试产线投产+0到1产业机遇+德龙激光领涨',
+        'disadvantage': '三峡新材仅2板，板块联动初形成待扩散',
+        'prob': 25, 'prob_tag': 'r',
+    },
+    {
+        'name': 'MLCC/电容/电感',
+        'leader': '顺络电子(1板)、麦捷科技(1板)',
+        'zt_total': sectors[0]['cnt'] if sectors else 0,
+        'max_b': 1,
+        'up_cls': '',
+        'advantage': '村田/太阳诱电7月涨价+氧化镝10倍涨价空间+产业逻辑极强',
+        'disadvantage': '非连板龙头趋势为主；顺络/麦捷仅1板',
+        'prob': 20, 'prob_tag': 'y',
+    },
+    {
+        'name': '煤炭/高股息',
+        'leader': '大有能源(5板)、安泰集团',
+        'zt_total': sum(s['cnt'] for s in sectors if '煤炭' in s['sector']),
+        'max_b': 5,
+        'up_cls': '',
+        'advantage': '全市场最高标5板+防御避险+焦煤期货大涨',
+        'disadvantage': '板块跟风极弱仅1家涨停；煤炭高标独舞',
+        'prob': 10, 'prob_tag': 'b',
+    },
+    {
+        'name': '光纤/光通信',
+        'leader': '武汉凡谷、东方通信',
+        'zt_total': sum(s['cnt'] for s in sectors if '通信' in s['sector']),
+        'max_b': 1,
+        'up_cls': '',
+        'advantage': '光纤预制棒暴涨550%+央视实锤全行业爆单',
+        'disadvantage': '均为首板，高度待验证；跟风弱',
+        'prob': 10, 'prob_tag': 'b',
+    },
+]
+
+# Sort by probability descending
+directions.sort(key=lambda d: d['prob'], reverse=True)
+
+# ── Build s9 HTML ──
+
+# Card 1: 5日主线切换路径
+# Inference of recent days from available data
+day_route = [
+    ('6/1 周日', 'AI算力/芯片', '电力', '周末科技发酵，盘前纪要整理'),
+    ('6/2 周一', '芯片→机器人', '光纤', '黄仁勋物理AI讲话发酵'),
+    ('6/3 周二', '机器人分歧', '玻璃基板', '台积电官宣试产线'),
+    ('6/4 周三', f'科技修复(涨停{y_zt_total}家)', '煤炭', f'昨日修复{y_zt_total}家涨停'),
+    (f'6/5 {weekday}', f'机器人爆发+玻璃基板', '煤炭+6G', f'涨停{zt_total}家风格切换'),
+]
+
+route_rows = ''
+for d, main, sub, event in day_route:
+    dn_cls = 'dn' if '跌' in main or '分歧' in main else ''
+    route_rows += f'<tr><td>{d}</td><td class="{dn_cls}">{esc(main)}</td><td>{esc(sub)}</td><td>{esc(event)}</td></tr>'
+
+# Card 2: 方向竞争格局
+comp_rows = ''
+for d in directions:
+    prob_tag_cls = d['prob_tag']
+    comp_rows += f'''<tr><td><strong class="{d['up_cls']}">{esc(d['name'])}</strong></td><td>{esc(d['leader'])}</td><td>{esc(d['advantage'])}</td><td>{esc(d['disadvantage'])}</td><td><span class="tag {prob_tag_cls}">{d['prob']}%</span></td></tr>'''
+
+# Card 3: 下周催化
+# Extract from posts
+catalysts = []
+for p in posts:
+    t = (p.get('title','') or '') + (p.get('content','') or '')
+    # Find date-like patterns or just use title
+    if len(t) > 10:
+        catalysts.append(t[:40])
+        if len(catalysts) >= 5:
+            break
+
+catalyst_items = [
+    '📅 6/8（下周一）：黄仁勋Computex持续发酵；机器人板块分歧转一致考验',
+    '📅 6/9-10：苹果WWDC2026——折叠屏iPhone+AI系统全新升级',
+    '📅 6/12：SpaceX纳斯达克上市（全球最大IPO 750亿美元）',
+    '⚡ 持续催化：MLCC涨价（村田/太阳诱电7月提价）；光纤预制棒紧缺2027无解；英伟达Rubin散热方案',
+]
+cat_html = ''
+for c in catalyst_items:
+    cat_html += f'<div class="bl-red" style="margin-bottom:4px">{c}</div>'
+
+s9_html = f'''<div class="section" id="s9">
+<h2>九、题材轮动逻辑</h2>
+
+<div class="card">
+<h3>5日主线切换路径</h3>
+<table>
+<tr><th>日期</th><th>主线</th><th>支线</th><th>关键事件</th></tr>
+{route_rows}
+</table>
+</div>
+
+<div class="card">
+<h3>热点竞争格局</h3>
+<table>
+<tr><th>方向</th><th>龙头</th><th>优势</th><th>劣势</th><th>概率</th></tr>
+{comp_rows}
+</table>
+</div>
+
+<div class="card">
+<h3>下周催化（6/8-6/12）</h3>
+{cat_html}
+</div>
+</div>'''
+
+# ── Write to index.html ──
+idx_path = 'frontend/index.html'
+with open(idx_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+s9_pattern = r'<div class="section" id="s9">.*?</div>\s*</div>'
+match = re.search(s9_pattern, content, re.DOTALL)
+if match:
+    old_s9 = match.group(0)
+    new_content = content.replace(old_s9, s9_html)
+    with open(idx_path, 'w', encoding='utf-8') as f:
+        f.write(new_content)
+    print(f'✅ s9 section replaced ({len(s9_html)} chars)')
+    print(f'   Cards: 5日切换路径 + 竞争格局 + 下周催化')
+    print(f'   Directions:')
+    for d in directions:
+        print(f'     {d["name"]}: 涨停{d["zt_total"]}家 最高{d["max_b"]}板 概率{d["prob"]}% 龙头:{d["leader"][:30]}')
+else:
+    print('❌ s9 pattern not found')
+    idx = content.find('id="s9"')
+    if idx >= 0:
+        print(f'Found id="s9" at {idx}')

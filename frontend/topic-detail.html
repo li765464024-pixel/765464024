@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>题材详情 · 生命周期分析</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/topics.css">
+</head>
+<body>
+<header style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap">
+<div>
+<h1>📊 <span id="topic-name">加载中...</span></h1>
+<div class="meta">题材生命周期分析 | <a href="/topics.html" style="color:var(--gold)">← 返回总览</a></div>
+</div>
+</header>
+
+<main id="detail-main" style="max-width:900px;margin:0 auto;padding:16px">
+<div class="loading" id="loading-main"><div class="spinner"></div><div>加载题材详情...</div></div>
+</main>
+
+<script>
+const API_BASE = 'http://localhost:5500/api';
+
+async function apiGet(path) {
+  var resp = await fetch(API_BASE + path);
+  return resp.json();
+}
+
+function q(sel) { return document.querySelector(sel); }
+
+function stageColor(stage) {
+  var map = {
+    '孕育期/预热期': '#6b7280', '启动期': '#22c55e', '爆发期': '#059669',
+    '分歧震荡期': '#f59e0b', '退潮期': '#ef4444', '余温反复/二波观察期': '#8b5cf6',
+  };
+  return map[stage] || '#6b7280';
+}
+
+function stageTag(stage) {
+  var color = stageColor(stage);
+  return '<span class="stage-badge" style="background:' + color + '20;color:' + color + ';border:1px solid ' + color + ';font-size:14px;padding:3px 12px">' + stage + '</span>';
+}
+
+function scoreBar(name, val, weight) {
+  var bc = val >= 60 ? 'var(--red)' : (val >= 40 ? 'var(--gold)' : 'var(--green)');
+  return '<div style="display:flex;align-items:center;gap:8px;margin:5px 0">'
+    + '<span style="width:56px;font-size:13px">' + name + '</span>'
+    + '<div style="flex:1;height:12px;background:var(--border);border-radius:6px">'
+    + '<div style="width:' + val + '%;height:12px;background:' + bc + ';border-radius:6px"></div></div>'
+    + '<span style="width:30px;text-align:right;font-weight:700;font-size:13px">' + val + '</span>'
+    + '<span style="width:40px;font-size:11px;color:var(--muted)">×' + weight + '</span></div>';
+}
+
+function card(title, content) {
+  return '<div class="card"><h3>' + title + '</h3>' + content + '</div>';
+}
+
+async function loadDetail() {
+  var params = new URLSearchParams(window.location.search);
+  var topicId = params.get('id');
+  if (!topicId) {
+    q('#loading-main').outerHTML = '<div class="card"><div class="error-msg">缺少题材ID参数</div></div>';
+    return;
+  }
+  
+  var res = await apiGet('/v2/topics/' + topicId + '/detail');
+  if (!res.ok || !res.data) {
+    q('#loading-main').outerHTML = '<div class="card"><div class="error-msg">⚠️ 加载失败</div></div>';
+    return;
+  }
+  
+  var d = res.data;
+  var topic = d.topic || {};
+  var scoring = d.scoring || {};
+  var components = d.components || {};
+  var quotes = d.quotes || [];
+  var catalysts = d.catalysts || [];
+  var heat = d.heat || [];
+  var capital = d.capital || [];
+  var report = d.report || {};
+  var risks = d.risks || [];
+  
+  var stage = topic.current_stage || scoring.lifecycle_stage || '未知';
+  var totalScore = topic.total_score || scoring.total_score || 0;
+  q('#topic-name').textContent = topic.topic_name || '题材详情';
+  
+  // ════════════════════════════════════════
+  // Block 1: 头部摘要卡
+  // ════════════════════════════════════════
+  var block1 = card('📋 题材摘要',
+    '<div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">'
+    + '<div style="font-size:22px;font-weight:700">' + (topic.topic_name || '') + '</div>'
+    + '<div>' + stageTag(stage) + '</div>'
+    + '<div><span style="font-size:14px;color:var(--muted)">总分 </span><span style="font-size:24px;font-weight:700">' + totalScore + '</span></div>'
+    + '</div>'
+    + '<div style="margin-top:10px;font-size:13px;color:var(--muted)">核心逻辑：' + (topic.core_logic || '暂无') + '</div>'
+    + '<div style="margin-top:4px;font-size:12px">'
+    + '别名：' + (topic.topic_aliases || '无') + ' | '
+    + '首次异动：' + (topic.first_active_date || '未知') + ' | '
+    + '最近分析：' + (topic.last_analysis_date || '-')
+    + '</div>'
+  );
+  
+  // ════════════════════════════════════════
+  // Block 2: 五维评分卡
+  // ════════════════════════════════════════
+  var block2 = card('📈 五维评分' + 
+    (scoring.analysis_date ? ' <span style="font-size:11px;color:var(--muted);font-weight:normal">' + scoring.analysis_date + '</span>' : ''),
+    scoreBar('价格强度', scoring.price_strength || 0, '30%')
+    + scoreBar('资金强度', scoring.capital_strength || 0, '25%')
+    + scoreBar('催化强度', scoring.catalyst_strength || 0, '20%')
+    + scoreBar('热度强度', scoring.sentiment_strength || 0, '15%')
+    + scoreBar('结构质量', scoring.structure_quality || 0, '10%')
+    + '<div style="margin-top:8px;text-align:right;font-size:13px;font-weight:700">总分 = ' + (scoring.total_score || 0) + ' × 置信度 ' + (scoring.confidence || '-') + '</div>'
+  );
+  
+  // ════════════════════════════════════════
+  // Block 3: 板块行情
+  // ════════════════════════════════════════
+  var quotesHtml = '';
+  if (quotes.length > 0) {
+    quotesHtml = '<table><tr><th>日期</th><th>涨停数</th><th>跌停数</th><th>连板数</th><th>成交额(亿)</th><th>前排均涨幅</th><th>后排均涨幅</th></tr>';
+    quotes.slice(0, 10).forEach(function(q) {
+      quotesHtml += '<tr><td>' + (q.trade_date || '') + '</td>'
+        + '<td class="up">' + (q.limit_up_count || 0) + '</td>'
+        + '<td class="dn">' + (q.limit_down_count || 0) + '</td>'
+        + '<td>' + (q.consecutive_board_count || 0) + '</td>'
+        + '<td>' + (q.board_turnover_amount || 0) + '</td>'
+        + '<td>' + (q.front_avg_change_pct != null ? q.front_avg_change_pct + '%' : '-') + '</td>'
+        + '<td>' + (q.back_avg_change_pct != null ? q.back_avg_change_pct + '%' : '-') + '</td></tr>';
+    });
+    quotesHtml += '</table>';
+  } else {
+    quotesHtml = '<div class="empty-msg">暂无行情数据</div>';
+  }
+  var block3 = card('📊 板块行情（近10日）', quotesHtml);
+  
+  // ════════════════════════════════════════
+  // Block 4: 龙头与梯队
+  // ════════════════════════════════════════
+  var leaders = (components.leader_candidate || []).map(function(c) {
+    return c.stock_name + '(' + c.stock_code + ')';
+  }).join('、') || '未确定';
+  
+  var centers = (components.center_candidate || []).map(function(c) {
+    return c.stock_name + '(' + c.stock_code + ')';
+  }).join('、') || '暂无';
+  
+  var followUps = (components.follow_up_candidate || []).map(function(c) {
+    return c.stock_name;
+  }).join('、') || '暂无';
+  
+  var block4 = card('👑 龙头与梯队分析',
+    '<table>'
+    + '<tr><th style="width:80px">角色</th><th>标的</th><th>说明</th></tr>'
+    + '<tr><td><span class="tag r">龙头</span></td><td>' + leaders + '</td><td>最高连板引领方向</td></tr>'
+    + '<tr><td><span class="tag b">中军</span></td><td>' + centers + '</td><td>大市值趋势中军</td></tr>'
+    + '<tr><td><span class="tag y">补涨</span></td><td>' + followUps.slice(0, 50) + '</td><td>后排跟风扩散</td></tr>'
+    + '</table>'
+  );
+  
+  // ════════════════════════════════════════
+  // Block 5: 催化事件时间线
+  // ════════════════════════════════════════
+  var catHtml = '';
+  if (catalysts.length > 0) {
+    catHtml = '<div style="position:relative;padding-left:20px">';
+    catalysts.slice(0, 10).forEach(function(c) {
+      var ecolor = c.event_level === 'national' ? 'var(--red)' : (c.event_level === 'ministry' ? 'var(--gold)' : 'var(--blue)');
+      catHtml += '<div style="border-left:2px solid ' + ecolor + ';padding:4px 0 8px 14px;position:relative">'
+        + '<div style="position:absolute;left:-5px;top:8px;width:8px;height:8px;border-radius:50%;background:' + ecolor + '"></div>'
+        + '<div style="font-size:11px;color:var(--muted)">' + (c.event_date || '') + '</div>'
+        + '<div style="font-size:13px">' + (c.event_title || '') + '</div>'
+        + '<div><span class="tag ' + (c.event_level === 'national' ? 'r' : (c.event_level === 'ministry' ? 'y' : 'b')) + '">' + (c.event_type || '') + '</span> '
+        + '<span style="font-size:11px;color:var(--muted)">' + (c.event_level || '') + '</span></div>'
+        + '</div>';
+    });
+    catHtml += '</div>';
+  } else {
+    catHtml = '<div class="empty-msg">暂无催化事件</div>';
+  }
+  var block5 = card('⚡ 催化事件时间线', catHtml);
+  
+  // ════════════════════════════════════════
+  // Block 6: 热度趋势
+  // ════════════════════════════════════════
+  var heatHtml = '';
+  if (heat.length > 0) {
+    heatHtml = '<table><tr><th>日期</th><th>媒体报道</th><th>股吧讨论</th><th>1日变化</th><th>3日变化</th><th>7日变化</th></tr>';
+    heat.slice(0, 7).forEach(function(h) {
+      var c1d = h.heat_change_1d || 0;
+      var c1dClass = c1d > 0 ? 'up' : (c1d < 0 ? 'dn' : '');
+      heatHtml += '<tr><td>' + (h.stat_date || '') + '</td>'
+        + '<td>' + (h.media_report_count || 0) + '</td>'
+        + '<td>' + (h.guba_discussion_count || 0) + '</td>'
+        + '<td class="' + c1dClass + '">' + (c1d > 0 ? '+' : '') + c1d + '%</td>'
+        + '<td>' + (h.heat_change_3d || 0) + '%</td>'
+        + '<td>' + (h.heat_change_7d || 0) + '%</td></tr>';
+    });
+    heatHtml += '</table>';
+  } else {
+    heatHtml = '<div class="empty-msg">暂无热度数据</div>';
+  }
+  var block6 = card('🔥 热度趋势', heatHtml);
+  
+  // ════════════════════════════════════════
+  // Block 7: 风险提示
+  // ════════════════════════════════════════
+  var riskHtml = '';
+  if (risks.length > 0) {
+    risks.forEach(function(r) {
+      var sev = r.severity === 'critical' ? 'var(--red)' : (r.severity === 'warning' ? 'var(--gold)' : 'var(--blue)');
+      riskHtml += '<div style="border-left:3px solid ' + sev + ';padding:6px 10px;margin:4px 0;font-size:13px">'
+        + '<span style="color:' + sev + ';font-weight:700">[' + (r.risk_type || '风险') + ']</span> '
+        + (r.description || '')
+        + '</div>';
+    });
+  } else {
+    riskHtml = '<div class="empty-msg">暂无风险信号</div>';
+  }
+  var block7 = card('⚠️ 风险提示', riskHtml);
+  
+  // ════════════════════════════════════════
+  // Block 8: 后续观察点
+  // ════════════════════════════════════════
+  var obsHtml = '';
+  if (stage === '爆发期' || stage === '启动期') {
+    obsHtml = '<div style="font-size:13px;padding:3px 0">✅ 关注龙头是否继续晋级打开高度</div>'
+      + '<div style="font-size:13px;padding:3px 0">✅ 观察后排跟风力度是否持续</div>'
+      + '<div style="font-size:13px;padding:3px 0">✅ 关注板块成交额是否持续放大</div>';
+  } else if (stage === '分歧震荡期') {
+    obsHtml = '<div style="font-size:13px;padding:3px 0">✅ 龙头能否分歧转一致继续走强</div>'
+      + '<div style="font-size:13px;padding:3px 0">✅ 后排是否止跌企稳</div>'
+      + '<div style="font-size:13px;padding:3px 0">✅ 新催化能否出现打破僵局</div>';
+  } else if (stage === '退潮期') {
+    obsHtml = '<div style="font-size:13px;padding:3px 0">✅ 龙头是否止跌企稳</div>'
+      + '<div style="font-size:13px;padding:3px 0">✅ 是否有新题材替代</div>'
+      + '<div style="font-size:13px;padding:3px 0">✅ 板块成交额是否缩至地量</div>';
+  } else {
+    obsHtml = '<div style="font-size:13px;padding:3px 0">✅ 催化事件能否持续发酵</div>'
+      + '<div style="font-size:13px;padding:3px 0">✅ 是否有龙头率先连板打开空间</div>'
+      + '<div style="font-size:13px;padding:3px 0">✅ 板块涨停家数是否增加</div>';
+  }
+  var block8 = card('👀 后续观察点', obsHtml);
+  
+  // ════════════════════════════════════════
+  // Block 9: 数据来源
+  // ════════════════════════════════════════
+  var block9 = card('📚 数据来源与证据链',
+    '<div style="font-size:12px;color:var(--muted)">'
+    + '<div>• 涨停池数据：东方财富</div>'
+    + '<div>• 概念排行/风口：悟道API (stock.quicktiny.cn)</div>'
+    + '<div>• 热度数据：社区帖子（淘股吧/韭研公社）</div>'
+    + '<div>• 成分股：多平台交叉采集</div>'
+    + '<div>• 评分日期：' + (scoring.analysis_date || '-') + '</div>'
+    + '</div>'
+  );
+  
+  // 组装
+  var html = block1 + block2 + block3 + block4 + block5 + block6 + block7 + block8 + block9;
+  
+  q('#loading-main').outerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', loadDetail);
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>题材总览 · 生命周期分析</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/topics.css">
+</head>
+<body>
+<header style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap">
+<div>
+<h1>📊 <span id="header-date">加载中...</span> 题材生命周期总览</h1>
+<div class="meta">多维度量化评分 · 6阶段自动判定 | <span id="header-meta">数据加载中</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:10px">
+  <a href="/" style="color:var(--gold);font-size:12px">← 返回复盘主页</a>
+</div>
+</header>
+
+<!-- 筛选栏 -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <label>分析日期</label>
+    <input type="date" id="filter-date" class="filter-input">
+  </div>
+  <div class="filter-group">
+    <label>时间范围</label>
+    <div class="btn-group" id="filter-range">
+      <button class="btn btn-sm active" data-value="10d">10日</button>
+      <button class="btn btn-sm" data-value="30d">30日</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <label>题材搜索</label>
+    <input type="text" id="filter-search" class="filter-input" placeholder="输入题材关键词..." style="width:160px">
+  </div>
+  <div class="filter-group">
+    <label>生命周期</label>
+    <select id="filter-stage" class="filter-input" style="width:140px">
+      <option value="">全部阶段</option>
+      <option value="孕育期/预热期">🌱 孕育期/预热期</option>
+      <option value="启动期">🚀 启动期</option>
+      <option value="爆发期">💥 爆发期</option>
+      <option value="分歧震荡期">⚡ 分歧震荡期</option>
+      <option value="退潮期">📉 退潮期</option>
+      <option value="余温反复/二波观察期">🔄 余温反复/二波观察期</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>&nbsp;</label>
+    <button id="btn-analyze" class="btn btn-primary btn-sm" onclick="triggerAnalysis()">🔍 启动分析</button>
+  </div>
+</div>
+
+<!-- 统计摘要 -->
+<div class="stats-row" id="stats-row">
+  <div class="stat-card">活跃题材 <span id="stat-total">-</span></div>
+  <div class="stat-card">爆发期 <span id="stat-explosion" style="color:#059669">-</span></div>
+  <div class="stat-card">启动期 <span id="stat-start" style="color:#22c55e">-</span></div>
+  <div class="stat-card">分歧 <span id="stat-divergence" style="color:#f59e0b">-</span></div>
+  <div class="stat-card">退潮 <span id="stat-cooling" style="color:#ef4444">-</span></div>
+  <div class="stat-card">预热 <span id="stat-preheat" style="color:#6b7280">-</span></div>
+</div>
+
+<!-- 数据表格 -->
+<div class="table-wrap">
+<table id="topics-table">
+<thead>
+<tr>
+  <th class="sortable" data-sort="topic_name">题材名称</th>
+  <th class="sortable" data-sort="current_stage">生命周期阶段</th>
+  <th class="sortable" data-sort="total_score">总分</th>
+  <th class="sortable" data-sort="price_strength">价格</th>
+  <th class="sortable" data-sort="capital_strength">资金</th>
+  <th class="sortable" data-sort="catalyst_strength">催化</th>
+  <th class="sortable" data-sort="sentiment_strength">热度</th>
+  <th class="sortable" data-sort="structure_quality">结构</th>
+  <th>龙头股</th>
+  <th>中军股</th>
+  <th class="sortable" data-sort="zt_count">涨停</th>
+  <th>风险等级</th>
+  <th class="sortable" data-sort="last_analysis_date">更新时间</th>
+  <th>操作</th>
+</tr>
+</thead>
+<tbody id="topics-tbody">
+<tr><td colspan="14" class="empty-msg">加载中...</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 分页 -->
+<div class="pagination" id="pagination">
+  <button class="btn btn-sm" id="page-prev" onclick="changePage(-1)">← 上一页</button>
+  <span id="page-info">第 1 页</span>
+  <button class="btn btn-sm" id="page-next" onclick="changePage(1)">下一页 →</button>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:5500/api';
+var currentPage = 1;
+var totalPages = 1;
+
+async function apiGet(path) {
+  var resp = await fetch(API_BASE + path);
+  return resp.json();
+}
+
+function q(sel) { return document.querySelector(sel); }
+function qa(sel) { return document.querySelectorAll(sel); }
+
+function stageColor(stage) {
+  var map = {
+    '孕育期/预热期': '#6b7280',
+    '启动期': '#22c55e',
+    '爆发期': '#059669',
+    '分歧震荡期': '#f59e0b',
+    '退潮期': '#ef4444',
+    '余温反复/二波观察期': '#8b5cf6',
+  };
+  return map[stage] || '#6b7280';
+}
+
+function riskBadge(level) {
+  if (level === 'critical') return '<span class="tag r">高危</span>';
+  if (level === 'warning') return '<span class="tag y">警告</span>';
+  return '<span class="tag b">正常</span>';
+}
+
+function formatDate(d) {
+  if (!d) return '-';
+  return d.slice(0, 10);
+}
+
+async function loadTopics() {
+  var date = q('#filter-date').value || new Date().toISOString().slice(0, 10);
+  var stage = q('#filter-stage').value;
+  var search = q('#filter-search').value;
+  var params = new URLSearchParams({date: date, page: currentPage, page_size: 20});
+  if (stage) params.set('stage', stage);
+  if (search) params.set('search', search);
+  
+  var res = await apiGet('/v2/topics?' + params.toString());
+  if (!res.ok) {
+    q('#topics-tbody').innerHTML = '<tr><td colspan="14" class="error-msg">⚠️ 加载失败</td></tr>';
+    return;
+  }
+  
+  var data = res.data || [];
+  q('#stat-total').textContent = res.total || data.length;
+  
+  // 统计各阶段数量
+  var counts = { '爆发期': 0, '启动期': 0, '分歧震荡期': 0, '退潮期': 0, '孕育期/预热期': 0, '余温反复/二波观察期': 0 };
+  data.forEach(function(r) {
+    if (counts[r.current_stage] !== undefined) counts[r.current_stage]++;
+  });
+  q('#stat-explosion').textContent = counts['爆发期'];
+  q('#stat-start').textContent = counts['启动期'];
+  q('#stat-divergence').textContent = counts['分歧震荡期'];
+  q('#stat-cooling').textContent = counts['退潮期'];
+  q('#stat-preheat').textContent = counts['孕育期/预热期'] + counts['余温反复/二波观察期'];
+  
+  // 分页
+  totalPages = Math.ceil((res.total || data.length) / 20);
+  q('#page-info').textContent = '第 ' + currentPage + ' 页 / 共 ' + totalPages + ' 页';
+  q('#page-prev').disabled = currentPage <= 1;
+  q('#page-next').disabled = currentPage >= totalPages;
+  
+  if (data.length === 0) {
+    q('#topics-tbody').innerHTML = '<tr><td colspan="14" class="empty-msg">暂无数据，请点击"启动分析"</td></tr>';
+    return;
+  }
+  
+  var html = '';
+  data.forEach(function(r) {
+    var color = stageColor(r.current_stage);
+    html += '<tr onclick="window.location.href=\'/topic-detail.html?id=' + r.id + '\'" style="cursor:pointer">';
+    html += '<td><strong>' + (r.topic_name || '') + '</strong></td>';
+    html += '<td><span class="stage-badge" style="background:' + color + '20;color:' + color + ';border:1px solid ' + color + '">' + (r.current_stage || '') + '</span></td>';
+    html += '<td><strong>' + (r.total_score != null ? r.total_score : '-') + '</strong></td>';
+    html += '<td>' + (r.price_strength != null ? r.price_strength : '-') + '</td>';
+    html += '<td>' + (r.capital_strength != null ? r.capital_strength : '-') + '</td>';
+    html += '<td>' + (r.catalyst_strength != null ? r.catalyst_strength : '-') + '</td>';
+    html += '<td>' + (r.sentiment_strength != null ? r.sentiment_strength : '-') + '</td>';
+    html += '<td>' + (r.structure_quality != null ? r.structure_quality : '-') + '</td>';
+    html += '<td>' + (r.leader_name || '-') + '</td>';
+    html += '<td>' + (r.center_name || '-') + '</td>';
+    html += '<td>' + (r.limit_up_count || r.zt_count || 0) + '</td>';
+    html += '<td>' + riskBadge(r.risk_level || 'none') + '</td>';
+    html += '<td style="font-size:11px;color:var(--muted)">' + formatDate(r.last_analysis_date || r.score_date) + '</td>';
+    html += '<td><a href="/topic-detail.html?id=' + r.id + '" style="color:var(--blue);font-size:11px">详情 →</a></td>';
+    html += '</tr>';
+  });
+  q('#topics-tbody').innerHTML = html;
+}
+
+function changePage(delta) {
+  var newPage = currentPage + delta;
+  if (newPage < 1 || newPage > totalPages) return;
+  currentPage = newPage;
+  loadTopics();
+}
+
+async function triggerAnalysis() {
+  var btn = q('#btn-analyze');
+  btn.textContent = '⏳ 分析中...';
+  btn.disabled = true;
+  
+  try {
+    var res = await fetch(API_BASE + '/v2/analyze', {method: 'POST'});
+    var data = await res.json();
+    if (data.ok) {
+      btn.textContent = '✅ 完成 (共' + (data.count || '') + '个)';
+      setTimeout(function() {
+        btn.textContent = '🔍 启动分析';
+        btn.disabled = false;
+        loadTopics();
+      }, 1000);
+    } else {
+      btn.textContent = '❌ ' + (data.error || '失败');
+      setTimeout(function() { btn.textContent = '🔍 启动分析'; btn.disabled = false; }, 2000);
+    }
+  } catch(e) {
+    btn.textContent = '❌ 请求失败';
+    setTimeout(function() { btn.textContent = '🔍 启动分析'; btn.disabled = false; }, 2000);
+  }
+}
+
+// 筛选事件绑定
+document.addEventListener('DOMContentLoaded', function() {
+  q('#filter-date').value = new Date().toISOString().slice(0, 10);
+  q('#filter-date').addEventListener('change', function() { currentPage = 1; loadTopics(); });
+  q('#filter-stage').addEventListener('change', function() { currentPage = 1; loadTopics(); });
+  q('#filter-search').addEventListener('input', function() { currentPage = 1; loadTopics(); });
+  
+  // 时间范围按钮
+  qa('#filter-range .btn').forEach(function(b) {
+    b.addEventListener('click', function() {
+      qa('#filter-range .btn').forEach(function(x) { x.classList.remove('active'); });
+      this.classList.add('active');
+      loadTopics();
+    });
+  });
+  
+  // 表头排序
+  qa('.sortable').forEach(function(th) {
+    th.addEventListener('click', function() {
+      var col = this.getAttribute('data-sort');
+      var asc = this.classList.contains('asc');
+      qa('.sortable').forEach(function(h) { h.classList.remove('asc', 'desc'); });
+      this.classList.add(asc ? 'desc' : 'asc');
+      sortTable(col, !asc);
+    });
+  });
+  
+  loadTopics();
+});
+
+var sortDirection = {};
+function sortTable(col, asc) {
+  var tbody = q('#topics-tbody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length === 0 || rows[0].cells.length <= 1) return;
+  sortDirection[col] = asc;
+  rows.sort(function(a, b) {
+    var av = a.getAttribute('data-sort-' + col) || a.cells[getColIndex(col)].textContent.trim();
+    var bv = b.getAttribute('data-sort-' + col) || b.cells[getColIndex(col)].textContent.trim();
+    var numA = parseFloat(av) || 0;
+    var numB = parseFloat(bv) || 0;
+    if (numA !== 0 || numB !== 0) return asc ? numA - numB : numB - numA;
+    return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  rows.forEach(function(r) { tbody.appendChild(r); });
+}
+
+function getColIndex(name) {
+  var map = {topic_name:0, current_stage:1, total_score:2, price_strength:3, capital_strength:4, catalyst_strength:5, sentiment_strength:6, structure_quality:7, zt_count:10};
+  return map[name] || 0;
+}
+</script>
+</body>
+</html>

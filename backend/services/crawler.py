@@ -1049,142 +1049,204 @@ def fetch_cls_news():
 
 
 # ════════════════════════════════════════════
-# 5. 新 section 构建器
+# 6. 新 section 构建器
 # ════════════════════════════════════════════
 
 def _build_s3_html(today):
-    """题材生命周期全景 — 1:1复刻原始HTML stock-box格式"""
-    sector_map = [
-        {'emoji': '🏠', 'name': '房地产', 'kw': ['房地产','房地'], 'default_stage': '萌芽→主升', 'color': 'red', 'tag': 'r'},
-        {'emoji': '⚡', 'name': '电力/能源', 'kw': ['电力','电网','煤炭','能源','电机'], 'default_stage': '高位分歧', 'color': 'gold', 'tag': 'y'},
-        {'emoji': '🔌', 'name': 'MLCC/电容', 'kw': ['MLCC','电容','被动元件','陶瓷','电子化学'], 'default_stage': '主升期', 'color': 'red', 'tag': 'r'},
-        {'emoji': '📋', 'name': 'PCB/铜箔', 'kw': ['PCB','铜箔','CCL','金属新材','封装'], 'default_stage': '主升期', 'color': 'red', 'tag': 'r'},
-        {'emoji': '💻', 'name': '半导体/芯片', 'kw': ['半导体','芯片','封测','硅片','光刻'], 'default_stage': '退潮', 'color': 'green', 'tag': 'g'},
-        {'emoji': '🚀', 'name': '商业航天', 'kw': ['航天','卫星','太空','火箭','航空'], 'default_stage': '试错', 'color': 'blue', 'tag': 'b'},
-        {'emoji': '🔦', 'name': '光通信/CPO', 'kw': ['光通信','CPO','光模块','光纤','通信设备'], 'default_stage': '主升期', 'color': 'red', 'tag': 'r'},
-        {'emoji': '🚗', 'name': '汽车/新能源', 'kw': ['汽车','新能源','汽车零部','商用车'], 'default_stage': '试错', 'color': 'blue', 'tag': 'b'},
-        {'emoji': '🛒', 'name': '大消费', 'kw': ['家居','零售','广告','数字媒体','贸易','家电'], 'default_stage': '试错', 'color': 'blue', 'tag': 'b'},
-        {'emoji': '💊', 'name': '医药/化工', 'kw': ['化学','医药','化工','农化','化纤','化学原料','化学制品'], 'default_stage': '试错', 'color': 'blue', 'tag': 'b'},
-    ]
+    """题材生命周期全景 — 使用 lifecycle 引擎的新版"""
+    from backend.services.lifecycle import analyze_all_active_topics, analyze_topic, discover_active_topics
     
-    sectors_raw = query("SELECT sector, COUNT(*) as cnt, MAX(board_num) as mb FROM zt_stocks WHERE date=? AND sector!='' GROUP BY sector ORDER BY cnt DESC", (today,))
-    if not sectors_raw:
-        return ''
+    # 1. 先尝试从数据库读取已有分析结果
+    existing = query("SELECT * FROM topic_lifecycle WHERE date=? ORDER BY total_score DESC", (today,))
+    
+    results = []
+    if existing:
+        # 已有分析结果，直接使用
+        for row in existing:
+            try:
+                if row.get('summary_json'):
+                    full = json.loads(row['summary_json'])
+                    results.append(full)
+                else:
+                    results.append(dict(row))
+            except:
+                results.append(dict(row))
+    else:
+        # 没有分析结果，运行分析引擎
+        print(f"  ⚡ lifecycle引擎分析 {today} 的活跃题材...")
+        topics = discover_active_topics(today)
+        for t in topics[:8]:
+            result = analyze_topic(t['name'], today)
+            results.append(result)
+    
+    if not results:
+        return '<h2>三、题材生命周期全景 <span style="font-size:11px;color:var(--muted);font-weight:normal">暂无数据</span></h2>\n<div class="card"><p>暂无涨停数据，无法分析题材生命周期。</p></div>'
     
     def esc(s):
         if not s: return ''
         return str(s).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
     
+    # 颜色/表情映射
+    stage_config = {
+        '孕育期/预热期': {'color': 'blue', 'tag': 'b', 'emoji': '🌱'},
+        '启动期': {'color': 'gold', 'tag': 'y', 'emoji': '🚀'},
+        '爆发期': {'color': 'red', 'tag': 'r', 'emoji': '💥'},
+        '分歧震荡期': {'color': 'gold', 'tag': 'y', 'emoji': '⚡'},
+        '退潮期': {'color': 'green', 'tag': 'g', 'emoji': '📉'},
+        '余温反复/二波观察期': {'color': 'blue', 'tag': 'b', 'emoji': '🔄'},
+    }
+    
+    # 行业表情映射
+    emoji_map = {
+        '房地产': '🏠', '电力': '⚡', '能源': '⚡', 'MLCC': '🔌', '电容': '🔌',
+        'PCB': '📋', '铜箔': '📋', '半导体': '💻', '芯片': '💻', '封测': '💻',
+        '航天': '🚀', '卫星': '🚀', '光通信': '🔦', 'CPO': '🔦', '光模块': '🔦',
+        '汽车': '🚗', '新能源': '🚗', '消费': '🛒', '医药': '💊', '化工': '🧪',
+        '机器人': '🤖', 'AI': '🤖', '人工智能': '🤖', '算力': '⚙️', '数据': '💾',
+        '金融': '🏦', '证券': '🏦', '银行': '🏦', '低空': '🛸', '飞行': '🛸',
+    }
+    
+    def get_emoji(name):
+        for kw, em in emoji_map.items():
+            if kw in name:
+                return em
+        return '📊'
+    
     boxes = ''
-    for sm in sector_map:
-        total_zt = 0
-        max_board = 0
-        leaders = []
-        all_stocks = []
-        for sec in sectors_raw:
-            if any(kw in sec['sector'] for kw in sm['kw']):
-                total_zt += sec['cnt']
-                if sec['mb'] > max_board:
-                    max_board = sec['mb']
-                ls = query("SELECT name, board_num, board_tag FROM zt_stocks WHERE date=? AND sector=? ORDER BY board_num DESC, seal_time", (today, sec['sector']))
-                for l in ls:
-                    if l['name'] not in [x['name'] for x in leaders if 'name' in x]:
-                        leaders.append(l)
-                    if l['name'] not in [x['name'] for x in all_stocks if 'name' in x]:
-                        all_stocks.append(l)
-        
-        if total_zt == 0:
-            continue
-        
-        top_leader = leaders[0] if leaders else None
-        leader_name = top_leader['name'] if top_leader else ''
-        leader_board = top_leader['board_num'] if top_leader else 0
-        has_high = max_board >= 3
-        
-        # Phase determination
-        if sm['name'] == 'MLCC/电容' or sm['name'] == '光通信/CPO':
-            stage = '主升期'; color = 'red'; tag = 'r'
-        elif sm['name'] == 'PCB/铜箔' and has_high:
-            stage = '主升期'; color = 'red'; tag = 'r'
-        elif sm['name'] == '房地产' and has_high:
-            stage = '萌芽→主升'; color = 'red'; tag = 'r'
-        elif sm['name'] == '电力/能源' and max_board >= 3:
-            stage = '高位分歧'; color = 'gold'; tag = 'y'
-        elif sm['name'] == '半导体/芯片':
-            stage = '退潮'; color = 'green'; tag = 'g'
-        elif has_high and total_zt >= 5:
-            stage = '主升'; color = 'red'; tag = 'r'
-        elif total_zt >= 3:
-            stage = '分歧'; color = 'gold'; tag = 'y'
-        elif total_zt >= 1:
-            stage = '试错'; color = 'blue'; tag = 'b'
+    for r in results:
+        if isinstance(r, dict) and 'topic_name' in r:
+            topic = r['topic_name']
+            stage = r.get('lifecycle_stage', '孕育期/预热期')
+            total = r.get('scores', {}).get('total_score', 0)
+            ps = r.get('scores', {}).get('price_strength', 0)
+            cs = r.get('scores', {}).get('capital_strength', 0)
+            cat_s = r.get('scores', {}).get('catalyst_strength', 0)
+            ss = r.get('scores', {}).get('sentiment_strength', 0)
+            sq = r.get('scores', {}).get('structure_quality', 0)
+            leader = r.get('data_summary', {}).get('leader_stock', {}).get('name', '')
+            leader_board = r.get('data_summary', {}).get('leader_stock', {}).get('performance_summary', '')
+            center = r.get('data_summary', {}).get('center_stock', {}).get('name', '')
+            zt_change = r.get('data_summary', {}).get('limit_up_count_change', '')
+            risks = r.get('risk_warnings', [])
+            reasons = r.get('stage_judgement_reasons', [])
+            catalysts = r.get('catalyst_and_fundamentals', {}).get('recent_7d_catalysts', [])
         else:
-            stage = '试错'; color = 'blue'; tag = 'b'
+            # 数据库行格式
+            topic = r.get('topic_name', '')
+            stage = r.get('lifecycle_stage', '孕育期/预热期')
+            total = r.get('total_score', 0)
+            ps = r.get('price_strength', 0)
+            cs = r.get('capital_strength', 0)
+            cat_s = r.get('catalyst_strength', 0)
+            ss = r.get('sentiment_strength', 0)
+            sq = r.get('structure_quality', 0)
+            leader = r.get('leader_name', '')
+            leader_board = f"{r.get('leader_board', 0)}连板" if r.get('leader_board', 0) > 1 else '首板'
+            center = r.get('center_name', '')
+            zt_change = ''
+            risks = []
+            reasons = []
+            catalysts = []
         
-        # Headline
-        if sm['name'] == 'MLCC/电容':
-            headline = '高盛：MLCC=AI"新内存"，史上最大周期，仍处早期'
-        elif sm['name'] == '光通信/CPO':
-            headline = '英伟达Spectrum-X量产+Marvell单日+22%，连线成AI新瓶颈'
-        elif sm['name'] == 'PCB/铜箔':
-            headline = '英伟达RV200 NVL72量产爬坡，单柜PCB+233%，铜箔+275%'
-        elif sm['name'] == '商业航天':
-            headline = 'SpaceX 6月12日上市交易，星链产业链受益'
-        elif sm['name'] == '半导体/芯片':
-            headline = '硅片全面提价，沪硅+14%，中船特气20cm涨停'
-        elif sm['name'] == '电力/能源':
-            headline = leader_name + str(leader_board) + '板+京东方A涨停但触发异动监控'
-        elif sm['name'] == '房地产':
-            headline = leader_name + str(leader_board) + '板破局 + 城市更新"十五五"全国性政策'
-        elif sm['name'] == '汽车/新能源':
-            headline = '汽车零部件板块走强，' + str(total_zt) + '家涨停'
-        else:
-            headline = '板块' + str(total_zt) + '家涨停，最高' + str(max_board) + '板'
+        cfg = stage_config.get(stage, {'color': 'blue', 'tag': 'b', 'emoji': '📊'})
+        color = cfg['color']
+        tag = cfg['tag']
+        emoji = get_emoji(topic)
         
-        # Catalyst text
-        leader_names = '、'.join([esc(l['name']) for l in leaders[:3]])
-        catalyst = sm['kw'][0] + '板块受催化走强，涨停' + str(total_zt) + '家，最高' + str(max_board) + '板。龙头' + esc(leader_name) + str(leader_board) + '板引领方向。'
+        # 风险标签
+        risk_badges = ''
+        for risk in risks[:3]:
+            rtype = risk.get('risk_type', '')
+            sev = risk.get('severity', 'warning')
+            risk_badges += f'<span class="chip chip-{"dn" if sev=="critical" else "ne"}">{esc(rtype)}</span> '
         
-        # Diffusion
-        stock_names = '、'.join([esc(l['name']) for l in all_stocks[:5]])
-        if stock_names:
-            catalyst += ' ' + stock_names + '等涨停助攻，梯队形成中。'
-        else:
-            catalyst += ' 板块梯队形成中。'
+        # 评分条
+        score_bars = ''
+        for dim, val, lbl in [('price_strength', ps, '价格'), ('capital_strength', cs, '资金'), 
+                               ('catalyst_strength', cat_s, '催化'), ('sentiment_strength', ss, '热度'),
+                               ('structure_quality', sq, '结构')]:
+            bar_color = 'var(--red)' if val >= 60 else ('var(--gold)' if val >= 40 else 'var(--green)')
+            score_bars += f'<div style="display:flex;align-items:center;gap:4px;font-size:10px;margin:1px 0"><span style="width:24px">{lbl}</span><div style="flex:1;height:6px;background:var(--border);border-radius:3px"><div style="width:{val}%;height:6px;background:{bar_color};border-radius:3px"></div></div><span style="width:20px;text-align:right;font-size:10px">{val}</span></div>'
         
-        # Capital
-        if total_zt >= 5:
-            catalyst += ' 资金面看，板块资金加仓明显，热度偏强。'
-        elif total_zt >= 3:
-            catalyst += ' 资金面看，板块资金小幅流入，热度中等。'
-        else:
-            catalyst += ' 资金面看，板块资金试探性流入，热度一般。'
+        # 催化摘要
+        catalyst_text = ''
+        if catalysts:
+            c_items = [f"{c.get('type', '')}:{c.get('title', '')[:20]}" for c in catalysts[:3]]
+            catalyst_text = ' | '.join(c_items)
         
-        # Phase conclusion
-        catalyst += ' 综合判定：当前处于<strong>' + stage + '</strong>。<span class="src st">淘</span><span class="src sj">韭</span>'
+        # 理由摘要
+        reasons_text = ''
+        if reasons:
+            reasons_text = ' '.join([f'<span style="font-size:10px;color:var(--muted)">• {esc(r)}</span>' for r in reasons[:2]])
         
-        # Vote bar
-        bull = min(50 + total_zt * 5, 85)
-        bear = max(5, 30 - total_zt * 3)
+        # 看多/看空 比例
+        base_bull = 40 + total * 0.4
+        bull = min(base_bull, 85)
+        bear = max(5, 30 - total * 0.3)
         neut = 100 - bull - bear
         if neut < 5:
             neut = 5
             bear = 100 - bull - neut
         
-        box = '<div class="stock-box" style="border-color:var(--' + color + ');background:rgba(248,81,73,.04)">\n'
-        box += '<h4>' + sm['emoji'] + ' ' + esc(sm['name']) + ' <span class="tag ' + tag + '">' + stage + '</span></h4>\n'
-        box += '<div class="headline">' + esc(headline) + '</div>\n'
-        box += '<p>' + catalyst + '</p>\n'
-        box += '<div class="vote"><div class="v-up" style="width:' + str(bull) + '%"></div>'
-        box += '<div class="v-dn" style="width:' + str(bear) + '%"></div>'
-        box += '<div class="v-ne" style="width:' + str(neut) + '%"></div></div>\n'
-        box += '<div class="v-label">看多' + str(bull) + '% | 看空' + str(bear) + '% | 中性' + str(neut) + '%（龙头' + esc(leader_name) + '引领 | ' + str(total_zt) + '家涨停）</div>\n'
-        box += '</div>\n'
-        
+        box = f'''<div class="stock-box" style="border-color:var(--{color});background:rgba(248,81,73,.04);cursor:pointer" onclick="showTopicDetail('{esc(topic)}')">
+<h4>{emoji} {esc(topic)} <span class="tag {tag}">{esc(stage)}</span> <span style="float:right;font-size:12px;color:var(--muted)">✨{total}</span></h4>
+<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start">
+  <div style="flex:1;min-width:140px">
+    {score_bars}
+  </div>
+  <div style="flex:2;min-width:180px">
+    <div style="font-size:12px"><strong>龙头</strong> {esc(leader)} {esc(leader_board)}</div>
+    <div style="font-size:12px">{risk_badges}</div>
+    <div style="font-size:12px;color:var(--muted)">涨停变化 {esc(str(zt_change))}</div>
+    {('<div style="font-size:10px;color:var(--muted);margin-top:4px">' + catalyst_text + '</div>') if catalyst_text else ''}
+  </div>
+</div>
+{('<div style="margin:4px 0 2px 0">' + reasons_text + '</div>') if reasons_text else ''}
+<div class="vote"><div class="v-up" style="width:{bull:.0f}%"></div><div class="v-dn" style="width:{bear:.0f}%"></div><div class="v-ne" style="width:{neut:.0f}%"></div></div>
+<div class="v-label">看多{bull:.0f}% | 看空{bear:.0f}% | 中性{neut:.0f}%（龙头{esc(leader)}引领 | 总分{total}）</div>
+</div>
+'''
         boxes += box
     
-    result = '<h2>三、题材生命周期全景 <span style="font-size:11px;color:var(--muted);font-weight:normal">涨停行业分布 · 实时数据</span></h2>\n'
+    # 生命周期热力图
+    heatmap = ''
+    if existing:
+        # 查询最近 10 天的数据
+        import datetime as dtm
+        end_date = dtm.date.fromisoformat(today)
+        dates = [(end_date - dtm.timedelta(days=i)).strftime("%Y-%m-%d") for i in range(9, -1, -1)]
+        
+        topic_names = [r['topic_name'] for r in existing[:6]]  # 最多6个题材
+        
+        heat_rows = ''
+        for tname in topic_names:
+            hcell = ''
+            for d in dates:
+                stage_row = query("SELECT lifecycle_stage FROM topic_lifecycle WHERE topic_name=? AND date=? ORDER BY id DESC LIMIT 1", (tname, d))
+                if stage_row:
+                    s = stage_row[0]['lifecycle_stage'] or ''
+                    # 颜色映射
+                    sc = {'孕育期/预热期': 'b', '启动期': 'y', '爆发期': 'r', '分歧震荡期': 'y', '退潮期': 'g', '余温反复/二波观察期': 'b'}.get(s, 'b')
+                    hcell += f'<td class="{sc}" style="font-size:10px;padding:2px 4px;text-align:center">{s[:2]}</td>'
+                else:
+                    hcell += '<td style="font-size:10px;padding:2px 4px;text-align:center;color:var(--muted)">-</td>'
+            
+            heat_rows += f'<tr><td style="font-size:11px;padding:2px 6px">{esc(tname)}</td>{hcell}</tr>'
+        
+        date_header = ''.join([f'<th style="font-size:10px;padding:2px 4px">{d[-5:]}</th>' for d in dates])
+        heatmap = f'''
+<div class="card" style="margin-top:12px">
+<h3>🗓️ 生命周期热力图（近10日演变）</h3>
+<table>
+<tr><th style="font-size:10px">题材</th>{date_header}</tr>
+{heat_rows}
+</table>
+<div style="font-size:10px;color:var(--muted);margin-top:6px">■ 红=爆发/启动 ■ 黄=分歧/孕育 ■ 绿=退潮 ■ 蓝=预热/二波</div>
+</div>'''
+    
+    result = '<h2>三、题材生命周期全景 <span style="font-size:11px;color:var(--muted);font-weight:normal">量化评分 · 实时数据 · ' + today + '</span> <button id="lifecycle-btn" onclick="runLifecycleAnalysis()" style="float:right;font-size:11px;padding:4px 12px;background:var(--blue);color:#fff;border:none;border-radius:4px;cursor:pointer">🔍 启动题材分析</button></h2>\n'
     result += boxes
+    result += heatmap
     return result
 
 
@@ -1537,10 +1599,7 @@ def rebuild_section_html(today=None):
     if s2:
         sections.append({'date': today, 'section_id': 's2', 'title': f'板块热度 {today}', 'html': s2})
 
-    # 4. 题材生命周期 (实时)
-    s3 = _build_s3_html(today)
-    if s3:
-        sections.append({'date': today, 'section_id': 's3', 'title': f'题材生命周期 {today}', 'html': s3})
+    # 4. 题材生命周期 (已迁移到前端 v2 渲染，此处跳过)
     
     # 5. 题材轮动 (实时)
     s9 = _build_s9_html(today)
@@ -1618,13 +1677,41 @@ def refresh_all():
     results['tg_posts'] = tg_count
     print(f"    ✅ {tg_count}条帖子")
     
-    # 6. 重建 section_html (用实时数据替换静态分析)
+    # 6. 题材生命周期分析
+    print("  → 分析题材生命周期...")
+    try:
+        from backend.services.lifecycle import analyze_all_active_topics
+        lc_results = analyze_all_active_topics()
+        results['lifecycle_topics'] = len(lc_results)
+        print(f"    ✅ {len(lc_results)}个题材完成生命周期分析")
+    except Exception as e:
+        print(f"    ⚠️ 题材生命周期分析失败: {e}")
+        results['lifecycle_topics'] = 0
+    
+    # 6b. v2 全量分析 + 日报
+    print("  → v2 全量分析 & 日报生成...")
+    try:
+        from backend.services.pipeline import run_full_analysis
+        v2_results = run_full_analysis()
+        results['v2_topics'] = len(v2_results)
+        print(f"    ✅ {len(v2_results)}个题材完成v2分析")
+        
+        from backend.services.reporter import generate_all_reports
+        report_results = generate_all_reports()
+        results['v2_reports'] = len(report_results)
+        print(f"    ✅ {len(report_results)}份日报已生成")
+    except Exception as e:
+        print(f"    ⚠️ v2分析失败: {e}")
+        results['v2_topics'] = 0
+        results['v2_reports'] = 0
+    
+    # 7. 重建 section_html (用实时数据替换静态分析)
     print("  → 重建页面...")
     sec_count = rebuild_section_html()
     results['sections'] = sec_count
     
     # 汇总
-    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · 财联社{cls_count}条 · {sec_count}个板块已更新")
+    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · 财联社{cls_count}条 · 题材{results['lifecycle_topics']}个 · {sec_count}个板块已更新")
     return results
 
 

@@ -129,8 +129,9 @@ async function switchDate(dateStr) {
   currentDate = dateStr;
   q('#header-date').textContent = dateStr;
   
-  // 显示加载状态
+  // 显示加载状态（s3 除外，它自己加载）
   qa('.section').forEach(function(s) {
+    if (s.id === 's3') return;
     s.innerHTML = '<div class="loading"><div class="spinner"></div><div>加载 ' + dateStr + ' 数据...</div></div>';
   });
   
@@ -139,6 +140,7 @@ async function switchDate(dateStr) {
   if (sectionsRes.ok && sectionsRes.data) {
     var count = 0;
     Object.keys(sectionsRes.data).forEach(function(sid) {
+      if (sid === 's3') return; // 跳过 s3，由 v2 API 渲染
       var sec = sectionsRes.data[sid];
       var el = document.getElementById(sid);
       if (el && sec.html) {
@@ -158,8 +160,9 @@ async function switchDate(dateStr) {
     }
   }
   
-  // 3. 重新绑定
+  // 3. 重新绑定 + 刷新 s3 排行榜
   setupTableSorting();
+  s3refreshRankings();
 }
 
 async function initDateSelector() {
@@ -184,7 +187,150 @@ async function initDateSelector() {
 }
 
 // ════════════════════════════════════════════
-// 初始化
+// 热门题材与主线题材监控 — 三个排行榜
+// ════════════════════════════════════════════
+
+function s3stageColor(stage) {
+  var map = {
+    '孕育期/预热期': '#6b7280', '启动期': '#22c55e', '爆发期': '#059669',
+    '分歧震荡期': '#f59e0b', '退潮期': '#ef4444', '余温反复/二波观察期': '#8b5cf6',
+  };
+  return map[stage] || '#6b7280';
+}
+
+function s3riskBadge(level) {
+  if (level === 'critical') return '<span class="tag r">高危</span>';
+  if (level === 'warning') return '<span class="tag y">警告</span>';
+  return '<span class="tag b">正常</span>';
+}
+
+function s3formatPct(v) {
+  if (v == null || v === 0) return '-';
+  var s = v > 0 ? '+' : '';
+  return s + Number(v).toFixed(1) + '%';
+}
+
+function s3formatNum(v) {
+  if (v == null || v === 0) return '-';
+  return Number(v).toFixed(1);
+}
+
+async function s3refreshRankings() {
+  var btn = document.getElementById('s3-btn-refresh');
+  var status = document.getElementById('s3-data-status');
+  if (btn) { btn.textContent = '⏳ 刷新中...'; btn.disabled = true; }
+  if (status) status.textContent = '正在获取排行榜数据...';
+  
+  var date = (document.getElementById('s3-filter-date') && document.getElementById('s3-filter-date').value) || new Date().toISOString().slice(0, 10);
+  
+  try {
+    var res = await fetch(API_BASE + '/v2/hot-topics/rankings?date=' + date);
+    var data = await res.json();
+    
+    if (data.ok && data.data) {
+      renderHotRankings(data.data.hot_rankings || []);
+      renderMainlineRankings(data.data.mainline_rankings || []);
+      renderCombinedRankings(data.data.combined_rankings || []);
+      if (status) status.textContent = '✅ 已更新 ' + date;
+      if (btn) {
+        btn.textContent = '✅ 完成';
+        setTimeout(function() { btn.textContent = '🔄 刷新排行榜'; btn.disabled = false; }, 1500);
+      }
+    } else {
+      if (status) status.textContent = '❌ ' + (data.error || '获取失败');
+      if (btn) { btn.textContent = '❌ 失败'; setTimeout(function() { btn.textContent = '🔄 刷新排行榜'; btn.disabled = false; }, 2000); }
+    }
+  } catch (e) {
+    if (status) status.textContent = '❌ 请求失败';
+    if (btn) { btn.textContent = '❌ 失败'; setTimeout(function() { btn.textContent = '🔄 刷新排行榜'; btn.disabled = false; }, 2000); }
+  }
+}
+
+function renderHotRankings(data) {
+  var tbody = document.getElementById('s3-hot-tbody');
+  if (!tbody) return;
+  
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-msg">暂无数据，请点击"刷新排行榜"</td></tr>';
+    return;
+  }
+  
+  var html = '';
+  data.forEach(function(r) {
+    var cls = r.rank <= 3 ? ' style="font-weight:700"' : '';
+    html += '<tr' + cls + '>';
+    html += '<td><span class="' + (r.rank <= 3 ? 'tag r' : '') + '">' + r.rank + '</span></td>';
+    html += '<td><strong>' + (r.topic_name || '') + '</strong></td>';
+    html += '<td><strong>' + (r.heat_score != null ? r.heat_score : '-') + '</strong></td>';
+    html += '<td>' + (r.jygs_heat != null ? r.jygs_heat : '-') + '</td>';
+    html += '<td>' + (r.xueqiu_heat != null ? r.xueqiu_heat : '-') + '</td>';
+    html += '<td>' + (r.eastmoney_heat != null ? r.eastmoney_heat : '-') + '</td>';
+    html += '<td>' + (r.ths_heat != null ? r.ths_heat : '-') + '</td>';
+    html += '<td class="' + (r.heat_change_3d > 0 ? 'up' : (r.heat_change_3d < 0 ? 'dn' : '')) + '">' + s3formatPct(r.heat_change_3d) + '</td>';
+    html += '<td>' + (r.representative_stocks || '-') + '</td>';
+    html += '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function renderMainlineRankings(data) {
+  var tbody = document.getElementById('s3-mainline-tbody');
+  if (!tbody) return;
+  
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-msg">暂无数据，请点击"刷新排行榜"</td></tr>';
+    return;
+  }
+  
+  var html = '';
+  data.forEach(function(r) {
+    var color = s3stageColor(r.lifecycle_stage);
+    html += '<tr>';
+    html += '<td><span class="' + (r.rank <= 3 ? 'tag r' : '') + '">' + r.rank + '</span></td>';
+    html += '<td><strong>' + (r.topic_name || '') + '</strong></td>';
+    html += '<td><strong>' + (r.mainline_strength_score != null ? r.mainline_strength_score : '-') + '</strong></td>';
+    html += '<td>' + s3formatPct(r.board_change_5d) + '</td>';
+    html += '<td>' + s3formatPct(r.board_change_10d) + '</td>';
+    html += '<td>' + s3formatNum(r.turnover_5d) + '亿</td>';
+    html += '<td>' + (r.limit_up_count_5d || 0) + '</td>';
+    html += '<td>' + (r.leader_stock || '-') + (r.leader_board ? '(' + r.leader_board + '板)' : '') + '</td>';
+    html += '<td>' + (r.leader_board || 0) + '</td>';
+    html += '<td><span class="stage-badge" style="background:' + color + '20;color:' + color + ';border:1px solid ' + color + ';font-size:11px">' + (r.lifecycle_stage || '未知') + '</span></td>';
+    html += '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function renderCombinedRankings(data) {
+  var tbody = document.getElementById('s3-combined-tbody');
+  if (!tbody) return;
+  
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-msg">暂无数据，请点击"刷新排行榜"</td></tr>';
+    return;
+  }
+  
+  var html = '';
+  data.forEach(function(r) {
+    var color = s3stageColor(r.lifecycle_stage);
+    html += '<tr onclick="window.open(\'/topic-detail.html?id=' + (r.topic_id || '') + '\',\'_blank\')" style="cursor:pointer">';
+    html += '<td><span class="' + (r.rank <= 3 ? 'tag r' : '') + '">' + r.rank + '</span></td>';
+    html += '<td><strong>' + (r.topic_name || '') + '</strong></td>';
+    html += '<td><strong>' + (r.total_score != null ? r.total_score : '-') + '</strong></td>';
+    html += '<td>' + (r.heat_score != null ? r.heat_score : '-') + '</td>';
+    html += '<td>' + (r.mainline_strength_score != null ? r.mainline_strength_score : '-') + '</td>';
+    html += '<td><span class="stage-badge" style="background:' + color + '20;color:' + color + ';border:1px solid ' + color + ';font-size:11px">' + (r.lifecycle_stage || '未知') + '</span></td>';
+    html += '<td>' + s3riskBadge(r.risk_level || 'none') + '</td>';
+    html += '<td>' + (r.leader_stock || '-') + '</td>';
+    html += '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function closeTopicDetail() {
+  var modal = document.getElementById('topic-detail-modal');
+  if (modal) modal.style.display = 'none';
+}
 // ════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -203,11 +349,12 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
 
-    // 3. 加载 section HTML
+    // 3. 加载 section HTML（跳过 s3）
     var sectionsRes = await apiGet('/sections/all');
     var loadedCount = 0;
     if (sectionsRes.ok && sectionsRes.data) {
       Object.keys(sectionsRes.data).forEach(function(sid) {
+        if (sid === 's3') return; // s3 由 v2 API 渲染
         var sec = sectionsRes.data[sid];
         var el = document.getElementById(sid);
         if (el && sec.html) {
@@ -221,6 +368,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupTableSorting();
     var defaultTab = q('.board-tab.active');
     if (defaultTab) updateRateDisplay(defaultTab);
+
+    // 5. 初始化 s3 热门题材排行榜
+    var dateInput = document.getElementById('s3-filter-date');
+    if (dateInput) {
+      dateInput.value = new Date().toISOString().slice(0, 10);
+      dateInput.addEventListener('change', function() { s3refreshRankings(); });
+    }
+    
+    s3refreshRankings();
 
   } catch (e) {
     console.error('加载失败:', e);

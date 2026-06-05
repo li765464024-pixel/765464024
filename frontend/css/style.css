@@ -115,3 +115,16 @@ h2{font-size:17px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid 
 
 /* Version badge */
 .version-badge{font-size:10px;color:var(--muted);background:var(--card);padding:2px 8px;border-radius:3px;border:1px solid var(--border);margin-left:auto}
+
+/* Modal (题材详情) */
+#topic-detail-modal{display:none}
+#topic-detail-modal .card{margin-bottom:10px}
+#topic-detail-modal::-webkit-scrollbar{width:6px}
+#topic-detail-modal::-webkit-scrollbar-track{background:transparent}
+#topic-detail-modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* 生命周期热力图 */
+td.r{background:rgba(248,81,73,.25);color:var(--red);font-weight:700}
+td.y{background:rgba(210,153,29,.25);color:var(--gold);font-weight:700}
+td.g{background:rgba(63,185,80,.25);color:var(--green);font-weight:700}
+td.b{background:rgba(88,166,255,.25);color:var(--blue);font-weight:700}

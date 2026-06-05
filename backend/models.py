@@ -147,6 +147,225 @@ def init_db():
         created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
+    -- ── 题材生命周期分析结果 ──
+    CREATE TABLE IF NOT EXISTS topic_lifecycle (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        date            TEXT NOT NULL,
+        topic_name      TEXT NOT NULL,
+        lifecycle_stage TEXT,           -- 孕育期/启动期/爆发期/分歧震荡期/退潮期/余温反复期
+        total_score     REAL DEFAULT 0,
+        price_strength  REAL DEFAULT 0, -- 价格强度 0-100
+        capital_strength REAL DEFAULT 0,-- 资金强度 0-100
+        catalyst_strength REAL DEFAULT 0,-- 催化强度 0-100
+        sentiment_strength REAL DEFAULT 0,-- 热度强度 0-100
+        structure_quality REAL DEFAULT 0,-- 结构质量 0-100
+        zt_count        INTEGER DEFAULT 0,   -- 当日涨停家数
+        leader_name     TEXT,           -- 龙头股名
+        leader_board    INTEGER DEFAULT 0,   -- 龙头连板数
+        center_name     TEXT,           -- 中军股名
+        summary_json    TEXT,           -- 完整的分析结果JSON
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(date, topic_name)
+    );
+
+    -- ── 题材催化事件 ──
+    CREATE TABLE IF NOT EXISTS topic_catalysts (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        date            TEXT NOT NULL,
+        topic_name      TEXT NOT NULL,
+        event_date      TEXT,           -- 事件发生日期
+        title           TEXT,
+        content         TEXT,
+        catalyst_type   TEXT,           -- 政策/公告/订单/合作/产品/业绩/行业会议/行业数据
+        catalyst_level  TEXT,           -- 国家级/部委级/地方级/公司级/媒体级
+        source_name     TEXT,           -- 来源名称
+        source_url      TEXT,           -- 来源链接
+        is_verified     INTEGER DEFAULT 0, -- 是否已核验
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- ── 题材成分股 ──
+    CREATE TABLE IF NOT EXISTS topic_components (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        date            TEXT NOT NULL,
+        topic_name      TEXT NOT NULL,
+        stock_code      TEXT,
+        stock_name      TEXT,
+        role            TEXT,           -- 龙头/中军/弹性/补涨/核心/扩展
+        source_platform TEXT,           -- 东方财富/同花顺/问财
+        board_num       INTEGER DEFAULT 0, -- 当日板数
+        market_cap      REAL DEFAULT 0, -- 流通市值(亿)
+        is_active       INTEGER DEFAULT 1, -- 当日是否活跃
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(date, topic_name, stock_code)
+    );
+
+    -- ── 题材风险事件 ──
+    CREATE TABLE IF NOT EXISTS topic_risk_events (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        date            TEXT NOT NULL,
+        topic_name      TEXT NOT NULL,
+        risk_type       TEXT,           -- 监管关注/异动公告/减持/澄清/业绩不及预期/高位巨震/断板/梯队断层/板块拥挤
+        stock_code      TEXT,
+        stock_name      TEXT,
+        description     TEXT,
+        severity        TEXT DEFAULT 'warning', -- critical/warning/info
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- ════════════════════════════════════════════
+    -- v2 — 新系统 9 表（旧表保留兼容）
+    -- ════════════════════════════════════════════
+
+    -- 1. 题材主表
+    CREATE TABLE IF NOT EXISTS topics (
+        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_name          TEXT NOT NULL UNIQUE,
+        topic_aliases       TEXT,               -- JSON array: ["低空经济","飞行汽车","eVTOL"]
+        core_logic          TEXT,               -- 核心逻辑一句话
+        industry_chain      TEXT,               -- 产业链环节 JSON
+        first_active_date   TEXT,               -- 首次异动日期
+        current_stage       TEXT,               -- 当前生命周期阶段
+        total_score         REAL DEFAULT 0,
+        last_analysis_date  TEXT,               -- 最近分析日期
+        created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- 2. 题材成分股表 (v2)
+    CREATE TABLE IF NOT EXISTS topic_components_v2 (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id        INTEGER NOT NULL,
+        stock_code      TEXT NOT NULL,
+        stock_name      TEXT,
+        component_type  TEXT,           -- core / extended / leader_candidate / center_candidate / follow_up_candidate
+        source_platform TEXT,           -- 东方财富/同花顺/问财
+        source_date     TEXT,           -- 数据采集日期
+        is_active       INTEGER DEFAULT 1,
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(topic_id, stock_code, component_type)
+    );
+
+    -- 3. 题材每日行情表
+    CREATE TABLE IF NOT EXISTS topic_daily_quotes (
+        id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id                INTEGER NOT NULL,
+        trade_date              TEXT NOT NULL,
+        board_change_pct        REAL,           -- 板块涨跌幅%
+        board_turnover_amount   REAL,           -- 板块成交额(亿)
+        rising_stock_count      INTEGER,        -- 上涨家数
+        falling_stock_count     INTEGER,        -- 下跌家数
+        limit_up_count          INTEGER,        -- 涨停家数
+        limit_down_count        INTEGER,        -- 跌停家数
+        consecutive_board_count INTEGER,        -- 连板家数
+        front_avg_change_pct    REAL,           -- 前排股平均涨幅%
+        back_avg_change_pct     REAL,           -- 后排股平均涨幅%
+        created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(topic_id, trade_date)
+    );
+
+    -- 4. 个股题材行情表
+    CREATE TABLE IF NOT EXISTS stock_topic_quotes (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id        INTEGER NOT NULL,
+        trade_date      TEXT NOT NULL,
+        stock_code      TEXT NOT NULL,
+        stock_name      TEXT,
+        change_pct      REAL,           -- 涨跌幅%
+        turnover_amount REAL,           -- 成交额(亿)
+        turnover_rate   REAL DEFAULT 0, -- 换手率%
+        is_limit_up     INTEGER DEFAULT 0,
+        is_limit_down   INTEGER DEFAULT 0,
+        board_count     INTEGER DEFAULT 0,  -- 连板数
+        role_tag        TEXT,           -- leader / center / elastic / follow_up
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(topic_id, trade_date, stock_code)
+    );
+
+    -- 5. 催化事件表 (v2)
+    CREATE TABLE IF NOT EXISTS catalysts (
+        event_id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id            INTEGER NOT NULL,
+        event_date          TEXT NOT NULL,
+        event_title         TEXT,
+        event_type          TEXT,     -- policy / announcement / order / cooperation / product / earnings / conference / industry_data / media
+        event_level         TEXT,     -- national / ministry / local / company / media
+        related_companies   TEXT,     -- JSON数组
+        is_confirmed        INTEGER DEFAULT 0,
+        sentiment_direction TEXT DEFAULT 'positive', -- positive / neutral / negative
+        source_name         TEXT,
+        source_url          TEXT,
+        raw_text            TEXT,
+        cleaned_text        TEXT,
+        created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- 6. 热度表
+    CREATE TABLE IF NOT EXISTS heat_data (
+        id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id                INTEGER NOT NULL,
+        stat_date               TEXT NOT NULL,
+        media_report_count      INTEGER DEFAULT 0,
+        guba_discussion_count   INTEGER DEFAULT 0,
+        xueqiu_discussion_count INTEGER DEFAULT 0,
+        baidu_index_value       INTEGER DEFAULT 0,
+        heat_change_1d          REAL DEFAULT 0,
+        heat_change_3d          REAL DEFAULT 0,
+        heat_change_7d          REAL DEFAULT 0,
+        created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(topic_id, stat_date)
+    );
+
+    -- 7. 资金表
+    CREATE TABLE IF NOT EXISTS capital_flow (
+        id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id                    INTEGER NOT NULL,
+        trade_date                  TEXT NOT NULL,
+        board_main_net_inflow       REAL,     -- 板块主力净流入(亿)
+        leader_main_net_inflow      REAL,     -- 龙头主力净流入(亿)
+        center_main_net_inflow      REAL,     -- 中军主力净流入(亿)
+        lhb_stock_count             INTEGER DEFAULT 0, -- 龙虎榜上榜个股数
+        institution_participation   TEXT,     -- 机构参与描述
+        hot_money_participation     TEXT,     -- 游资参与描述
+        northbound_change_desc      TEXT,     -- 北向资金变化描述
+        created_at                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(topic_id, trade_date)
+    );
+
+    -- 8. 评分表
+    CREATE TABLE IF NOT EXISTS scoring (
+        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id            INTEGER NOT NULL,
+        analysis_date       TEXT NOT NULL,
+        price_strength      REAL DEFAULT 0,
+        capital_strength    REAL DEFAULT 0,
+        catalyst_strength   REAL DEFAULT 0,
+        sentiment_strength  REAL DEFAULT 0,
+        structure_quality   REAL DEFAULT 0,
+        total_score         REAL DEFAULT 0,
+        lifecycle_stage     TEXT,
+        confidence          REAL DEFAULT 0.5,  -- 置信度 0-1
+        created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(topic_id, analysis_date)
+    );
+
+    -- 9. 报告表
+    CREATE TABLE IF NOT EXISTS reports (
+        id                              INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id                        INTEGER NOT NULL,
+        analysis_date                   TEXT NOT NULL,
+        lifecycle_stage                 TEXT,
+        summary_text                    TEXT,
+        judgement_reasons               TEXT,     -- JSON数组
+        risk_warnings                   TEXT,     -- JSON数组
+        next_observation_points         TEXT,     -- JSON数组
+        second_wave_trigger_conditions  TEXT,     -- JSON数组
+        report_json                     TEXT,     -- 完整JSON
+        report_markdown                 TEXT,     -- Markdown格式
+        created_at                      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(topic_id, analysis_date)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_market_date ON market_data(date);
     CREATE INDEX IF NOT EXISTS idx_zt_date ON zt_stocks(date);
     CREATE INDEX IF NOT EXISTS idx_zt_board ON zt_stocks(board_num);
@@ -156,6 +375,49 @@ def init_db():
     CREATE INDEX IF NOT EXISTS idx_youzi_date ON youzi_analysis(date);
     CREATE INDEX IF NOT EXISTS idx_section_date ON section_html(date);
     CREATE INDEX IF NOT EXISTS idx_section_id ON section_html(section_id);
+    CREATE INDEX IF NOT EXISTS idx_topic_date ON topic_lifecycle(date);
+    CREATE INDEX IF NOT EXISTS idx_topic_name ON topic_lifecycle(topic_name);
+    CREATE INDEX IF NOT EXISTS idx_catalyst_topic ON topic_catalysts(topic_name);
+    CREATE INDEX IF NOT EXISTS idx_comp_topic ON topic_components(topic_name);
+    CREATE INDEX IF NOT EXISTS idx_risk_topic ON topic_risk_events(topic_name);
+    CREATE INDEX IF NOT EXISTS idx_topics_name ON topics(topic_name);
+    CREATE INDEX IF NOT EXISTS idx_topics_stage ON topics(current_stage);
+    CREATE INDEX IF NOT EXISTS idx_comp_v2_topic ON topic_components_v2(topic_id);
+    CREATE INDEX IF NOT EXISTS idx_daily_quotes_topic ON topic_daily_quotes(topic_id);
+    CREATE INDEX IF NOT EXISTS idx_daily_quotes_date ON topic_daily_quotes(trade_date);
+    CREATE INDEX IF NOT EXISTS idx_stock_quotes_topic ON stock_topic_quotes(topic_id);
+    CREATE INDEX IF NOT EXISTS idx_catalysts_topic ON catalysts(topic_id);
+    CREATE INDEX IF NOT EXISTS idx_catalysts_date ON catalysts(event_date);
+    CREATE INDEX IF NOT EXISTS idx_heat_topic ON heat_data(topic_id);
+    CREATE INDEX IF NOT EXISTS idx_capital_topic ON capital_flow(topic_id);
+    CREATE INDEX IF NOT EXISTS idx_scoring_topic ON scoring(topic_id);
+    CREATE INDEX IF NOT EXISTS idx_scoring_date ON scoring(analysis_date);
+    CREATE INDEX IF NOT EXISTS idx_reports_topic ON reports(topic_id);
+
+    -- 10. 平台热度表 — 按平台存储独立热度指标
+    CREATE TABLE IF NOT EXISTS platform_heat (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id        INTEGER NOT NULL,
+        topic_name      TEXT NOT NULL,
+        platform        TEXT NOT NULL,   -- jygs / xueqiu / eastmoney / ths
+        stat_date       TEXT NOT NULL,
+        mention_count   INTEGER DEFAULT 0,
+        article_count   INTEGER DEFAULT 0,
+        comment_count   INTEGER DEFAULT 0,
+        like_count      INTEGER DEFAULT 0,
+        favorite_count  INTEGER DEFAULT 0,
+        share_count     INTEGER DEFAULT 0,
+        hot_rank        INTEGER DEFAULT 0,
+        heat_change_1d  REAL DEFAULT 0,
+        heat_change_3d  REAL DEFAULT 0,
+        heat_change_7d  REAL DEFAULT 0,
+        extra_data      TEXT,           -- JSON 扩展字段
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(topic_id, platform, stat_date)
+    );
+    CREATE INDEX IF NOT EXISTS idx_plat_heat_topic ON platform_heat(topic_id);
+    CREATE INDEX IF NOT EXISTS idx_plat_heat_date ON platform_heat(stat_date);
+    CREATE INDEX IF NOT EXISTS idx_plat_heat_plat ON platform_heat(platform);
     """)
     conn.commit()
     conn.close()

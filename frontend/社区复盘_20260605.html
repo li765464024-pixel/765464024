@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>6月5日双社区复盘 · 淘股吧×韭研公社</title>
+<style>
+:root{
+  --bg:#0d1117; --card:#161b22; --border:#30363d;
+  --text:#c9d1d9; --muted:#8b949e;
+  --red:#f85149; --green:#3fb950; --blue:#58a6ff; --gold:#d2991d; --purple:#a371f7;
+  --red-bg:rgba(248,81,73,.08); --green-bg:rgba(63,185,80,.08); --blue-bg:rgba(88,166,255,.08); --gold-bg:rgba(210,153,29,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.7}
+a{color:var(--blue);text-decoration:none}
+header{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;position:sticky;top:0;z-index:100}
+header h1{font-size:18px;margin-bottom:2px}
+header .meta{font-size:11px;color:var(--muted)}
+.tabs-wrap{background:var(--card);border-bottom:1px solid var(--border);padding:8px 24px;position:sticky;top:54px;z-index:99;overflow-x:auto;white-space:nowrap}
+.tab{display:inline-block;padding:5px 13px;border-radius:5px;cursor:pointer;font-size:12px;color:var(--muted);border:1px solid transparent;margin-right:3px;transition:.15s}
+.tab:hover{color:var(--text);border-color:var(--border)}
+.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+main{padding:20px 24px;max-width:1500px;margin:0 auto}
+.section{display:none}
+.section.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px 20px;margin-bottom:14px}
+.card h3{font-size:15px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.stat{background:rgba(22,27,34,.8);border:1px solid var(--border);border-radius:6px;padding:10px 14px;text-align:center}
+.stat .v{font-size:22px;font-weight:700}
+.stat .l{font-size:10px;color:var(--muted);margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+th{background:rgba(48,54,61,.4);padding:7px 10px;text-align:left;font-weight:600;color:var(--muted);font-size:11px;border-bottom:2px solid var(--border)}
+td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover{background:rgba(48,54,61,.2)}
+.tag{display:inline-block;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700}
+.r{background:rgba(248,81,73,.18);color:var(--red)}
+.g{background:rgba(63,185,80,.18);color:var(--green)}
+.b{background:rgba(88,166,255,.18);color:var(--blue)}
+.y{background:rgba(210,153,29,.18);color:var(--gold)}
+.p{background:rgba(163,113,247,.18);color:var(--purple)}
+.up{color:var(--red)} .dn{color:var(--green)} .ne{color:var(--blue)} .warn{color:var(--gold)}
+.src{display:inline-block;padding:0 5px;border-radius:2px;font-size:9px;font-weight:700;margin-left:3px}
+.st{background:rgba(248,81,73,.2);color:var(--red)}
+.sj{background:rgba(88,166,255,.2);color:var(--blue)}
+.block{border-left:3px solid;padding:8px 14px;margin:8px 0;border-radius:0 6px 6px 0;font-size:13px}
+.bl-red{border-color:var(--red);background:var(--red-bg)}
+.bl-green{border-color:var(--green);background:var(--green-bg)}
+.bl-blue{border-color:var(--blue);background:var(--blue-bg)}
+.bl-gold{border-color:var(--gold);background:var(--gold-bg)}
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;border:1px solid var(--border);margin:2px}
+.chip-up{border-color:var(--red);color:var(--red);background:rgba(248,81,73,.08)}
+.chip-dn{border-color:var(--green);color:var(--green);background:rgba(63,185,80,.08)}
+.quote{background:rgba(163,113,247,.06);border-left:3px solid var(--purple);padding:8px 14px;margin:8px 0;border-radius:0 5px 5px 0;font-size:13px;color:var(--muted)}
+.quote strong{color:var(--purple)}
+.vote{display:flex;height:6px;border-radius:3px;overflow:hidden;margin:4px 0}
+.v-up{background:var(--red)} .v-dn{background:var(--green)} .v-ne{background:var(--border)}
+.v-label{font-size:10px;color:var(--muted)}
+.badge{display:inline-block;padding:1px 5px;border-radius:2px;font-size:9px;font-weight:700}
+.bg{background:rgba(248,81,73,.2);color:var(--red)}
+.br{background:rgba(63,185,80,.2);color:var(--green)}
+.bk{background:rgba(88,166,255,.2);color:var(--blue)}
+h2{font-size:17px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.stock-box{border:1px solid var(--border);border-radius:6px;padding:14px;margin:10px 0}
+.stock-box h4{font-size:14px;margin-bottom:6px}
+.stock-box .headline{color:var(--muted);font-size:12px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>📊 6月5日 双社区全面复盘</h1>
+<div class="meta">淘股吧×韭研公社 | 2026年6月5日（周五） | 数据来源：韭研公社实时抓取 + 项目数据库</div>
+</header>
+
+<div class="tabs-wrap">
+<div class="tab active" onclick="switchTab('s1')">📈 大盘概况</div>
+<div class="tab" onclick="switchTab('s2')">🔥 板块热度</div>
+<div class="tab" onclick="switchTab('s3')">🔄 题材生命周期</div>
+<div class="tab" onclick="switchTab('s5')">🐂 淘股吧视角</div>
+<div class="tab" onclick="switchTab('s6')">🔬 韭研公社视角</div>
+<div class="tab" onclick="switchTab('s7')">🪜 连板梯队</div>
+<div class="tab" onclick="switchTab('s8')">🎯 高标个股分析</div>
+<div class="tab" onclick="switchTab('s9')">🔀 题材轮动</div>
+<div class="tab" onclick="switchTab('s10')">🤝 共识与分歧</div>
+<div class="tab" onclick="switchTab('s11')">🧠 综合研判</div>
+<div class="tab" onclick="switchTab('s0')">📰 盘前快讯</div>
+<div class="tab" onclick="switchTab('s13')">💰 游资观察</div>
+</div>
+
+<main>
+
+<div class="section" id="s0">
+<h2>📰 盘前快讯（6月5日） <span class="src sj">韭:实时抓取</span></h2>
+<div class="card">
+<h3>今日热点速览</h3>
+
+<div class="bl-red" style="margin-bottom:8px">
+<strong>1. 北交所柔性屏、商业航天双热点，化工低位股转型新材料</strong><br>
+市场段子： 【瑞华技术】低位化工转身新材料，强势介入塑料黄金，全产业链布局 聚酰亚胺被称为 &quot;塑料黄金&quot;，是塑料价格的天花板。瑞华技术PI研发已全部完成，进入中试阶段，布局 2000吨产能，2027年投产。产品为自主研发，打通产业链布局，主
+
+</div>
+<div class="bl-red" style="margin-bottom:8px">
+<strong>2. 航天动力投资研报（三）：航天六院液体动力唯一产业化平台，商业航天+液氢双拐点兑现</strong><br>
+核心结论前置：航天动力是A股稀缺的国家级液体火箭动力正宗标的，技术端背靠航天六院（国内唯一全谱系液体动力研制院所），产业端同时受益商业航天高密度发射红利、航天级液氢国产化替代红利，改革端子公司市场化改制落地，三重拐点共振，基本面具备极强稀缺
+
+</div>
+<div class="bl-red" style="margin-bottom:8px">
+<strong>3. 久之洋：光电、商业航天、深海经济、物理ai集一身</strong><br>
+一、军工光电：筑牢业绩基本盘 久之洋的核心竞争力源于其在军工光电领域的深厚积淀。公司前身为中国船舶集团第七一七研究所，拥有齐全的军工科研生产资质和二级保密资质，是国内唯一同时掌握 &quot;红外 + 激光 + 光学 + 光纤器件&quot; 全链条技术的军工
+
+</div>
+<div class="bl-red" style="margin-bottom:8px">
+<strong>4. 6G核心AI梳理</strong><br>
+好的，根据您提供的【参考资料】，我已梳理与“6G”概念直接相关的核心公司及产业链信息。以下是处理后的内容： 一、6G产业链核心公司梳理 产业链环节 核心公司 核心逻辑与业务亮点（精炼） 主设备商/标准制定 中兴通讯 全球通信设备巨头及6G标
+
+</div>
+<div class="bl-red" style="margin-bottom:8px">
+<strong>5. Rubin 架构引爆被动元件超级周期，全产业链机会</strong><br>
+Rubin 架构引爆被动元件超级周期，全产业链机会｜ 前言 AI 算力行情从 GPU、PCB 逐步下沉到最不起眼的被动元件，本轮上涨核心驱动只有一个：英伟达 Rubin 新一代 VR200 架构电源革命，单机 BOM 里电阻、电感、MLCC
+
+</div>
+<div class="bl-red" style="margin-bottom:8px">
+<strong>6. 玻璃基板低位预期差隆华科技：靶材龙头卡位TGV玻璃基板+商业航天</strong><br>
+玻璃基板低位预期差 隆华科技「靶材+航天」双主线 TGV种子层溅射靶材需求爆发 × 商业航天PMI泡沫轻量化放量 ▎核心逻辑 国内高纯铜靶材龙头，京东方、天马核心供应商，康宁、三星体系内合作方，TGV种子层溅射靶材需求爆发；同时，旗下兆恒科
+
+</div>
+</div>
+</div>
+
+<div class="section active" id="s1">
+<h2>一、大盘概况</h2>
+
+<div class="grid2">
+<div class="stat"><div class="v" style="color:var(--red)">82家</div><div class="l">涨停家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">昨89 → -7</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">17家</div><div class="l">跌停家数</div></div>
+<div class="stat"><div class="v" style="color:var(--gold)">58.6%</div><div class="l">封板率</div></div>
+<div class="stat"><div class="v" style="color:var(--gold)">30692亿</div><div class="l">成交额</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">2982家</div><div class="l">上涨家数</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">2091家</div><div class="l">下跌家数</div></div>
+</div>
+
+<div class="card">
+<h3>指数表现</h3>
+<table>
+<tr><th>指数</th><th>收盘</th><th>定性</th></tr>
+<tr><td>上证指数</td><td>4,027.74</td><td><span class="tag y">冲高回落</span></td></tr>
+<tr><td>深证成指</td><td>15,314.70</td><td><span class="tag g">调整</span></td></tr>
+<tr><td>创业板指</td><td>3,957.93</td><td><span class="tag g">领跌</span></td></tr>
+<tr><td>科创50</td><td>1,668.33</td><td><span class="tag g">大幅回调</span></td></tr>
+</table>
+</div>
+
+<div class="bl-red">
+<strong>📌 核心定性：</strong>风格大切换——创指大阴线砸盘，资金跷跷板切向低位。涨停82只，跌停17只，封板率58.6%。近3300只个股飘红，总算摆脱"指数涨小票亏"的割裂魔咒。机器人、6G、玻璃基板逆势爆发，AI算力/芯片方向大幅回调。
+</div>
+</div>
+
+<div class="section" id="s2">
+<h2>二、板块热度</h2>
+
+<div class="card">
+<h3>板块全景</h3>
+<table>
+<tr><th>板块</th><th>涨停</th><th>阶段</th><th>龙头</th></tr>
+<tr><td><strong>通用设备</strong></td><td>8</td><td><span class="tag r">主升</span></td><td>宇环数控/莱伯泰科</td></tr><tr><td><strong>专用设备</strong></td><td>7</td><td><span class="tag r">主升</span></td><td>中重科技(3板)/泰坦股份(2板)</td></tr><tr><td><strong>家居用品</strong></td><td>4</td><td><span class="tag y">活跃</span></td><td>德尔未来/松霖科技</td></tr><tr><td><strong>光学光电</strong></td><td>4</td><td><span class="tag y">活跃</span></td><td>维信诺/凯盛科技</td></tr><tr><td><strong>通信设备</strong></td><td>3</td><td><span class="tag y">活跃</span></td><td>武汉凡谷/东方通信</td></tr><tr><td><strong>电网设备</strong></td><td>3</td><td><span class="tag y">活跃</span></td><td>中超控股/宝胜股份</td></tr><tr><td><strong>玻璃玻纤</strong></td><td>3</td><td><span class="tag y">活跃</span></td><td>三峡新材(2板)/北玻股份</td></tr><tr><td><strong>汽车零部</strong></td><td>3</td><td><span class="tag y">活跃</span></td><td>光洋股份/福达股份</td></tr><tr><td><strong>房地产开</strong></td><td>3</td><td><span class="tag y">活跃</span></td><td>荣安地产/荣丰控股</td></tr><tr><td><strong>化学制品</strong></td><td>3</td><td><span class="tag y">活跃</span></td><td>XD百合花/XD雅运股</td></tr><tr><td><strong>IT服务Ⅱ</strong></td><td>3</td><td><span class="tag y">活跃</span></td><td>能科科技/达实智能</td></tr><tr><td><strong>电机Ⅱ</strong></td><td>2</td><td><span class="tag b">异动</span></td><td>华瑞股份/科力尔</td></tr><tr><td><strong>化学纤维</strong></td><td>2</td><td><span class="tag b">异动</span></td><td>泰和新材/皖维高新</td></tr><tr><td><strong>化学原料</strong></td><td>2</td><td><span class="tag b">异动</span></td><td>三孚股份/金瑞矿业</td></tr><tr><td><strong>冶钢原料</strong></td><td>2</td><td><span class="tag b">异动</span></td><td>方大炭素/广东明珠</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>今日热门话题词云 <span class="src sj">韭:实时抓取</span></h3>
+<div>
+<span class="chip chip-up">玻璃基板</span> <span class="chip chip-up">商业航天</span> <span class="chip chip-up">机器人</span> <span class="chip chip-up">6G</span> <span class="chip chip-up">AI</span> <span class="chip chip-up">电感</span> <span class="chip chip-up">散热</span> <span class="chip chip-up">石墨烯</span>
+</div>
+</div>
+</div>
+
+<div class="section" id="s3">
+<h2>三、题材生命周期全景</h2>
+
+<div class="stock-box" style="border-color:var(--green)">
+<h4>📊 专用设备 <span class="tag g">启动期</span> <span style="float:right;font-size:13px;color:var(--muted)">总分42.5</span></h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin:4px 0">
+<span>价格60.0</span><span>资金28.0</span><span>催化5.0</span><span>热度61.0</span><span>结构73.0</span>
+</div>
+<div style="margin:4px 0;font-size:12px"><strong>龙头</strong> 中重科技 3板 · <strong>涨停</strong> 7家</div>
+</div>
+<div class="stock-box" style="border-color:var(--green)">
+<h4>📊 玻璃玻纤 <span class="tag g">启动期</span> <span style="float:right;font-size:13px;color:var(--muted)">总分36.4</span></h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin:4px 0">
+<span>价格45.0</span><span>资金28.0</span><span>催化5.0</span><span>热度55.0</span><span>结构66.0</span>
+</div>
+<div style="margin:4px 0;font-size:12px"><strong>龙头</strong> 三峡新材 2板 · <strong>涨停</strong> 3家</div>
+</div>
+<div class="stock-box" style="border-color:var(--green)">
+<h4>📊 通用设备 <span class="tag g">启动期</span> <span style="float:right;font-size:13px;color:var(--muted)">总分35.0</span></h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin:4px 0">
+<span>价格50.0</span><span>资金28.0</span><span>催化5.0</span><span>热度55.0</span><span>结构38.0</span>
+</div>
+<div style="margin:4px 0;font-size:12px"><strong>龙头</strong> 宇环数控 1板 · <strong>涨停</strong> 8家</div>
+</div>
+<div class="stock-box" style="border-color:var(--blue)">
+<h4>📊 通信设备 <span class="tag b">孕育期/预热期</span> <span style="float:right;font-size:13px;color:var(--muted)">总分33.2</span></h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin:4px 0">
+<span>价格41.0</span><span>资金28.0</span><span>催化5.0</span><span>热度61.0</span><span>结构38.0</span>
+</div>
+<div style="margin:4px 0;font-size:12px"><strong>龙头</strong> 武汉凡谷 1板 · <strong>涨停</strong> 3家</div>
+</div>
+<div class="stock-box" style="border-color:var(--blue)">
+<h4>📊 家居用品 <span class="tag b">孕育期/预热期</span> <span style="float:right;font-size:13px;color:var(--muted)">总分32.3</span></h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin:4px 0">
+<span>价格41.0</span><span>资金28.0</span><span>催化5.0</span><span>热度55.0</span><span>结构38.0</span>
+</div>
+<div style="margin:4px 0;font-size:12px"><strong>龙头</strong> 德尔未来 1板 · <strong>涨停</strong> 4家</div>
+</div>
+<div class="stock-box" style="border-color:var(--blue)">
+<h4>📊 光学光电 <span class="tag b">孕育期/预热期</span> <span style="float:right;font-size:13px;color:var(--muted)">总分32.3</span></h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin:4px 0">
+<span>价格41.0</span><span>资金28.0</span><span>催化5.0</span><span>热度55.0</span><span>结构38.0</span>
+</div>
+<div style="margin:4px 0;font-size:12px"><strong>龙头</strong> 维信诺 1板 · <strong>涨停</strong> 4家</div>
+</div>
+<div class="stock-box" style="border-color:var(--blue)">
+<h4>📊 电网设备 <span class="tag b">孕育期/预热期</span> <span style="float:right;font-size:13px;color:var(--muted)">总分32.3</span></h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin:4px 0">
+<span>价格41.0</span><span>资金28.0</span><span>催化5.0</span><span>热度55.0</span><span>结构38.0</span>
+</div>
+<div style="margin:4px 0;font-size:12px"><strong>龙头</strong> 中超控股 1板 · <strong>涨停</strong> 3家</div>
+</div>
+<div class="stock-box" style="border-color:var(--blue)">
+<h4>📊 汽车零部 <span class="tag b">孕育期/预热期</span> <span style="float:right;font-size:13px;color:var(--muted)">总分32.3</span></h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin:4px 0">
+<span>价格41.0</span><span>资金28.0</span><span>催化5.0</span><span>热度55.0</span><span>结构38.0</span>
+</div>
+<div style="margin:4px 0;font-size:12px"><strong>龙头</strong> 光洋股份 1板 · <strong>涨停</strong> 3家</div>
+</div>
+</div>
+
+<div class="section" id="s5">
+<h2>五、社区热门观点（韭研公社实时 TOP10）</h2>
+
+<div class="grid2" style="margin-bottom:12px">
+<div class="stat"><div class="v" style="color:var(--red)">4看多</div></div>
+<div class="stat"><div class="v" style="color:var(--green)">0看空</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">6中性</div></div>
+</div>
+
+<div class="card">
+<h3>1. AAAA大A王总2026-06-05 1 — 中性 <span class="tag r">热门帖</span></h3>
+<div class="bl-blue">
+<strong>北交所柔性屏、商业航天双热点，化工低位股转型新材料</strong><br>
+市场段子： 【瑞华技术】低位化工转身新材料，强势介入塑料黄金，全产业链布局 聚酰亚胺被称为 &quot;塑料黄金&quot;，是塑料价格的天花板。瑞华技术PI研发已全部完成，进入中试阶段，布局 2000吨产能，2027年投产。产品为自主研发，打通产业链布局，主打中高端，低成本高毛利。 航空级PI膜是商业航天与太空光伏的
+</div>
+</div>
+<div class="card">
+<h3>2. 宜臻論古只买龙头的游资2026-06-0 — 中性 <span class="tag y">讨论帖</span></h3>
+<div class="bl-blue">
+<strong>航天动力投资研报（三）：航天六院液体动力唯一产业化平台，商业航天+液氢双拐点兑现</strong><br>
+核心结论前置：航天动力是A股稀缺的国家级液体火箭动力正宗标的，技术端背靠航天六院（国内唯一全谱系液体动力研制院所），产业端同时受益商业航天高密度发射红利、航天级液氢国产化替代红利，改革端子公司市场化改制落地，三重拐点共振，基本面具备极强稀缺性与确定性。 1、股权与技术壁垒（严谨溯源） 公司直接控股股
+</div>
+</div>
+<div class="card">
+<h3>3. 小黄瓜炒辣椒2026-06-05 15: — 看多 <span class="tag y">讨论帖</span></h3>
+<div class="bl-red">
+<strong>久之洋：光电、商业航天、深海经济、物理ai集一身</strong><br>
+一、军工光电：筑牢业绩基本盘 久之洋的核心竞争力源于其在军工光电领域的深厚积淀。公司前身为中国船舶集团第七一七研究所，拥有齐全的军工科研生产资质和二级保密资质，是国内唯一同时掌握 &quot;红外 + 激光 + 光学 + 光纤器件&quot; 全链条技术的军工企业。 海军装备：绝对龙头地位稳固 在海军舰船光电系统领域，
+</div>
+</div>
+<div class="card">
+<h3>4. 炒谷养娃2007一路向北的公社达人202 — 看多 <span class="tag b">分享帖</span></h3>
+<div class="bl-red">
+<strong>6G核心AI梳理</strong><br>
+好的，根据您提供的【参考资料】，我已梳理与“6G”概念直接相关的核心公司及产业链信息。以下是处理后的内容： 一、6G产业链核心公司梳理 产业链环节 核心公司 核心逻辑与业务亮点（精炼） 主设备商/标准制定 中兴通讯 全球通信设备巨头及6G标准核心制定者，已全面展开6G端到端系统预研，在RIS、通感算
+</div>
+</div>
+<div class="card">
+<h3>5. 参证消息2026-06-05 13:53 — 中性 <span class="tag b">分享帖</span></h3>
+<div class="bl-blue">
+<strong>Rubin 架构引爆被动元件超级周期，全产业链机会</strong><br>
+Rubin 架构引爆被动元件超级周期，全产业链机会｜ 前言 AI 算力行情从 GPU、PCB 逐步下沉到最不起眼的被动元件，本轮上涨核心驱动只有一个：英伟达 Rubin 新一代 VR200 架构电源革命，单机 BOM 里电阻、电感、MLCC 全部量价齐升，用量、单价双双大幅抬升，行业迎来三年最强景气
+</div>
+</div>
+<div class="card">
+<h3>6. 路边新闻社不要怂的老司机2026-06- — 看多 <span class="tag b">分享帖</span></h3>
+<div class="bl-red">
+<strong>玻璃基板低位预期差隆华科技：靶材龙头卡位TGV玻璃基板+商业航天</strong><br>
+玻璃基板低位预期差 隆华科技「靶材+航天」双主线 TGV种子层溅射靶材需求爆发 × 商业航天PMI泡沫轻量化放量 ▎核心逻辑 国内高纯铜靶材龙头，京东方、天马核心供应商，康宁、三星体系内合作方，TGV种子层溅射靶材需求爆发；同时，旗下兆恒科技PMI泡沫卡位商业航天轻量化赛道，已配套主要商业航天客户。
+</div>
+</div>
+<div class="card">
+<h3>7. 致远趋势中线波段2026-06-04 1 — 中性 <span class="tag b">分享帖</span></h3>
+<div class="bl-blue">
+<strong>玻璃基板TGV工艺：玻璃（微通孔）为什么这么难？</strong><br>
+玻璃基板：首先得在上面打出成千上万个微米级的孔，然后在孔里填满铜，最后还得保证几百度温差下不开裂。 玻璃基板要取代有机基板，英特尔、三星、台积电、英伟达全在押注。但有一个绕不开的死结：为什么这么好、还迟迟没有大规模量产？ 答案就在两个字里：TGV。 TGV，全称Through-Glass Via，玻
+</div>
+</div>
+<div class="card">
+<h3>8. 无名小韭735805222026-06- — 中性 <span class="tag b">分享帖</span></h3>
+<div class="bl-blue">
+<strong>电感涨价风云再起，关注低位的中光防雷，叠加6G！</strong><br>
+7月1日起，村田全系列功率电感出厂涨价50%；太阳诱电功率电感紧缺料号现货统一上调150%，常规型号上调35%，7月1日新单执行新报价，日韩原厂停止小批量接单，代理商现货全面锁价惜售。芯片电感为什么要升级：#一方面，高端 GPU、ASIC、TPU 等算力芯片功耗快速提升，供电系统从“能供电”转向“要
+</div>
+</div>
+<div class="card">
+<h3>9. muma2026-06-05 14:54 — 看多 <span class="tag b">分享帖</span></h3>
+<div class="bl-red">
+<strong>明阳电路：玻璃基板+英伟达机器人+6g，今天的三大热点于一身</strong><br>
+明阳电路：玻璃基板+英伟达机器人+6g，今天的三大热点于一身 玻璃基板大爆发，明阳电路有玻璃基板工艺技术研发，制备多层玻璃基板，完成样品小试，并交付检测；同时公司玻璃基板压合的方法 机器人今天同样爆涨：【申万机器人】 明阳电路，基于NVIDIA Jetson系列提供载板设计制造，为机器人客户提供定制
+</div>
+</div>
+<div class="card">
+<h3>10. hulidion2026-06-05 1 — 中性 <span class="tag b">分享帖</span></h3>
+<div class="bl-blue">
+<strong>周末发酵新题材英伟达物理ai机器人</strong><br>
+12:48:58【英伟达CEO：芯片制造将变得更加自动化。 英伟达可以将机器人技术应用于韩国工业。 机器人将成为韩国的下一个主要支柱产业】 英伟达CEO：芯片制造将变得更加自动化。 英伟达可以将机器人技术应用于韩国工业。 机器人将成为韩国的下一个主要支柱产业。
+</div>
+</div>
+</div>
+
+<div class="section" id="s6">
+<h2>六、韭研公社热门研究帖（实时 TOP8）</h2>
+
+<div class="grid2" style="margin-bottom:12px">
+<div class="stat"><div class="v" style="color:var(--red)">7看多</div><div class="l">产业深度挖掘</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">1中性</div><div class="l">策略研判</div></div>
+</div>
+
+<div class="card">
+<h3>1. AAAA大A王总2026-06-05 1 — 北交所柔性屏、商业航天双热点，化工低位股转型新材料 <span class="tag r">商业航天</span></h3>
+<div class="bl-red">
+市场段子： 【瑞华技术】低位化工转身新材料，强势介入塑料黄金，全产业链布局 聚酰亚胺被称为 &quot;塑料黄金&quot;，是塑料价格的天花板。瑞华技术PI研发已全部完成，进入中试阶段，布局 2000吨产能，2027年投产。产品为自主研发，打通产业链布局，主打中高端，低成本高毛利。 航空级PI膜是商业航天与太空光伏的 &quot;刚需材料&quot;，价同黄金，可作为太空太阳能电池基板，是卫星多层隔热系统、星间链路天线罩、柔性电路基板
+</div>
+</div>
+<div class="card">
+<h3>2. 宜臻論古只买龙头的游资2026-06-0 — 航天动力投资研报（三）：航天六院液体动力唯一产业化平台，商业航天+液氢双拐点兑现 <span class="tag r">商业航天</span></h3>
+<div class="bl-red">
+核心结论前置：航天动力是A股稀缺的国家级液体火箭动力正宗标的，技术端背靠航天六院（国内唯一全谱系液体动力研制院所），产业端同时受益商业航天高密度发射红利、航天级液氢国产化替代红利，改革端子公司市场化改制落地，三重拐点共振，基本面具备极强稀缺性与确定性。 1、股权与技术壁垒（严谨溯源） 公司直接控股股东为西安航天科技工业有限公司，系航天六院专属产业化持股平台，院所与上市公司技术、产业、资源深度绑定。
+</div>
+</div>
+<div class="card">
+<h3>3. 小黄瓜炒辣椒2026-06-05 15: — 久之洋：光电、商业航天、深海经济、物理ai集一身 <span class="tag r">光纤</span></h3>
+<div class="bl-red">
+一、军工光电：筑牢业绩基本盘 久之洋的核心竞争力源于其在军工光电领域的深厚积淀。公司前身为中国船舶集团第七一七研究所，拥有齐全的军工科研生产资质和二级保密资质，是国内唯一同时掌握 &quot;红外 + 激光 + 光学 + 光纤器件&quot; 全链条技术的军工企业。 海军装备：绝对龙头地位稳固 在海军舰船光电系统领域，久之洋拥有不可撼动的市场地位。2025 年，公司在海军舰船光电系统的市占率超过 60%，其红外热成像
+</div>
+</div>
+<div class="card">
+<h3>4. 参证消息2026-06-05 13:53 — Rubin 架构引爆被动元件超级周期，全产业链机会 <span class="tag r">MLCC</span></h3>
+<div class="bl-red">
+Rubin 架构引爆被动元件超级周期，全产业链机会｜ 前言 AI 算力行情从 GPU、PCB 逐步下沉到最不起眼的被动元件，本轮上涨核心驱动只有一个：英伟达 Rubin 新一代 VR200 架构电源革命，单机 BOM 里电阻、电感、MLCC 全部量价齐升，用量、单价双双大幅抬升，行业迎来三年最强景气拐点。大摩拆解 Rubin 整机 BOM 数据落地后，市场资金开始挖掘这条被低估的算力细分主线，钧崴
+</div>
+</div>
+<div class="card">
+<h3>5. 路边新闻社不要怂的老司机2026-06- — 玻璃基板低位预期差隆华科技：靶材龙头卡位TGV玻璃基板+商业航天 <span class="tag r">玻璃基板</span></h3>
+<div class="bl-red">
+玻璃基板低位预期差 隆华科技「靶材+航天」双主线 TGV种子层溅射靶材需求爆发 × 商业航天PMI泡沫轻量化放量 ▎核心逻辑 国内高纯铜靶材龙头，京东方、天马核心供应商，康宁、三星体系内合作方，TGV种子层溅射靶材需求爆发；同时，旗下兆恒科技PMI泡沫卡位商业航天轻量化赛道，已配套主要商业航天客户。双赛道高景气共振，估值存在显著预期差。 一传统主业稳中有进，面板靶材基本盘扎实 公司传统业务涵盖节能
+</div>
+</div>
+<div class="card">
+<h3>6. 致远趋势中线波段2026-06-04 1 — 玻璃基板TGV工艺：玻璃（微通孔）为什么这么难？ <span class="tag r">玻璃基板</span></h3>
+<div class="bl-red">
+玻璃基板：首先得在上面打出成千上万个微米级的孔，然后在孔里填满铜，最后还得保证几百度温差下不开裂。 玻璃基板要取代有机基板，英特尔、三星、台积电、英伟达全在押注。但有一个绕不开的死结：为什么这么好、还迟迟没有大规模量产？ 答案就在两个字里：TGV。 TGV，全称Through-Glass Via，玻璃通孔。它是玻璃基板的&quot;任督二脉&quot;——没有它，玻璃就是一块普通的玻璃板，做不了芯片封装。而TGV恰恰
+</div>
+</div>
+<div class="card">
+<h3>7. 无名小韭735805222026-06- — 电感涨价风云再起，关注低位的中光防雷，叠加6G！ <span class="tag r">6G</span></h3>
+<div class="bl-red">
+7月1日起，村田全系列功率电感出厂涨价50%；太阳诱电功率电感紧缺料号现货统一上调150%，常规型号上调35%，7月1日新单执行新报价，日韩原厂停止小批量接单，代理商现货全面锁价惜售。芯片电感为什么要升级：#一方面，高端 GPU、ASIC、TPU 等算力芯片功耗快速提升，供电系统从“能供电”转向“要在极短时间内稳定供电”。#另一方面，VPD 把供电模块进一步靠近芯片，降低供电路径阻抗。两者共同推动
+</div>
+</div>
+<div class="card">
+<h3>8. muma2026-06-05 14:54 — 明阳电路：玻璃基板+英伟达机器人+6g，今天的三大热点于一身 <span class="tag r">机器人</span></h3>
+<div class="bl-red">
+明阳电路：玻璃基板+英伟达机器人+6g，今天的三大热点于一身 玻璃基板大爆发，明阳电路有玻璃基板工艺技术研发，制备多层玻璃基板，完成样品小试，并交付检测；同时公司玻璃基板压合的方法 机器人今天同样爆涨：【申万机器人】 明阳电路，基于NVIDIA Jetson系列提供载板设计制造，为机器人客户提供定制化解决方案，价值量数千元 6g受消息面刺激大涨，明阳电路在6G研发领域有参与部分客户的PCB样品设计
+</div>
+</div>
+</div>
+
+<div class="section" id="s7">
+<h2>七、连板梯队</h2>
+
+<div class="card">
+<h3>今日连板全表</h3>
+<table>
+<tr><th>梯队</th><th>标的</th><th>板块</th><th>强度</th></tr>
+<tr><td><span class="tag bg">5板</span></td><td><strong>大有能源</strong></td><td>煤炭开采</td><td><span class="tag r">强</span></td></tr><tr><td><span class="tag br">3板</span></td><td><strong>中重科技</strong></td><td>专用设备</td><td><span class="tag y">中</span></td></tr><tr><td><span class="tag br">2板</span></td><td><strong>祥和实业</strong></td><td>轨交设备</td><td><span class="tag y">中</span></td></tr><tr><td><span class="tag br">2板</span></td><td><strong>凤凰航运</strong></td><td>航运港口</td><td><span class="tag y">中</span></td></tr><tr><td><span class="tag br">2板</span></td><td><strong>泰坦股份</strong></td><td>专用设备</td><td><span class="tag y">中</span></td></tr><tr><td><span class="tag br">2板</span></td><td><strong>三峡新材</strong></td><td>玻璃玻纤</td><td><span class="tag y">中</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>天娱数科</strong></td><td>广告营销</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>新华网</strong></td><td>数字媒体</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>能科科技</strong></td><td>IT服务Ⅱ</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>达实智能</strong></td><td>IT服务Ⅱ</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>中超控股</strong></td><td>电网设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>中青宝</strong></td><td>IT服务Ⅱ</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>步步高</strong></td><td>一般零售</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>宇环数控</strong></td><td>通用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>荣安地产</strong></td><td>房地产开</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>中百集团</strong></td><td>一般零售</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>莱伯泰科</strong></td><td>通用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>方大炭素</strong></td><td>冶钢原料</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>武汉凡谷</strong></td><td>通信设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>东方通信</strong></td><td>通信设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>三孚股份</strong></td><td>化学原料</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>维信诺</strong></td><td>光学光电</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>XD百合花</strong></td><td>化学制品</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>北玻股份</strong></td><td>玻璃玻纤</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>荣丰控股</strong></td><td>房地产开</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>凯盛科技</strong></td><td>光学光电</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>宝胜股份</strong></td><td>电网设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>金瑞矿业</strong></td><td>化学原料</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>创远信科</strong></td><td>通用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>泰和新材</strong></td><td>化学纤维</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>神剑股份</strong></td><td>塑料</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>广东明珠</strong></td><td>冶钢原料</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>江南新材</strong></td><td>金属新材</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>华瑞股份</strong></td><td>电机Ⅱ</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>安彩高科</strong></td><td>光伏设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>阳光股份</strong></td><td>房地产开</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>上海亚虹</strong></td><td>专用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>皖维高新</strong></td><td>化学纤维</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>怡 亚 通</strong></td><td>贸易Ⅱ</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>江化微</strong></td><td>电子化学</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>耀皮玻璃</strong></td><td>玻璃玻纤</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>智能自控</strong></td><td>通用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>江顺科技</strong></td><td>专用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>雷曼光电</strong></td><td>光学光电</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>芯瑞达</strong></td><td>光学光电</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>万控智造</strong></td><td>电网设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>德尔未来</strong></td><td>家居用品</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>津膜科技</strong></td><td>环境治理</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>曙光股份</strong></td><td>商用车</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>顺络电子</strong></td><td>元件</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>贵广网络</strong></td><td>电视广播</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>百傲化学</strong></td><td>农化制品</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>绿的谐波</strong></td><td>自动化设</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>松霖科技</strong></td><td>家居用品</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>光洋股份</strong></td><td>汽车零部</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>青鸟智控</strong></td><td>专用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>丰光精密</strong></td><td>通用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>炜冈科技</strong></td><td>专用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>冠龙节能</strong></td><td>通用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>东土科技</strong></td><td>通信设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>福达股份</strong></td><td>汽车零部</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>科力尔</strong></td><td>电机Ⅱ</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>银宝山新</strong></td><td>专用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>中大力德</strong></td><td>通用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>家联科技</strong></td><td>家居用品</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>XD雅运股</strong></td><td>化学制品</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>天安新材</strong></td><td>家居用品</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>爱普股份</strong></td><td>化学制品</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>中天火箭</strong></td><td>航天装备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>金帝股份</strong></td><td>通用设备</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>亚泰集团</strong></td><td>综合Ⅱ</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>三星新材</strong></td><td>家电零部</td><td><span class="tag b">弱</span></td></tr><tr><td><span class="tag br">1板</span></td><td><strong>浙江黎明</strong></td><td>汽车零部</td><td><span class="tag b">弱</span></td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>热点题材涨停分布</h3>
+<table>
+<tr><th>题材</th><th>涨停家数</th><th>最高板</th><th>代表个股</th></tr>
+<tr><td>通用设备</td><td class="up">8</td><td>1板</td><td>宇环数控</td></tr><tr><td>专用设备</td><td class="up">7</td><td>3板</td><td>中重科技</td></tr><tr><td>家居用品</td><td class="up">4</td><td>1板</td><td>德尔未来</td></tr><tr><td>光学光电</td><td class="up">4</td><td>1板</td><td>维信诺</td></tr><tr><td>通信设备</td><td class="up">3</td><td>1板</td><td>武汉凡谷</td></tr><tr><td>电网设备</td><td class="up">3</td><td>1板</td><td>中超控股</td></tr><tr><td>玻璃玻纤</td><td class="up">3</td><td>2板</td><td>三峡新材</td></tr><tr><td>汽车零部</td><td class="up">3</td><td>1板</td><td>光洋股份</td></tr><tr><td>房地产开</td><td class="up">3</td><td>1板</td><td>荣安地产</td></tr><tr><td>化学制品</td><td class="up">3</td><td>1板</td><td>XD百合花</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section" id="s8">
+<h2>八、高标个股分析（≥3板）</h2>
+
+<div class="stock-box" style="border-color:var(--red)">
+<h4>⭐ 大有能源（5板）· 煤炭开采 <span class="tag r">高度标</span></h4>
+<table>
+<tr><th style="width:80px">维度</th><th>分析</th></tr>
+<tr><td>涨停时间</td><td>09:36</td></tr>
+<tr><td>板块地位</td><td>煤炭开采方向龙头，5板高度</td></tr>
+<tr><td>强度</td><td><span class="tag r">超强</span></td></tr>
+</table>
+</div>
+<div class="stock-box" style="border-color:var(--gold)">
+<h4>⭐ 中重科技（3板）· 专用设备 <span class="tag y">高度标</span></h4>
+<table>
+<tr><th style="width:80px">维度</th><th>分析</th></tr>
+<tr><td>涨停时间</td><td>10:43</td></tr>
+<tr><td>板块地位</td><td>专用设备方向龙头，3板高度</td></tr>
+<tr><td>强度</td><td><span class="tag y">强</span></td></tr>
+</table>
+</div>
+</div>
+
+<div class="section" id="s9">
+<h2>九、题材轮动逻辑</h2>
+
+<div class="card">
+<h3>今日轮动格局</h3>
+<table>
+<tr><th>方向</th><th>龙头</th><th>阶段</th><th>强度评分</th></tr>
+<tr><td><strong>专用设备</strong></td><td>中重科技</td><td>启动期</td><td class="up">19.2</td></tr><tr><td><strong>玻璃玻纤</strong></td><td>三峡新材</td><td>启动期</td><td class="up">14.4</td></tr><tr><td><strong>通用设备</strong></td><td>宇环数控</td><td>启动期</td><td class="up">14.4</td></tr><tr><td><strong>家居用品</strong></td><td>德尔未来</td><td>孕育期/预热期</td><td class="up">12.0</td></tr><tr><td><strong>光学光电</strong></td><td>维信诺</td><td>孕育期/预热期</td><td class="up">12.0</td></tr><tr><td><strong>汽车零部</strong></td><td>光洋股份</td><td>孕育期/预热期</td><td class="up">12.0</td></tr><tr><td><strong>通信设备</strong></td><td></td><td>未知</td><td class="up">0.0</td></tr><tr><td><strong>电网设备</strong></td><td></td><td>未知</td><td class="up">0.0</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>热点题材热度排行 <span class="src sj">韭研公社</span></h3>
+<div>
+<span class="chip chip-up">玻璃基板</span> <span class="chip chip-up">商业航天</span> <span class="chip chip-up">机器人</span> <span class="chip chip-dn">6G</span> <span class="chip chip-dn">AI</span> <span class="chip chip-dn">电感</span> <span class="chip chip-dn">散热</span> <span class="chip chip-dn">石墨烯</span>
+</div>
+</div>
+</div>
+
+<div class="section" id="s10">
+<h2>十、社区共识与分歧</h2>
+
+<div class="card">
+<h3>看多/看空/中性 分布</h3>
+<div class="vote"><div class="v-up" style="width:40%"></div><div class="v-dn" style="width:0%"></div><div class="v-ne" style="width:60%"></div></div>
+<div class="v-label">看多4 · 看空0 · 中性6</div>
+</div>
+
+<div class="card">
+<h3>热点题材多空研判</h3>
+<table>
+<tr><th>题材</th><th>热度排名</th><th>社区态度</th></tr>
+<tr><td>玻璃基板</td><td>1</td><td><span class="tag r">偏多</span></td></tr><tr><td>商业航天</td><td>2</td><td><span class="tag r">偏多</span></td></tr><tr><td>机器人</td><td>3</td><td><span class="tag r">偏多</span></td></tr><tr><td>6G</td><td>4</td><td><span class="tag y">中性</span></td></tr><tr><td>AI</td><td>5</td><td><span class="tag y">中性</span></td></tr><tr><td>电感</td><td>6</td><td><span class="tag y">中性</span></td></tr><tr><td>散热</td><td>7</td><td><span class="tag y">中性</span></td></tr><tr><td>石墨烯</td><td>8</td><td><span class="tag y">中性</span></td></tr>
+</table>
+</div>
+</div>
+
+<div class="section" id="s11">
+<h2>十一、综合研判</h2>
+
+<div class="card">
+<h3>判定框架</h3>
+<table>
+<tr><th>因子</th><th>数据</th><th>判定</th></tr>
+<tr><td>涨停/跌停比</td><td>82/17=高</td><td><span class="tag y">正常</span></td></tr>
+<tr><td>封板率</td><td>58.6%</td><td><span class="tag g">偏弱</span></td></tr>
+<tr><td>连板高度</td><td>5板</td><td><span class="tag r">正常</span></td></tr>
+<tr><td>成交额</td><td>30692亿</td><td><span class="tag r">活跃</span></td></tr>
+<tr><td>情绪周期</td><td>风格切换</td><td><span class="tag y">混沌转机</span></td></tr>
+</table>
+<div style="background:rgba(210,153,29,.12);border:2px solid var(--gold);border-radius:8px;padding:16px 20px;margin-top:14px;text-align:center">
+<div style="font-size:28px;font-weight:900;color:var(--gold);margin-bottom:6px">⚡ 综合判定：风格切换期</div>
+<div style="font-size:15px;color:var(--text);line-height:2">
+AI算力/芯片大幅回调，资金跷跷板切向机器人、6G、玻璃基板等低位新方向<br>
+创业板大跌但近3300家上涨——"假指数，真赚钱"<br>
+<span style="color:var(--gold);font-weight:700">关注新方向持续性：机器人+玻璃基板能否成为新主线</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="section" id="s13">
+<h2>💰 游资观察 — 韭研公社热门博主</h2>
+
+<div class="grid2" style="margin-bottom:12px">
+<div class="stat"><div class="v" style="color:var(--red)">7篇看多</div><div class="l">产业挖掘派</div></div>
+<div class="stat"><div class="v" style="color:var(--blue)">3篇策略</div><div class="l">数据研判派</div></div>
+</div>
+
+<div class="card">
+<h3>今日热门博主 TOP10 <span class="src sj">韭:实时热榜</span></h3>
+<table>
+<tr><th>排名</th><th>博主</th><th>方向</th><th>核心观点</th></tr>
+<tr><td>1</td><td><strong>AAAA大A王总2026</strong></td><td><span class="tag b">中性</span></td><td style="font-size:11px">北交所柔性屏、商业航天双热点，化工低位股转型新材料</td></tr><tr><td>2</td><td><strong>宜臻論古只买龙头的游资2</strong></td><td><span class="tag b">中性</span></td><td style="font-size:11px">航天动力投资研报（三）：航天六院液体动力唯一产业化平台，商业航天+液氢双拐点兑现</td></tr><tr><td>3</td><td><strong>小黄瓜炒辣椒2026-0</strong></td><td><span class="tag r">看多</span></td><td style="font-size:11px">久之洋：光电、商业航天、深海经济、物理ai集一身</td></tr><tr><td>4</td><td><strong>炒谷养娃2007一路向北</strong></td><td><span class="tag r">看多</span></td><td style="font-size:11px">6G核心AI梳理</td></tr><tr><td>5</td><td><strong>参证消息2026-06-</strong></td><td><span class="tag b">中性</span></td><td style="font-size:11px">Rubin 架构引爆被动元件超级周期，全产业链机会</td></tr><tr><td>6</td><td><strong>路边新闻社不要怂的老司机</strong></td><td><span class="tag r">看多</span></td><td style="font-size:11px">玻璃基板低位预期差隆华科技：靶材龙头卡位TGV玻璃基板+商业航天</td></tr><tr><td>7</td><td><strong>致远趋势中线波段2026</strong></td><td><span class="tag b">中性</span></td><td style="font-size:11px">玻璃基板TGV工艺：玻璃（微通孔）为什么这么难？</td></tr><tr><td>8</td><td><strong>无名小韭73580522</strong></td><td><span class="tag b">中性</span></td><td style="font-size:11px">电感涨价风云再起，关注低位的中光防雷，叠加6G！</td></tr><tr><td>9</td><td><strong>muma2026-06-</strong></td><td><span class="tag r">看多</span></td><td style="font-size:11px">明阳电路：玻璃基板+英伟达机器人+6g，今天的三大热点于一身</td></tr><tr><td>10</td><td><strong>hulidion2026</strong></td><td><span class="tag b">中性</span></td><td style="font-size:11px">周末发酵新题材英伟达物理ai机器人</td></tr>
+</table>
+</div>
+</div>
+
+<main>
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
