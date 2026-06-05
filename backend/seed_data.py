@@ -163,9 +163,9 @@ def extract_sections(html):
         # 内容从 opening tag 结束之后开始
         section_start = m.end()
         
-        # 找到下一个 section 的注释或 </main>
+        # 找到下一个 section 的注释（不要求前面有换行）
         remaining = html[section_start:]
-        next_match = re.search(r'\n<!-- ===== \d+\.', remaining)
+        next_match = re.search(r'<!-- ===== \d+\.', remaining)
         if next_match:
             section_end = section_start + next_match.start()
         else:
@@ -173,6 +173,11 @@ def extract_sections(html):
         
         # inner = opening tag 之后到下一个 section 之间的内容
         inner = html[section_start:section_end].strip()
+        
+        # 去掉 section 自己的 </div> 关闭标签（最后一个 </div>）
+        # 因为前端 <div class="section" id="sN"> 已经提供了外层容器
+        if inner.endswith('</div>'):
+            inner = inner[:-6].rstrip('\n ')
         
         # 提取标题文本（从 inner 的 h2 中提取）
         title_match = re.search(r'<h2>(.*?)</h2>', inner)
