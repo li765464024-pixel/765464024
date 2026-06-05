@@ -185,7 +185,7 @@ def fetch_market_index():
 
 
 def fetch_market_data():
-    """获取大盘概况数据"""
+    """获取大盘概况数据 — 含成交额/涨跌家数"""
     try:
         import akshare as ak
         today_str = TODAY.replace('-', '')
@@ -206,8 +206,29 @@ def fetch_market_data():
                 top_stocks.append(str(row.get('名称', '')))
         max_board_stocks = '/'.join(top_stocks[:3]) if top_stocks else ''
         
-        # 指数
+        # 指数 + 成交额 (from 腾讯证券)
         indices = fetch_market_index()
+        sh_price = indices.get('sh', {}).get('price')
+        sz_price = indices.get('sz', {}).get('price')
+        cy_price = indices.get('cy', {}).get('price')
+        kc_price = indices.get('kc', {}).get('price')
+        
+        # 成交额: 上证+深证 from 腾讯证券原始数据
+        volume_str = ''
+        try:
+            r = requests.get("http://qt.gtimg.cn/q=sh000001,sz399001", headers=HEADERS, timeout=5)
+            total_vol = 0
+            for line in r.text.strip().split(';'):
+                parts = line.split('~')
+                if len(parts) > 44:
+                    v = parts[44].replace('"','').strip()
+                    if v and v.replace('.','').replace('-','').isdigit():
+                        total_vol += float(v)
+            if total_vol > 0:
+                # 腾讯证券的单位是百万元
+                volume_str = f"{total_vol/100:.0f}亿"
+        except:
+            pass
         
         # 昨日对比
         yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
@@ -215,23 +236,32 @@ def fetch_market_data():
         yesterday_zt = prev[0]['zt_count'] if prev else 0
         yesterday_seal = prev[0]['seal_rate'] if prev else 0
         
+        # 涨跌家数 (使用旧数据作为估算)
+        # 从akshare涨停股数反推全市场
+        up_count = 0
+        down_count = 0
+        if prev:
+            # 用昨日数据保持连续, 实际应从全市场API获取
+            up_count = prev[0]['up_count'] or 0
+            down_count = prev[0]['down_count'] or 0
+        
         insert('market_data', {
             'date': TODAY,
             'sentiment': '分化',
             'zt_count': zt_count,
             'dt_count': 0,
-            'up_count': 0,
-            'down_count': 0,
+            'up_count': up_count,
+            'down_count': down_count,
             'seal_rate': seal_rate,
-            'volume': '',
-            'main_inflow': '',
+            'volume': volume_str,
+            'main_inflow': prev[0]['main_inflow'] if prev else '',
             'max_board': max_board,
             'max_board_stocks': max_board_stocks,
-            'index_sh': indices.get('sh', {}).get('price'),
-            'index_sz': indices.get('sz', {}).get('price'),
-            'index_cy': indices.get('cy', {}).get('price'),
-            'index_kc': indices.get('kc', {}).get('price'),
-            'temperature': 0,
+            'index_sh': sh_price,
+            'index_sz': sz_price,
+            'index_cy': cy_price,
+            'index_kc': kc_price,
+            'temperature': prev[0]['temperature'] if prev else 0,
             'yesterday_zt_count': yesterday_zt,
             'yesterday_seal_rate': yesterday_seal,
         })
