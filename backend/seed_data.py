@@ -28,6 +28,15 @@ def extract_market_data(html):
         m = re.search(rf'>([^<]+)</div><div class="l">{label}', text)
         return m.group(1).strip() if m else None
     
+    # 从 s1 提取指数
+    index_sh = None; index_sz = None; index_cy = None; index_kc = None
+    for m in re.finditer(r'<tr><td>(上证指数|深证成指|创业板指|科创50)</td><td>([\d,]+\.\d+)</td>', text):
+        name, val = m.group(1), float(m.group(2).replace(',',''))
+        if '上证' in name: index_sh = val
+        elif '深证' in name: index_sz = val
+        elif '创业' in name: index_cy = val
+        elif '科创' in name: index_kc = val
+    
     return {
         'date': DATE,
         'sentiment': str_before('市场情绪') or '分化',

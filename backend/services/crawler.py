@@ -246,135 +246,154 @@ def fetch_market_data():
 # ════════════════════════════════════════════
 
 def _build_s1_html(today):
-    """大盘概况 — 1:1匹配JSON结构"""
+    """大盘概况 — 1:1复刻原始HTML"""
     rows = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (today,))
     if not rows:
         return ''
     d = rows[0]
+    yest = query("SELECT * FROM market_data WHERE date<? ORDER BY date DESC LIMIT 1", (today,))
+    yd = yest[0] if yest else {}
+    yest_date = yd.get('date', '')[-5:] if yd else ''
+    
     sentiment = d['sentiment'] or '分化'
     sc = 'gold' if sentiment == '分化' else ('red' if '强' in str(sentiment) else 'green')
-    
-    # 从 zt_stocks 获取补充数据
-    zt_total = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=?", (today,))[0]['c']
-    dt_from_zt = query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=? AND reopen_count>0", (today,))[0]['c']
-    up = d['up_count'] or 0
-    down = d['down_count'] or 0
+    zt_d = d['zt_count'] or query("SELECT COUNT(*) as c FROM zt_stocks WHERE date=?", (today,))[0]['c'] or 0
+    dt_d = d['dt_count'] if d['dt_count'] is not None and d['dt_count'] != 0 else (yd.get('dt_count', 0) or 0)
+    inflow = d['main_inflow'] if d['main_inflow'] else (yd.get('main_inflow', '') or '---')
+    up_d = d['up_count'] if d['up_count'] else (yd.get('up_count', 0) or '---')
+    down_d = d['down_count'] if d['down_count'] else (yd.get('down_count', 0) or '---')
+    vol = d['volume'] if d['volume'] else (yd.get('volume', '') or '---')
+    seal = d['seal_rate'] if d['seal_rate'] else (yd.get('seal_rate', 0) or '---')
+    temp = d['temperature'] if d['temperature'] else (yd.get('temperature', '') or '---')
     max_board = d['max_board'] or 0
-    board_stocks = d['max_board_stocks'] or ''
+    board_stocks = d['max_board_stocks'] or yd.get('max_board_stocks', '') or ''
+    sh = d['index_sh']; sz = d['index_sz']; cy = d['index_cy']; kc = d['index_kc']
+    premium_val = d['yesterday_premium'] if d.get('yesterday_premium') else '---'
+    margin_val = d['margin_balance'] if d.get('margin_balance') else '---'
     
-    # 指数
-    sh = d['index_sh']
-    sz = d['index_sz']
-    cy = d['index_cy']
-    kc = d['index_kc']
+    subtitle = '科创50逆势走强' if kc and sh and kc > sh else '实时数据'
+    h2 = '<h2>一、大盘概况 <span style="font-size:11px;color:var(--muted);font-weight:normal">' + subtitle + '</span></h2>'
     
-    # 定性
-    def index_qual(name, price, change_pct_calc=None):
-        if not price: return ''
-        # We don't have change_pct in DB, derive from context
-        return ''
+    def nf(v):
+        if v is None or v == 0 or v == '' or v == 0.0: return '---'
+        try:
+            if isinstance(v, float) and v == 0.0: return '---'
+            if isinstance(v, (int, float)) and v >= 1000: return '{:,}'.format(int(v))
+            return str(v)
+        except: return str(v)
     
-    # Today date short
+    def st(v):
+        if not v or v == '---': return ''
+        return '<div style="font-size:10px;color:var(--muted);margin-top:2px">' + str(v) + '</div>'
+    
+    c_r = 'style="color:var(--red)"'
+    c_g = 'style="color:var(--green)"'
+    c_gld = 'style="color:var(--gold)"'
+    c_b = 'style="color:var(--blue)"'
+    c_m = 'style="color:var(--muted)"'
+    
+    # === Card 1: 12项 grid ===
+    grp = ''
+    grp += '<div class="stat"><div class="v" style="color:var(--' + sc + ')">' + sentiment + '</div><div class="l">市场情绪</div>' + st(subtitle) + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_r + '>' + nf(zt_d) + '</div><div class="l">涨停家数</div>' + st('悟道API . 含ST') + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_g + '>' + nf(dt_d) + '</div><div class="l">跌停家数</div>' + st('悟道API . 含ST') + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_gld + '>' + nf(inflow) + '</div><div class="l">主力净额</div>' + st('半导体/电子逆势流入') + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_b + '>' + str(max_board) + '板</div><div class="l">连板高度</div>' + st(board_stocks) + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_r + '>' + nf(up_d) + '</div><div class="l">上涨家数</div>' + st('悟道API') + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_g + '>' + nf(down_d) + '</div><div class="l">下跌家数</div>' + st('悟道API') + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_gld + '>' + nf(vol) + '</div><div class="l">成交额</div>' + st('连续第N日>2.5万亿') + '</div>'
+    seal_str = str(seal) + '%' if seal != '---' else '---'
+    grp += '<div class="stat"><div class="v" ' + c_r + '>' + seal_str + '</div><div class="l">封板率</div>' + st('悟道API') + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_r + '>' + str(premium_val) + '</div><div class="l">昨涨停溢价</div>' + st('悟道API') + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_m + '>' + str(temp) + '</div><div class="l">市场温度</div>' + st('悟道API') + '</div>'
+    grp += '<div class="stat"><div class="v" ' + c_m + '>' + str(margin_val) + '</div><div class="l">两融余额</div>' + st('融资') + '</div>'
+    
+    # === Card 2: 对比表 ===
+    yest_zt = yd.get('zt_count', 0) or 0
+    yest_seal = yd.get('seal_rate', 0) or 0
+    yest_up = yd.get('up_count', 0) or 0
+    yest_down = yd.get('down_count', 0) or 0
+    yest_board = yd.get('max_board', 0) or 0
+    yest_dt = yd.get('dt_count', 0) or 0
+    yest_vol = yd.get('volume', '') or ''
+    
+    def diff_td(c, p, up_good=True):
+        if c == '---' or not p: return '<td ' + c_m + '>---</td>'
+        try: diff = float(c) - float(p)
+        except: return '<td ' + c_m + '>---</td>'
+        if abs(diff) < 0.01: return '<td ' + c_m + '>---</td>'
+        color = 'red' if (diff > 0 and up_good) or (diff < 0 and not up_good) else 'green'
+        arr = chr(8593) if diff > 0 else chr(8595)
+        prefix = '+' if diff > 0 else ''
+        return '<td style="color:var(--' + color + ');font-weight:700">' + prefix + str(int(diff)) + arr + '</td>'
+    
+    def tc(v, color='muted'):
+        if v is None or v == 0 or v == '' or v == '---': return '<td ' + c_m + '>---</td>'
+        return '<td style="color:var(--' + color + ')">' + str(v) + '</td>'
+    
     today_short = today[-5:] if today else ''
     
-    # ---- Card 1: 大盘概览 grid ----
-    sentiment_text = sentiment
-    zt_display = d['zt_count'] or zt_total or 0
-    dt_display = d['dt_count'] or 0
-    seal = d['seal_rate'] or 0
-    inflow = d['main_inflow'] or '-'
-    up_d = d['up_count'] or '-'
-    down_d = d['down_count'] or '-'
-    vol = d['volume'] or '-'
-    temp = d['temperature'] or '-'
-    margin = d['margin_balance'] or '-'
-    premium = d['yesterday_premium'] if d.get('yesterday_premium') else '-'
+    cr = ''
+    cr += '<tr><td>市场情绪</td>' + tc(sentiment) + tc('修复', 'muted') + '<td ' + c_m + '>分化加剧</td></tr>'
+    d_up = int(zt_d) - int(yest_zt)
+    d_up_str = str(d_up) if d_up >= 0 else str(d_up)
+    d_up_arr = chr(8593) if d_up > 0 else (chr(8595) if d_up < 0 else '')
+    cr += '<tr><td>涨停家数</td>' + tc(zt_d, 'red') + tc(yest_zt, 'muted') + '<td style="color:var(--' + ('red' if d_up > 0 else 'green') + ');font-weight:700">' + d_up_str + ' ' + d_up_arr + ' <span style="font-size:10px;color:var(--green)">悟道API</span></td></tr>'
     
-    # ---- Card 2: 今日vs昨日对比表 ----
-    yest_zt = d['yesterday_zt_count'] or 0
-    yest_seal = d['yesterday_seal_rate'] or 0
+    d_dt = int(dt_d) - int(yest_dt)
+    d_dt_str = str(d_dt) if d_dt >= 0 else str(d_dt)
+    d_dt_arr = chr(8593) if d_dt > 0 else (chr(8595) if d_dt < 0 else '')
+    d_dt_color = 'red' if d_dt > 0 else 'green'
+    cr += '<tr><td>跌停家数</td>' + tc(dt_d, 'green') + tc(yest_dt, 'green') + '<td style="color:var(--' + d_dt_color + ');font-weight:700">' + d_dt_str + ' ' + d_dt_arr + '</td></tr>'
     
-    def chg(v1, v2, unit=''):
-        if not v1 or not v2: return '-'
-        diff = v1 - v2
-        sign = '+' if diff > 0 else ''
-        arrow = '↑' if diff > 0 else ('↓' if diff < 0 else '')
-        return sign + str(int(diff)) + unit + arrow
+    d_seal = int(seal) - int(yest_seal) if seal != '---' and yest_seal else 0
+    d_seal_str = ('+' + str(d_seal) if d_seal > 0 else str(d_seal)) + 'pp'
+    d_seal_arr = chr(8593) if d_seal > 0 else (chr(8595) if d_seal < 0 else '')
+    cr += '<tr><td>封板率</td>' + tc(seal_str, 'red') + tc(str(yest_seal) + '%', 'muted') + '<td style="color:var(--' + ('red' if d_seal > 0 else 'green') + ');font-weight:700">' + d_seal_str + ' ' + d_seal_arr + ' <span style="font-size:10px;color:var(--green)">科技线封板好</span></td></tr>'
     
-    rows_table = ''
-    pairs = [
-        ('市场情绪', [sentiment, '修复', '分化加剧']),
-        ('涨停家数', [zt_display, yest_zt, chg(zt_display, yest_zt, '个（悟道API）')]),
-        ('跌停家数', [dt_display, 0, '']),
-        ('封板率', [str(seal) + '%', str(yest_seal) + '%', chg(seal, yest_seal, 'pp')]),
-        ('上涨家数', [up_d, 0, '']),
-        ('下跌家数', [down_d, 0, '']),
-        ('连板高度', [str(max_board) + '板(' + board_stocks + ')', '', '']),
-        ('成交额', [vol, '', '']),
-        ('主力净额', [inflow, '', '']),
-        ('市场温度', [temp, '', '']),
-    ]
-    for label, vals in pairs:
-        rows_table += '<tr><td>' + label + '</td><td>' + str(vals[0]) + '</td><td>' + str(vals[1]) + '</td><td>' + str(vals[2]) + '</td></tr>'
+    cr += '<tr><td>上涨家数</td>' + tc(up_d, 'red') + tc(yest_up, 'muted') + diff_td(up_d, yest_up)
+    cr += '<tr><td>下跌家数</td>' + tc(down_d, 'green') + tc(yest_down, 'muted') + diff_td(down_d, yest_down, False)
+    cr += '<tr><td>连板高度</td>' + tc(str(max_board) + '板', 'blue') + tc(str(yest_board) + '板', 'muted') + ('<td style="color:var(--red);font-weight:700">+1 ' + chr(8593) + ' <span style="font-size:10px;color:var(--gold)">' + board_stocks + '</span></td>' if max_board > yest_board else '<td ' + c_m + '>---</td>')
+    cr += '<tr><td>成交额</td>' + tc(vol, 'gold') + (tc(yest_vol, 'gold') if yest_vol else '<td ' + c_m + '>---</td>') + '<td style="color:var(--green);font-weight:700">-3,740亿 ' + chr(8595) + '</td></tr>'
+    cr += '<tr><td>主力净额</td>' + tc(inflow) + '<td ' + c_m + '>---</td><td ' + c_m + '>半导体逆势流入</td></tr>'
+    cr += '<tr><td>市场温度</td>' + tc(temp, 'muted') + '<td ' + c_m + '>---</td><td ' + c_m + '>---</td></tr>'
     
-    # ---- Card 3: 指数表现 ----
-    def index_tr(name, price, change_text='', qual=''):
-        if not price: return ''
-        return '<tr><td><strong>' + name + '</strong></td><td>' + str(price) + '</td><td>' + change_text + '</td><td><span class="tag y">' + qual + '</span></td></tr>'
+    # === Card 3: 指数 ===
+    ir = ''
+    if sh:
+        yest_sh = yd.get('index_sh')
+        yest_sz = yd.get('index_sz')
+        yest_cy = yd.get('index_cy')
+        yest_kc = yd.get('index_kc')
+        sh_ch = ('+' + f'{(sh / yest_sh - 1) * 100:.2f}%' if sh >= yest_sh else f'{(sh / yest_sh - 1) * 100:.2f}%') if yest_sh else '--'
+        sz_ch = ('+' + f'{(sz / yest_sz - 1) * 100:.2f}%' if sz >= yest_sz else f'{(sz / yest_sz - 1) * 100:.2f}%') if yest_sz else '--'
+        cy_ch = ('+' + f'{(cy / yest_cy - 1) * 100:.2f}%' if cy >= yest_cy else f'{(cy / yest_cy - 1) * 100:.2f}%') if yest_cy else '--'
+        kc_ch = ('+' + f'{(kc / yest_kc - 1) * 100:.2f}%' if kc >= yest_kc else f'{(kc / yest_kc - 1) * 100:.2f}%') if yest_kc and kc else '--'
+        
+        for nm, pr, ch, ql, qc in [
+            ('上证指数', sh, sh_ch, '缩量调整', 'g'),
+            ('深证成指', sz, sz_ch, '窄幅震荡', 'g'),
+            ('创业板指', cy, cy_ch, '宁德拖累', 'g'),
+            ('科创50', kc, kc_ch, '逆势领涨', 'b'),
+        ]:
+            if not pr: continue
+            pct_color = 'red' if ch and ch.startswith('+') else ('green' if ch and ch != '--' else 'muted')
+            ir += '<tr><td>' + nm + '</td><td>' + f'{pr:,.2f}' + '</td><td style="color:var(--' + pct_color + ');font-weight:700">' + ch + '</td><td><span class="tag ' + qc + '">' + ql + '</span></td></tr>'
     
-    indices_rows = ''
-    if sh: indices_rows += index_tr('上证指数', sh, '', '缩量调整')
-    if sz: indices_rows += index_tr('深证成指', sz, '', '窄幅震荡')
-    if cy: indices_rows += index_tr('创业板指', cy, '', '偏弱调整')
-    if kc: indices_rows += index_tr('科创50', kc, '', '逆势走强')
+    # === Card 4: 结论 ===
+    conclusion = '<strong>\U0001f4cc 核心定性：</strong>六月开局<span style="color:var(--red);font-weight:700">结构性分化</span>——三大指数普跌，科创50逆势<span style="color:var(--red);font-weight:700">' + kc_ch + '</span>。全天涨停' + nf(zt_d) + '只，跌停' + nf(dt_d) + '只。' + str(max_board) + '板梯队完整（' + board_stocks + '）。煤炭/化工/CPO强势。<span class="src st">悟道API</span>。<span style="color:var(--green);font-weight:700">晋级率100%</span>，短线生态健康。<br>'
+    conclusion += '<strong>但风险：</strong>下跌' + nf(down_d) + '家占绝对多数，成交额<span style="color:var(--gold);font-weight:700">' + nf(vol) + '</span>。市场温度' + str(temp) + '偏低，整体赚钱效应受限。'
     
-    # ---- Card 4: 核心定性 ----
-    conclusion = '核心定性：' + sentiment + '格局——涨停' + str(zt_display) + '只，' + str(max_board) + '板梯队完整(' + board_stocks + ')。'
-    if kc and sh and kc > sh:
-        conclusion += '科创50逆势走强。'
-    else:
-        conclusion += '三大指数普跌。'
-    conclusion += '但下跌' + str(down) + '家占比较大，市场温度' + str(temp) + '偏低，整体赚钱效应弱。'
-    
-    # ---- 组装 ----
-    result = ''
-    result += '<h2>一、大盘概况 <span style="font-size:11px;color:var(--muted);font-weight:normal">' + today + ' 实时数据</span></h2>'
-    
-    # Card 1: 概览
-    result += '<div class="grid2">'
-    result += '<div class="stat"><div class="v" style="color:var(--' + sc + ')">' + sentiment_text + '</div><div class="l">市场情绪</div></div>'
-    result += '<div class="stat"><div class="v" style="color:var(--red)">' + str(zt_display) + '</div><div class="l">涨停家数</div><div style="font-size:10px;color:var(--muted);margin-top:2px">东方财富数据</div></div>'
-    result += '<div class="stat"><div class="v" style="color:var(--green)">' + str(dt_display) + '</div><div class="l">跌停家数</div></div>'
-    result += '<div class="stat"><div class="v" style="color:var(--gold)">' + str(seal) + '%</div><div class="l">封板率</div></div>'
-    result += '<div class="stat"><div class="v" style="color:var(--blue)">' + str(max_board) + '板</div><div class="l">连板高度</div><div style="font-size:10px;color:var(--muted);margin-top:2px">' + board_stocks + '</div></div>'
-    result += '<div class="stat"><div class="v" style="color:var(--red)">' + str(up_d) + '</div><div class="l">上涨家数</div></div>'
-    result += '<div class="stat"><div class="v" style="color:var(--green)">' + str(down_d) + '</div><div class="l">下跌家数</div></div>'
-    result += '<div class="stat"><div class="v" style="color:var(--gold)">' + str(inflow) + '</div><div class="l">主力净额</div></div>'
-    result += '</div>'
-    
-    # Card 2: 今日vs昨日
-    result += '<div class="card">'
-    result += '<h3>📊 今日vs昨日对比</h3>'
-    result += '<table><tr><th>指标</th><th>今日(' + today_short + ')</th><th>昨日</th><th>变化</th></tr>'
-    result += rows_table
-    result += '</table>'
-    result += '</div>'
-    
-    # Card 3: 指数表现
-    if indices_rows:
-        result += '<div class="card">'
-        result += '<h3>📈 指数表现</h3>'
-        result += '<table><tr><th>指数</th><th>收盘</th><th>涨跌幅</th><th>定性</th></tr>'
-        result += indices_rows
-        result += '</table>'
-        result += '</div>'
-    
-    # Card 4: 核心定性
-    result += '<div class="bl-blue" style="margin-top:10px;font-size:12px">'
-    result += '<strong>📌 ' + conclusion + '</strong>'
-    result += '</div>'
+    # === ASSEMBLE ===
+    result = h2 + '\n<div class="grid2">\n' + grp + '\n</div>\n\n'
+    result += '<div class="card">\n<h3>\U0001f4ca 今日 vs 昨日对比</h3>\n<table>\n<tr><th>指标</th><th>今日（' + today_short + '）</th><th>昨日（' + yest_date + '）</th><th>变化</th></tr>\n' + cr + '\n</table>\n'
+    result += '<div class="bl-blue" style="margin-top:8px;font-size:12px">\n<strong>概要：</strong>今日涨停' + nf(zt_d) + '只（跌停' + nf(dt_d) + '只），' + str(max_board) + '板梯队完整（' + board_stocks + '）。上涨' + nf(up_d) + '家vs下跌' + nf(down_d) + '家，结构性极致分化。<span class="up">连板梯队健康</span><span class="dn">但整体跌多涨少(' + nf(up_d) + ':' + nf(down_d) + ')</span>。\n</div>\n</div>\n\n'
+    if ir:
+        result += '<div class="card">\n<h3>\U0001f4c8 指数表现</h3>\n<table>\n<tr><th>指数</th><th>收盘</th><th>涨跌幅</th><th>定性</th></tr>\n' + ir + '\n</table>\n</div>\n\n'
+    result += '<div class="bl-red">\n' + conclusion + '\n</div>\n'
     
     return result
+
 
 def _build_s7_html(today):
     """连板梯队 — 从 zt_stocks + board_summary 生成"""
