@@ -1,0 +1,638 @@
+{
+  "date": "2026-06-04",
+  "post_count": 30,
+  "user_count": 20,
+  "stock_count": 27,
+  "posts": [
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 07:14:07",
+      "title": "6月4日盘前纪要",
+      "stock_tags": [
+        {
+          "name": "鑫科材料",
+          "reads": 337,
+          "likes": 274,
+          "comments": 337,
+          "price_pct": 56.62
+        }
+      ],
+      "stock_names": [
+        "鑫科材料"
+      ],
+      "reads": 337,
+      "likes": 274,
+      "comments": 337,
+      "price_pct": 56.62
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 21:40:53",
+      "title": "晚间 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 43,
+          "likes": 44,
+          "comments": 147,
+          "price_pct": 19.11
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 43,
+      "likes": 44,
+      "comments": 147,
+      "price_pct": 19.11
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 21:40:53",
+      "title": "晚间 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 43,
+          "likes": 44,
+          "comments": 147,
+          "price_pct": 19.11
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 43,
+      "likes": 44,
+      "comments": 147,
+      "price_pct": 19.11
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 22:23:11",
+      "title": "0604图表：SpaceX、光纤预制棒、超聚变、腾讯等",
+      "stock_tags": [
+        {
+          "name": "利欧股份",
+          "reads": 39,
+          "likes": 35,
+          "comments": 68,
+          "price_pct": 28.53
+        }
+      ],
+      "stock_names": [
+        "利欧股份"
+      ],
+      "reads": 39,
+      "likes": 35,
+      "comments": 68,
+      "price_pct": 28.53
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 00:09:23",
+      "title": "0603图表：泵浦激光器、光纤、腾讯AI PC、豆包、比亚迪机器人等",
+      "stock_tags": [
+        {
+          "name": "久之洋",
+          "reads": 109,
+          "likes": 77,
+          "comments": 101,
+          "price_pct": 54.67
+        }
+      ],
+      "stock_names": [
+        "久之洋"
+      ],
+      "reads": 109,
+      "likes": 77,
+      "comments": 101,
+      "price_pct": 54.67
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 17:57:26",
+      "title": "韭研公社学习笔记（260604）",
+      "stock_tags": [
+        {
+          "name": "龙辰科技",
+          "reads": 64,
+          "likes": 45,
+          "comments": 93,
+          "price_pct": 16.14
+        }
+      ],
+      "stock_names": [
+        "龙辰科技"
+      ],
+      "reads": 64,
+      "likes": 45,
+      "comments": 93,
+      "price_pct": 16.14
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 17:18:54",
+      "title": "260604明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "中际旭创",
+          "reads": 24,
+          "likes": 52,
+          "comments": 27,
+          "price_pct": 13.48
+        }
+      ],
+      "stock_names": [
+        "中际旭创"
+      ],
+      "reads": 24,
+      "likes": 52,
+      "comments": 27,
+      "price_pct": 13.48
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 19:22:14",
+      "title": "6月4日 公社内容精选",
+      "stock_tags": [
+        {
+          "name": "中国动力",
+          "reads": 31,
+          "likes": 43,
+          "comments": 62,
+          "price_pct": 10.09
+        }
+      ],
+      "stock_names": [
+        "中国动力"
+      ],
+      "reads": 31,
+      "likes": 43,
+      "comments": 62,
+      "price_pct": 10.09
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 11:55:53",
+      "title": "韭研公社全天涨停简图（06.04)",
+      "stock_tags": [
+        {
+          "name": "大有能源",
+          "reads": 59,
+          "likes": 44,
+          "comments": 55,
+          "price_pct": 23.21
+        }
+      ],
+      "stock_names": [
+        "大有能源"
+      ],
+      "reads": 59,
+      "likes": 44,
+      "comments": 55,
+      "price_pct": 23.21
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 13:44:21",
+      "title": "PCB铜箔概念股",
+      "stock_tags": [
+        {
+          "name": "南亚新材",
+          "reads": 78,
+          "likes": 27,
+          "comments": 40,
+          "price_pct": 27.82
+        }
+      ],
+      "stock_names": [
+        "南亚新材"
+      ],
+      "reads": 78,
+      "likes": 27,
+      "comments": 40,
+      "price_pct": 27.82
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 07:16:20",
+      "title": "策略——低利率时期的资产配置",
+      "stock_tags": [
+        {
+          "name": "众生药业",
+          "reads": 6,
+          "likes": 31,
+          "comments": 19,
+          "price_pct": 11.69
+        }
+      ],
+      "stock_names": [
+        "众生药业"
+      ],
+      "reads": 6,
+      "likes": 31,
+      "comments": 19,
+      "price_pct": 11.69
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 08:50:21",
+      "title": "以Serenity的Chokepoint Theory看MLCC市场对产能瓶颈太低估",
+      "stock_tags": [
+        {
+          "name": "商络电子",
+          "reads": 6,
+          "likes": 5,
+          "comments": 9,
+          "price_pct": 2.43
+        }
+      ],
+      "stock_names": [
+        "商络电子"
+      ],
+      "reads": 6,
+      "likes": 5,
+      "comments": 9,
+      "price_pct": 2.43
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 15:13:38",
+      "title": "扩产传导至上游：国产封测设备投资逻辑清晰，国产替代加速兑现",
+      "stock_tags": [
+        {
+          "name": "鼎龙股份",
+          "reads": 9,
+          "likes": 10,
+          "comments": 10,
+          "price_pct": 9.26
+        }
+      ],
+      "stock_names": [
+        "鼎龙股份"
+      ],
+      "reads": 9,
+      "likes": 10,
+      "comments": 10,
+      "price_pct": 9.26
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 14:59:41",
+      "title": "供需硬缺口共振：电子级氦气投资逻辑明晰，业绩弹性窗口开启",
+      "stock_tags": [
+        {
+          "name": "和远气体",
+          "reads": 3,
+          "likes": 4,
+          "comments": 3,
+          "price_pct": 3.33
+        }
+      ],
+      "stock_names": [
+        "和远气体"
+      ],
+      "reads": 3,
+      "likes": 4,
+      "comments": 3,
+      "price_pct": 3.33
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 13:53:45",
+      "title": "基本面底部已至，太空光伏志在星海",
+      "stock_tags": [
+        {
+          "name": "晶盛机电",
+          "reads": 5,
+          "likes": 6,
+          "comments": 9,
+          "price_pct": 6.48
+        }
+      ],
+      "stock_names": [
+        "晶盛机电"
+      ],
+      "reads": 5,
+      "likes": 6,
+      "comments": 9,
+      "price_pct": 6.48
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 14:14:41",
+      "title": "Marvell重启AI互连beta，国内对标裕太微！",
+      "stock_tags": [
+        {
+          "name": "鑫科材料",
+          "reads": 10,
+          "likes": 7,
+          "comments": 8,
+          "price_pct": 5.4
+        }
+      ],
+      "stock_names": [
+        "鑫科材料"
+      ],
+      "reads": 10,
+      "likes": 7,
+      "comments": 8,
+      "price_pct": 5.4
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 16:01:40",
+      "title": "6.4个股信息差（无从下口）",
+      "stock_tags": [
+        {
+          "name": "贝因美",
+          "reads": 21,
+          "likes": 18,
+          "comments": 49,
+          "price_pct": 8.84
+        }
+      ],
+      "stock_names": [
+        "贝因美"
+      ],
+      "reads": 21,
+      "likes": 18,
+      "comments": 49,
+      "price_pct": 8.84
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 21:06:09",
+      "title": "【核心复盘】6月4日=",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 10,
+          "likes": 44,
+          "comments": 47,
+          "price_pct": 2.96
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 10,
+      "likes": 44,
+      "comments": 47,
+      "price_pct": 2.96
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 16:45:16",
+      "title": "2026 年 6 月 4 日连板个股复盘",
+      "stock_tags": [
+        {
+          "name": "豫能控股",
+          "reads": 9,
+          "likes": 5,
+          "comments": 10,
+          "price_pct": 2.14
+        }
+      ],
+      "stock_names": [
+        "豫能控股"
+      ],
+      "reads": 9,
+      "likes": 5,
+      "comments": 10,
+      "price_pct": 2.14
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 18:32:39",
+      "title": "6.5盘前",
+      "stock_tags": [
+        {
+          "name": "春秋电子",
+          "reads": 1,
+          "likes": 4,
+          "comments": 19,
+          "price_pct": 1.16
+        }
+      ],
+      "stock_names": [
+        "春秋电子"
+      ],
+      "reads": 1,
+      "likes": 4,
+      "comments": 19,
+      "price_pct": 1.16
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 15:50:24",
+      "title": "6月4日复盘笔记：芯片/超级电容/燃气轮机/机器人/光通信/液冷/玻璃基板/电力等",
+      "stock_tags": [
+        {
+          "name": "奕东电子",
+          "reads": 31,
+          "likes": 13,
+          "comments": 23,
+          "price_pct": 4.73
+        }
+      ],
+      "stock_names": [
+        "奕东电子"
+      ],
+      "reads": 31,
+      "likes": 13,
+      "comments": 23,
+      "price_pct": 4.73
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 07:01:34",
+      "title": "6月4日股市早报：AI电源/电网/储能/芯片产业/光通信/量子通信等",
+      "stock_tags": [
+        {
+          "name": "通富微电",
+          "reads": 6,
+          "likes": 6,
+          "comments": 17,
+          "price_pct": 3.19
+        }
+      ],
+      "stock_names": [
+        "通富微电"
+      ],
+      "reads": 6,
+      "likes": 6,
+      "comments": 17,
+      "price_pct": 3.19
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 18:08:34",
+      "title": "6月4日一图看市场",
+      "stock_tags": [
+        {
+          "name": "天洋新材",
+          "reads": 0,
+          "likes": 0,
+          "comments": 5,
+          "price_pct": 0.12
+        }
+      ],
+      "stock_names": [
+        "天洋新材"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 5,
+      "price_pct": 0.12
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 18:08:34",
+      "title": "6月4日一图看市场",
+      "stock_tags": [
+        {
+          "name": "天洋新材",
+          "reads": 0,
+          "likes": 0,
+          "comments": 5,
+          "price_pct": 0.12
+        }
+      ],
+      "stock_names": [
+        "天洋新材"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 5,
+      "price_pct": 0.12
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 23:35:30",
+      "title": "6.4题材",
+      "stock_tags": [
+        {
+          "name": "隆扬电子",
+          "reads": 0,
+          "likes": 0,
+          "comments": 4,
+          "price_pct": 0.56
+        }
+      ],
+      "stock_names": [
+        "隆扬电子"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 4,
+      "price_pct": 0.56
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 23:34:38",
+      "title": "金刚石散热调研纪要：AI算力时代的热管理革命与投资逻辑",
+      "stock_tags": [
+        {
+          "name": "四方达",
+          "reads": 5,
+          "likes": 2,
+          "comments": 3,
+          "price_pct": 0.95
+        }
+      ],
+      "stock_names": [
+        "四方达"
+      ],
+      "reads": 5,
+      "likes": 2,
+      "comments": 3,
+      "price_pct": 0.95
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 23:24:37",
+      "title": "AI硬件检测",
+      "stock_tags": [
+        {
+          "name": "日联科技",
+          "reads": 0,
+          "likes": 0,
+          "comments": 1,
+          "price_pct": 0.31
+        }
+      ],
+      "stock_names": [
+        "日联科技"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 1,
+      "price_pct": 0.31
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 21:10:30",
+      "title": "COPOS",
+      "stock_tags": [
+        {
+          "name": "沃格光电",
+          "reads": 5,
+          "likes": 4,
+          "comments": 6,
+          "price_pct": 2.58
+        }
+      ],
+      "stock_names": [
+        "沃格光电"
+      ],
+      "reads": 5,
+      "likes": 4,
+      "comments": 6,
+      "price_pct": 2.58
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 21:05:39",
+      "title": "SOFC",
+      "stock_tags": [
+        {
+          "name": "振华股份",
+          "reads": 1,
+          "likes": 0,
+          "comments": 1,
+          "price_pct": 0.35
+        }
+      ],
+      "stock_names": [
+        "振华股份"
+      ],
+      "reads": 1,
+      "likes": 0,
+      "comments": 1,
+      "price_pct": 0.35
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-04 09:18:33",
+      "title": "6.3题材",
+      "stock_tags": [
+        {
+          "name": "三祥新材",
+          "reads": 0,
+          "likes": 1,
+          "comments": 1,
+          "price_pct": 0.24
+        }
+      ],
+      "stock_names": [
+        "三祥新材"
+      ],
+      "reads": 0,
+      "likes": 1,
+      "comments": 1,
+      "price_pct": 0.24
+    }
+  ]
+}

@@ -1,0 +1,344 @@
+{
+  "date": "2026-06-02",
+  "post_count": 16,
+  "user_count": 16,
+  "stock_count": 15,
+  "posts": [
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 07:05:09",
+      "title": "6月2日盘前纪要",
+      "stock_tags": [
+        {
+          "name": "春秋电子",
+          "reads": 344,
+          "likes": 232,
+          "comments": 335,
+          "price_pct": 66.24
+        }
+      ],
+      "stock_names": [
+        "春秋电子"
+      ],
+      "reads": 344,
+      "likes": 232,
+      "comments": 335,
+      "price_pct": 66.24
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 21:39:22",
+      "title": "晚间 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 59,
+          "likes": 61,
+          "comments": 157,
+          "price_pct": 25.64
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 59,
+      "likes": 61,
+      "comments": 157,
+      "price_pct": 25.64
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 00:54:32",
+      "title": "0601图表：英伟达、商业航天、PTFE、厄尔尼诺、宇树科技等",
+      "stock_tags": [
+        {
+          "name": "英力股份",
+          "reads": 31,
+          "likes": 37,
+          "comments": 72,
+          "price_pct": 36.59
+        }
+      ],
+      "stock_names": [
+        "英力股份"
+      ],
+      "reads": 31,
+      "likes": 37,
+      "comments": 72,
+      "price_pct": 36.59
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 17:12:12",
+      "title": "韭研公社学习笔记（260602）",
+      "stock_tags": [
+        {
+          "name": "亨通光电",
+          "reads": 102,
+          "likes": 63,
+          "comments": 127,
+          "price_pct": 23.36
+        }
+      ],
+      "stock_names": [
+        "亨通光电"
+      ],
+      "reads": 102,
+      "likes": 63,
+      "comments": 127,
+      "price_pct": 23.36
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 17:49:18",
+      "title": "260602明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "大有能源",
+          "reads": 24,
+          "likes": 40,
+          "comments": 30,
+          "price_pct": 15.7
+        }
+      ],
+      "stock_names": [
+        "大有能源"
+      ],
+      "reads": 24,
+      "likes": 40,
+      "comments": 30,
+      "price_pct": 15.7
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 19:39:02",
+      "title": "6月2日 公社内容精选",
+      "stock_tags": [
+        {
+          "name": "新易盛",
+          "reads": 36,
+          "likes": 57,
+          "comments": 73,
+          "price_pct": 13.29
+        }
+      ],
+      "stock_names": [
+        "新易盛"
+      ],
+      "reads": 36,
+      "likes": 57,
+      "comments": 73,
+      "price_pct": 13.29
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 11:53:14",
+      "title": "韭研公社全天涨停简图（06.02)",
+      "stock_tags": [
+        {
+          "name": "春秋电子",
+          "reads": 51,
+          "likes": 47,
+          "comments": 55,
+          "price_pct": 22.45
+        }
+      ],
+      "stock_names": [
+        "春秋电子"
+      ],
+      "reads": 51,
+      "likes": 47,
+      "comments": 55,
+      "price_pct": 22.45
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 07:19:10",
+      "title": "不是科技退潮，而是拥挤需要消化",
+      "stock_tags": [
+        {
+          "name": "鸿富瀚",
+          "reads": 23,
+          "likes": 47,
+          "comments": 42,
+          "price_pct": 26.27
+        }
+      ],
+      "stock_names": [
+        "鸿富瀚"
+      ],
+      "reads": 23,
+      "likes": 47,
+      "comments": 42,
+      "price_pct": 26.27
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 16:03:56",
+      "title": "6.2个股信息差（科技修复）",
+      "stock_tags": [
+        {
+          "name": "长飞光纤",
+          "reads": 58,
+          "likes": 28,
+          "comments": 69,
+          "price_pct": 15.97
+        }
+      ],
+      "stock_names": [
+        "长飞光纤"
+      ],
+      "reads": 58,
+      "likes": 28,
+      "comments": 69,
+      "price_pct": 15.97
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 18:48:51",
+      "title": "【核心复盘】6月2日=",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 15,
+          "likes": 43,
+          "comments": 58,
+          "price_pct": 4.21
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 15,
+      "likes": 43,
+      "comments": 58,
+      "price_pct": 4.21
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 17:13:57",
+      "title": "2026 年 6 月 2 日连板个股复盘",
+      "stock_tags": [
+        {
+          "name": "郑州煤电",
+          "reads": 2,
+          "likes": 2,
+          "comments": 8,
+          "price_pct": 1.79
+        }
+      ],
+      "stock_names": [
+        "郑州煤电"
+      ],
+      "reads": 2,
+      "likes": 2,
+      "comments": 8,
+      "price_pct": 1.79
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 17:16:06",
+      "title": "6.3盘前",
+      "stock_tags": [
+        {
+          "name": "风华高科",
+          "reads": 0,
+          "likes": 4,
+          "comments": 12,
+          "price_pct": 1.13
+        }
+      ],
+      "stock_names": [
+        "风华高科"
+      ],
+      "reads": 0,
+      "likes": 4,
+      "comments": 12,
+      "price_pct": 1.13
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 15:42:27",
+      "title": "6月2日复盘笔记：光通信/光纤/机器人/MLCC/PCB/液冷/存储/有色等",
+      "stock_tags": [
+        {
+          "name": "圣泉集团",
+          "reads": 9,
+          "likes": 5,
+          "comments": 12,
+          "price_pct": 2.53
+        }
+      ],
+      "stock_names": [
+        "圣泉集团"
+      ],
+      "reads": 9,
+      "likes": 5,
+      "comments": 12,
+      "price_pct": 2.53
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 06:58:28",
+      "title": "6月2日股市早报：软件/AI应用/AIPC/机器人/电力/储能/华为链等",
+      "stock_tags": [
+        {
+          "name": "美迪凯",
+          "reads": 6,
+          "likes": 6,
+          "comments": 10,
+          "price_pct": 2.24
+        }
+      ],
+      "stock_names": [
+        "美迪凯"
+      ],
+      "reads": 6,
+      "likes": 6,
+      "comments": 10,
+      "price_pct": 2.24
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 20:22:54",
+      "title": "6月2日一图看市场",
+      "stock_tags": [
+        {
+          "name": "火炬电子",
+          "reads": 0,
+          "likes": 0,
+          "comments": 4,
+          "price_pct": 0.15
+        }
+      ],
+      "stock_names": [
+        "火炬电子"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 4,
+      "price_pct": 0.15
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-02 18:41:53",
+      "title": "锡",
+      "stock_tags": [
+        {
+          "name": "锡业股份",
+          "reads": 3,
+          "likes": 0,
+          "comments": 3,
+          "price_pct": 0.43
+        }
+      ],
+      "stock_names": [
+        "锡业股份"
+      ],
+      "reads": 3,
+      "likes": 0,
+      "comments": 3,
+      "price_pct": 0.43
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "date": "2026-04-14",
+  "post_count": 2,
+  "user_count": 2,
+  "stock_count": 2,
+  "posts": [
+    {
+      "user": "韭菜韭菜非韭菜",
+      "ts": "2026-04-14 10:17:57",
+      "title": "CPO光通信15 家核心公司",
+      "stock_tags": [
+        {
+          "name": "华工科技",
+          "reads": 67,
+          "likes": 35,
+          "comments": 49,
+          "price_pct": 53.62
+        }
+      ],
+      "stock_names": [
+        "华工科技"
+      ],
+      "reads": 67,
+      "likes": 35,
+      "comments": 49,
+      "price_pct": 53.62
+    },
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-04-14 21:24:24",
+      "title": "[东北电子]MLCC产业链:AI需求爆发，海外龙头接续提价催化，行业全面涨价势不可挡",
+      "stock_tags": [
+        {
+          "name": "风华高科",
+          "reads": 2,
+          "likes": 2,
+          "comments": 1,
+          "price_pct": 0.81
+        }
+      ],
+      "stock_names": [
+        "风华高科"
+      ],
+      "reads": 2,
+      "likes": 2,
+      "comments": 1,
+      "price_pct": 0.81
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "date": "2026-05-19",
+  "post_count": 9,
+  "user_count": 9,
+  "stock_count": 9,
+  "posts": [
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-19 07:17:19",
+      "title": "5月19日盘前纪要",
+      "stock_tags": [
+        {
+          "name": "威龙股份",
+          "reads": 394,
+          "likes": 274,
+          "comments": 332,
+          "price_pct": 61.77
+        }
+      ],
+      "stock_names": [
+        "威龙股份"
+      ],
+      "reads": 394,
+      "likes": 274,
+      "comments": 332,
+      "price_pct": 61.77
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-19 21:45:50",
+      "title": "晚间 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 41,
+          "likes": 35,
+          "comments": 121,
+          "price_pct": 20.14
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 41,
+      "likes": 35,
+      "comments": 121,
+      "price_pct": 20.14
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-19 18:04:32",
+      "title": "韭研公社学习笔记（260519）",
+      "stock_tags": [
+        {
+          "name": "辽宁能源",
+          "reads": 54,
+          "likes": 33,
+          "comments": 84,
+          "price_pct": 18.88
+        }
+      ],
+      "stock_names": [
+        "辽宁能源"
+      ],
+      "reads": 54,
+      "likes": 33,
+      "comments": 84,
+      "price_pct": 18.88
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-19 17:13:54",
+      "title": "260519明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "合肥城建",
+          "reads": 34,
+          "likes": 42,
+          "comments": 26,
+          "price_pct": 21.06
+        }
+      ],
+      "stock_names": [
+        "合肥城建"
+      ],
+      "reads": 34,
+      "likes": 42,
+      "comments": 26,
+      "price_pct": 21.06
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-19 11:57:44",
+      "title": "韭研公社全天涨停简图（05.19)",
+      "stock_tags": [
+        {
+          "name": "利仁科技",
+          "reads": 49,
+          "likes": 51,
+          "comments": 45,
+          "price_pct": 21.47
+        }
+      ],
+      "stock_names": [
+        "利仁科技"
+      ],
+      "reads": 49,
+      "likes": 51,
+      "comments": 45,
+      "price_pct": 21.47
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-19 10:37:58",
+      "title": "物理AI核心公司梳理",
+      "stock_tags": [
+        {
+          "name": "阿尔特",
+          "reads": 15,
+          "likes": 10,
+          "comments": 15,
+          "price_pct": 16.28
+        }
+      ],
+      "stock_names": [
+        "阿尔特"
+      ],
+      "reads": 15,
+      "likes": 10,
+      "comments": 15,
+      "price_pct": 16.28
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-19 22:18:41",
+      "title": "【核心复盘】5月19日=",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 16,
+          "likes": 32,
+          "comments": 60,
+          "price_pct": 4.61
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 16,
+      "likes": 32,
+      "comments": 60,
+      "price_pct": 4.61
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-19 16:05:08",
+      "title": "2026 年 5 月 19 日连板个股复盘",
+      "stock_tags": [
+        {
+          "name": "海星股份",
+          "reads": 9,
+          "likes": 4,
+          "comments": 12,
+          "price_pct": 10.03
+        }
+      ],
+      "stock_names": [
+        "海星股份"
+      ],
+      "reads": 9,
+      "likes": 4,
+      "comments": 12,
+      "price_pct": 10.03
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-19 20:31:05",
+      "title": "5月19日一图看市场",
+      "stock_tags": [
+        {
+          "name": "金海高科",
+          "reads": 0,
+          "likes": 0,
+          "comments": 1,
+          "price_pct": 0.05
+        }
+      ],
+      "stock_names": [
+        "金海高科"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 1,
+      "price_pct": 0.05
+    }
+  ]
+}

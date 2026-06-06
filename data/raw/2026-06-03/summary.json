@@ -1,0 +1,407 @@
+{
+  "date": "2026-06-03",
+  "post_count": 19,
+  "user_count": 17,
+  "stock_count": 19,
+  "posts": [
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 07:16:50",
+      "title": "6月3日盘前纪要",
+      "stock_tags": [
+        {
+          "name": "春秋电子",
+          "reads": 374,
+          "likes": 234,
+          "comments": 318,
+          "price_pct": 59.25
+        }
+      ],
+      "stock_names": [
+        "春秋电子"
+      ],
+      "reads": 374,
+      "likes": 234,
+      "comments": 318,
+      "price_pct": 59.25
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 22:26:24",
+      "title": "晚间 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 52,
+          "likes": 48,
+          "comments": 141,
+          "price_pct": 21.51
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 52,
+      "likes": 48,
+      "comments": 141,
+      "price_pct": 21.51
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 18:48:30",
+      "title": "韭研公社学习笔记（260603）",
+      "stock_tags": [
+        {
+          "name": "天洋新材",
+          "reads": 69,
+          "likes": 44,
+          "comments": 104,
+          "price_pct": 18.9
+        }
+      ],
+      "stock_names": [
+        "天洋新材"
+      ],
+      "reads": 69,
+      "likes": 44,
+      "comments": 104,
+      "price_pct": 18.9
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 17:55:31",
+      "title": "260603明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "万通发展",
+          "reads": 26,
+          "likes": 48,
+          "comments": 38,
+          "price_pct": 21.62
+        }
+      ],
+      "stock_names": [
+        "万通发展"
+      ],
+      "reads": 26,
+      "likes": 48,
+      "comments": 38,
+      "price_pct": 21.62
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 19:02:21",
+      "title": "6月3日 公社内容精选",
+      "stock_tags": [
+        {
+          "name": "寒武纪",
+          "reads": 30,
+          "likes": 32,
+          "comments": 65,
+          "price_pct": 11.73
+        }
+      ],
+      "stock_names": [
+        "寒武纪"
+      ],
+      "reads": 30,
+      "likes": 32,
+      "comments": 65,
+      "price_pct": 11.73
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 11:52:44",
+      "title": "韭研公社全天涨停简图（06.03)",
+      "stock_tags": [
+        {
+          "name": "节能铁汉",
+          "reads": 64,
+          "likes": 100,
+          "comments": 53,
+          "price_pct": 24.12
+        }
+      ],
+      "stock_names": [
+        "节能铁汉"
+      ],
+      "reads": 64,
+      "likes": 100,
+      "comments": 53,
+      "price_pct": 24.12
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 10:42:20",
+      "title": "光通信概念股梳理",
+      "stock_tags": [
+        {
+          "name": "长飞光纤",
+          "reads": 78,
+          "likes": 24,
+          "comments": 44,
+          "price_pct": 37.07
+        }
+      ],
+      "stock_names": [
+        "长飞光纤"
+      ],
+      "reads": 78,
+      "likes": 24,
+      "comments": 44,
+      "price_pct": 37.07
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 07:14:02",
+      "title": "AI“泡沫”走到了哪一步？",
+      "stock_tags": [
+        {
+          "name": "盈方微",
+          "reads": 10,
+          "likes": 52,
+          "comments": 32,
+          "price_pct": 20.21
+        }
+      ],
+      "stock_names": [
+        "盈方微"
+      ],
+      "reads": 10,
+      "likes": 52,
+      "comments": 32,
+      "price_pct": 20.21
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 16:33:52",
+      "title": "[长江PCB产业链研究]超级周期之生益科技重塑全球CCL供给",
+      "stock_tags": [
+        {
+          "name": "中钨高新",
+          "reads": 14,
+          "likes": 15,
+          "comments": 30,
+          "price_pct": 4.49
+        }
+      ],
+      "stock_names": [
+        "中钨高新"
+      ],
+      "reads": 14,
+      "likes": 15,
+      "comments": 30,
+      "price_pct": 4.49
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 19:03:27",
+      "title": "达梦数据-AI Infra 刚需！",
+      "stock_tags": [
+        {
+          "name": "达梦数据",
+          "reads": 3,
+          "likes": 1,
+          "comments": 6,
+          "price_pct": 0.65
+        }
+      ],
+      "stock_names": [
+        "达梦数据"
+      ],
+      "reads": 3,
+      "likes": 1,
+      "comments": 6,
+      "price_pct": 0.65
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 17:40:16",
+      "title": "应用板块观点更新-0603",
+      "stock_tags": [
+        {
+          "name": "易点天下",
+          "reads": 3,
+          "likes": 7,
+          "comments": 18,
+          "price_pct": 1.95
+        }
+      ],
+      "stock_names": [
+        "易点天下"
+      ],
+      "reads": 3,
+      "likes": 7,
+      "comments": 18,
+      "price_pct": 1.95
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 17:18:27",
+      "title": "高速铜缆：AI互联进入“军备竞赛”时代，业绩即将迎来大爆发！",
+      "stock_tags": [
+        {
+          "name": "鼎通科技",
+          "reads": 9,
+          "likes": 7,
+          "comments": 10,
+          "price_pct": 2.23
+        }
+      ],
+      "stock_names": [
+        "鼎通科技"
+      ],
+      "reads": 9,
+      "likes": 7,
+      "comments": 10,
+      "price_pct": 2.23
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 16:07:24",
+      "title": "6.3个股信息差（依旧老套路）",
+      "stock_tags": [
+        {
+          "name": "京能电力",
+          "reads": 61,
+          "likes": 30,
+          "comments": 72,
+          "price_pct": 13.96
+        }
+      ],
+      "stock_names": [
+        "京能电力"
+      ],
+      "reads": 61,
+      "likes": 30,
+      "comments": 72,
+      "price_pct": 13.96
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 19:11:03",
+      "title": "【核心复盘】6月3日=",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 10,
+          "likes": 43,
+          "comments": 52,
+          "price_pct": 4.03
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 10,
+      "likes": 43,
+      "comments": 52,
+      "price_pct": 4.03
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 16:30:09",
+      "title": "2026 年 6 月 3 日连板个股复盘",
+      "stock_tags": [
+        {
+          "name": "模塑科技",
+          "reads": 5,
+          "likes": 7,
+          "comments": 10,
+          "price_pct": 1.98
+        }
+      ],
+      "stock_names": [
+        "模塑科技"
+      ],
+      "reads": 5,
+      "likes": 7,
+      "comments": 10,
+      "price_pct": 1.98
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 17:05:59",
+      "title": "6.4盘前",
+      "stock_tags": [
+        {
+          "name": "国瓷材料",
+          "reads": 0,
+          "likes": 3,
+          "comments": 12,
+          "price_pct": 1.12
+        }
+      ],
+      "stock_names": [
+        "国瓷材料"
+      ],
+      "reads": 0,
+      "likes": 3,
+      "comments": 12,
+      "price_pct": 1.12
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 15:56:56",
+      "title": "6月3日复盘笔记：人形机器人/芯片产业/电力/光通信/PCB/超硬材料等",
+      "stock_tags": [
+        {
+          "name": "王子新材",
+          "reads": 6,
+          "likes": 6,
+          "comments": 7,
+          "price_pct": 1.54
+        }
+      ],
+      "stock_names": [
+        "王子新材"
+      ],
+      "reads": 6,
+      "likes": 6,
+      "comments": 7,
+      "price_pct": 1.54
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 06:59:33",
+      "title": "6月3日股市早报：光通信/存储/光纤/腾讯生态/农业/有色/算力硬件等",
+      "stock_tags": [
+        {
+          "name": "亨通光电",
+          "reads": 10,
+          "likes": 5,
+          "comments": 11,
+          "price_pct": 2.42
+        }
+      ],
+      "stock_names": [
+        "亨通光电"
+      ],
+      "reads": 10,
+      "likes": 5,
+      "comments": 11,
+      "price_pct": 2.42
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-03 08:57:55",
+      "title": "6.2题材",
+      "stock_tags": [
+        {
+          "name": "蓝科高新",
+          "reads": 1,
+          "likes": 0,
+          "comments": 3,
+          "price_pct": 0.45
+        }
+      ],
+      "stock_names": [
+        "蓝科高新"
+      ],
+      "reads": 1,
+      "likes": 0,
+      "comments": 3,
+      "price_pct": 0.45
+    }
+  ]
+}

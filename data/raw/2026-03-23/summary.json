@@ -1,0 +1,50 @@
+{
+  "date": "2026-03-23",
+  "post_count": 2,
+  "user_count": 2,
+  "stock_count": 2,
+  "posts": [
+    {
+      "user": "0.74",
+      "ts": "2026-03-23 07:33:44",
+      "title": "能源安全+太空算力双轮驱动：光伏储能全线爆发，特斯拉订单引爆国产链",
+      "stock_tags": [
+        {
+          "name": "阳光电源",
+          "reads": 296,
+          "likes": 108,
+          "comments": 108,
+          "price_pct": 94.1
+        }
+      ],
+      "stock_names": [
+        "阳光电源"
+      ],
+      "reads": 296,
+      "likes": 108,
+      "comments": 108,
+      "price_pct": 94.1
+    },
+    {
+      "user": "韭菜韭菜非韭菜",
+      "ts": "2026-03-23 10:22:29",
+      "title": "太空光伏细分领域核心龙头",
+      "stock_tags": [
+        {
+          "name": "东方日升",
+          "reads": 38,
+          "likes": 28,
+          "comments": 52,
+          "price_pct": 37.11
+        }
+      ],
+      "stock_names": [
+        "东方日升"
+      ],
+      "reads": 38,
+      "likes": 28,
+      "comments": 52,
+      "price_pct": 37.11
+    }
+  ]
+}

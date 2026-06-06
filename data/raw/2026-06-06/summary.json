@@ -1,0 +1,50 @@
+{
+  "date": "2026-06-06",
+  "post_count": 2,
+  "user_count": 2,
+  "stock_count": 2,
+  "posts": [
+    {
+      "user": "Vin7的大",
+      "ts": "2026-06-06 10:09:37",
+      "title": "大跌之夜，高盛合伙人喊“抄底”：今年这种买入的机会并不多",
+      "stock_tags": [
+        {
+          "name": "新易盛",
+          "reads": 4,
+          "likes": 4,
+          "comments": 4,
+          "price_pct": 0.0
+        }
+      ],
+      "stock_names": [
+        "新易盛"
+      ],
+      "reads": 4,
+      "likes": 4,
+      "comments": 4,
+      "price_pct": 0.0
+    },
+    {
+      "user": "Vin7的大",
+      "ts": "2026-06-06 08:33:20",
+      "title": "巨头扎堆落地+产业链成熟：AI眼镜的“iPhone时刻”快来了吗",
+      "stock_tags": [
+        {
+          "name": "卓兆点胶",
+          "reads": 2,
+          "likes": 7,
+          "comments": 5,
+          "price_pct": 0.0
+        }
+      ],
+      "stock_names": [
+        "卓兆点胶"
+      ],
+      "reads": 2,
+      "likes": 7,
+      "comments": 5,
+      "price_pct": 0.0
+    }
+  ]
+}

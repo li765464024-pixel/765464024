@@ -1,0 +1,29 @@
+{
+  "date": "2026-04-19",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-04-19 10:00:14",
+      "title": "【华西计算机】中国航天日主场活动将于成都举办:一系列重大信息待发布",
+      "stock_tags": [
+        {
+          "name": "西部材料",
+          "reads": 0,
+          "likes": 2,
+          "comments": 2,
+          "price_pct": 1.26
+        }
+      ],
+      "stock_names": [
+        "西部材料"
+      ],
+      "reads": 0,
+      "likes": 2,
+      "comments": 2,
+      "price_pct": 1.26
+    }
+  ]
+}

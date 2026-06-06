@@ -1,0 +1,29 @@
+{
+  "date": "2026-01-11",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "白熊",
+      "ts": "2026-01-11 11:56:07",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "力星股份",
+          "reads": 2,
+          "likes": 12,
+          "comments": 25,
+          "price_pct": 1.26
+        }
+      ],
+      "stock_names": [
+        "力星股份"
+      ],
+      "reads": 2,
+      "likes": 12,
+      "comments": 25,
+      "price_pct": 1.26
+    }
+  ]
+}

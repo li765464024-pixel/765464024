@@ -1,0 +1,29 @@
+{
+  "date": "2026-04-20",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "81.50",
+      "ts": "2026-04-20 07:09:39",
+      "title": "AI-PCB产业链全面梳理：需求爆发、上游通胀与封装变局",
+      "stock_tags": [
+        {
+          "name": "大族数控",
+          "reads": 269,
+          "likes": 86,
+          "comments": 95,
+          "price_pct": 103.77
+        }
+      ],
+      "stock_names": [
+        "大族数控"
+      ],
+      "reads": 269,
+      "likes": 86,
+      "comments": 95,
+      "price_pct": 103.77
+    }
+  ]
+}

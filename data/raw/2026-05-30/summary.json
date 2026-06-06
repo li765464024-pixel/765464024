@@ -1,0 +1,50 @@
+{
+  "date": "2026-05-30",
+  "post_count": 2,
+  "user_count": 2,
+  "stock_count": 2,
+  "posts": [
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-05-30 13:52:34",
+      "title": "韭研公社学习笔记（260529）",
+      "stock_tags": [
+        {
+          "name": "步步高",
+          "reads": 84,
+          "likes": 123,
+          "comments": 134,
+          "price_pct": 14.61
+        }
+      ],
+      "stock_names": [
+        "步步高"
+      ],
+      "reads": 84,
+      "likes": 123,
+      "comments": 134,
+      "price_pct": 14.61
+    },
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-05-30 22:32:21",
+      "title": "【zz】陈果： 这次变盘可能不一般，需要讨论应对预案",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 3,
+          "likes": 6,
+          "comments": 4,
+          "price_pct": 1.0
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 3,
+      "likes": 6,
+      "comments": 4,
+      "price_pct": 1.0
+    }
+  ]
+}

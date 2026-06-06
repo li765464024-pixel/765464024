@@ -1,0 +1,50 @@
+{
+  "date": "2026-04-12",
+  "post_count": 2,
+  "user_count": 1,
+  "stock_count": 2,
+  "posts": [
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-04-12 20:42:48",
+      "title": "【zz】算力租赁行业近期交流预期差更新",
+      "stock_tags": [
+        {
+          "name": "宏景科技",
+          "reads": 1,
+          "likes": 4,
+          "comments": 5,
+          "price_pct": 5.58
+        }
+      ],
+      "stock_names": [
+        "宏景科技"
+      ],
+      "reads": 1,
+      "likes": 4,
+      "comments": 5,
+      "price_pct": 5.58
+    },
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-04-12 15:44:47",
+      "title": "[怎么看待伊斯兰堡谈判与伊朗局势的后续走向]ByXF",
+      "stock_tags": [
+        {
+          "name": "中际旭创",
+          "reads": 0,
+          "likes": 6,
+          "comments": 8,
+          "price_pct": 5.08
+        }
+      ],
+      "stock_names": [
+        "中际旭创"
+      ],
+      "reads": 0,
+      "likes": 6,
+      "comments": 8,
+      "price_pct": 5.08
+    }
+  ]
+}

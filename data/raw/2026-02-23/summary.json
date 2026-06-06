@@ -1,0 +1,29 @@
+{
+  "date": "2026-02-23",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "Vin7的大",
+      "ts": "2026-02-23 15:26:44",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "铂科新材",
+          "reads": 7,
+          "likes": 24,
+          "comments": 18,
+          "price_pct": 2.96
+        }
+      ],
+      "stock_names": [
+        "铂科新材"
+      ],
+      "reads": 7,
+      "likes": 24,
+      "comments": 18,
+      "price_pct": 2.96
+    }
+  ]
+}

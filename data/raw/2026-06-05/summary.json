@@ -1,0 +1,659 @@
+{
+  "date": "2026-06-05",
+  "post_count": 31,
+  "user_count": 12,
+  "stock_count": 26,
+  "posts": [
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 07:12:20",
+      "title": "6月5日盘前纪要",
+      "stock_tags": [
+        {
+          "name": "祥和实业",
+          "reads": 380,
+          "likes": 251,
+          "comments": 308,
+          "price_pct": 35.71
+        }
+      ],
+      "stock_names": [
+        "祥和实业"
+      ],
+      "reads": 380,
+      "likes": 251,
+      "comments": 308,
+      "price_pct": 35.71
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 12:02:33",
+      "title": "韭研公社全天涨停简图（06.05)",
+      "stock_tags": [
+        {
+          "name": "大有能源",
+          "reads": 22,
+          "likes": 34,
+          "comments": 45,
+          "price_pct": 9.12
+        }
+      ],
+      "stock_names": [
+        "大有能源"
+      ],
+      "reads": 22,
+      "likes": 34,
+      "comments": 45,
+      "price_pct": 9.12
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 14:06:31",
+      "title": "机器人产业链概念股梳理",
+      "stock_tags": [
+        {
+          "name": "埃斯顿",
+          "reads": 8,
+          "likes": 9,
+          "comments": 12,
+          "price_pct": 3.76
+        }
+      ],
+      "stock_names": [
+        "埃斯顿"
+      ],
+      "reads": 8,
+      "likes": 9,
+      "comments": 12,
+      "price_pct": 3.76
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 13:24:34",
+      "title": "国金具身智能】破圈切入3D打印机赛道，奥比中光再添全新增长曲线",
+      "stock_tags": [
+        {
+          "name": "奥比中光",
+          "reads": 0,
+          "likes": 0,
+          "comments": 3,
+          "price_pct": 0.92
+        }
+      ],
+      "stock_names": [
+        "奥比中光"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 3,
+      "price_pct": 0.92
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 13:05:33",
+      "title": "【中泰机械】人形机器人：产能建设是最难伪装的战略信号，量产兑现期龙头分化加剧",
+      "stock_tags": [
+        {
+          "name": "绿的谐波",
+          "reads": 0,
+          "likes": 0,
+          "comments": 0,
+          "price_pct": 0.47
+        }
+      ],
+      "stock_names": [
+        "绿的谐波"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 0,
+      "price_pct": 0.47
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 07:27:34",
+      "title": "A股VS港股，同是科技，不同命运？",
+      "stock_tags": [
+        {
+          "name": "飞凯材料",
+          "reads": 8,
+          "likes": 38,
+          "comments": 20,
+          "price_pct": 10.46
+        }
+      ],
+      "stock_names": [
+        "飞凯材料"
+      ],
+      "reads": 8,
+      "likes": 38,
+      "comments": 20,
+      "price_pct": 10.46
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 21:23:24",
+      "title": "陈果： 本周机构沟通小结",
+      "stock_tags": [
+        {
+          "name": "中际旭创",
+          "reads": 5,
+          "likes": 5,
+          "comments": 11,
+          "price_pct": 0.46
+        }
+      ],
+      "stock_names": [
+        "中际旭创"
+      ],
+      "reads": 5,
+      "likes": 5,
+      "comments": 11,
+      "price_pct": 0.46
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 17:50:00",
+      "title": "[中泰电子]被动元件提价再次加速，重视被动元件涨价大行情",
+      "stock_tags": [
+        {
+          "name": "江海股份",
+          "reads": 2,
+          "likes": 8,
+          "comments": 32,
+          "price_pct": 1.93
+        }
+      ],
+      "stock_names": [
+        "江海股份"
+      ],
+      "reads": 2,
+      "likes": 8,
+      "comments": 32,
+      "price_pct": 1.93
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 17:19:54",
+      "title": "摩根大通：A股流动性稳定，市场担忧过度，回调是AI国产化的买入窗口",
+      "stock_tags": [
+        {
+          "name": "绿的谐波",
+          "reads": 13,
+          "likes": 17,
+          "comments": 27,
+          "price_pct": 1.92
+        }
+      ],
+      "stock_names": [
+        "绿的谐波"
+      ],
+      "reads": 13,
+      "likes": 17,
+      "comments": 27,
+      "price_pct": 1.92
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 14:28:27",
+      "title": "黄仁勋再提“机器人+AI制造”、工厂自动化进入产业加速期，工业机器人迎来价值重估",
+      "stock_tags": [
+        {
+          "name": "绿的谐波",
+          "reads": 14,
+          "likes": 16,
+          "comments": 23,
+          "price_pct": 2.63
+        }
+      ],
+      "stock_names": [
+        "绿的谐波"
+      ],
+      "reads": 14,
+      "likes": 16,
+      "comments": 23,
+      "price_pct": 2.63
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 12:28:03",
+      "title": "Rubin削减机架内DRAM用量不会影响MLCC的需求",
+      "stock_tags": [
+        {
+          "name": "三环集团",
+          "reads": 3,
+          "likes": 8,
+          "comments": 13,
+          "price_pct": 1.55
+        }
+      ],
+      "stock_names": [
+        "三环集团"
+      ],
+      "reads": 3,
+      "likes": 8,
+      "comments": 13,
+      "price_pct": 1.55
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 10:13:22",
+      "title": "[东吴电子]重点关注AI先进封装新方向：玻璃基板产业链",
+      "stock_tags": [
+        {
+          "name": "帝尔激光",
+          "reads": 9,
+          "likes": 4,
+          "comments": 7,
+          "price_pct": 1.02
+        }
+      ],
+      "stock_names": [
+        "帝尔激光"
+      ],
+      "reads": 9,
+      "likes": 4,
+      "comments": 7,
+      "price_pct": 1.02
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 09:18:52",
+      "title": "英伟达Ve­ra Ru­b­in存储用量减半，市场反应有所误读",
+      "stock_tags": [
+        {
+          "name": "东山精密",
+          "reads": 5,
+          "likes": 4,
+          "comments": 4,
+          "price_pct": 0.81
+        }
+      ],
+      "stock_names": [
+        "东山精密"
+      ],
+      "reads": 5,
+      "likes": 4,
+      "comments": 4,
+      "price_pct": 0.81
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 08:23:32",
+      "title": "存储承压",
+      "stock_tags": [
+        {
+          "name": "江波龙",
+          "reads": 6,
+          "likes": 5,
+          "comments": 21,
+          "price_pct": 2.56
+        }
+      ],
+      "stock_names": [
+        "江波龙"
+      ],
+      "reads": 6,
+      "likes": 5,
+      "comments": 21,
+      "price_pct": 2.56
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 08:19:35",
+      "title": "【高盛预测：SpaceX旗下AI业务收入到2030年将飙升100倍】",
+      "stock_tags": [
+        {
+          "name": "信科移动",
+          "reads": 1,
+          "likes": 2,
+          "comments": 12,
+          "price_pct": 1.31
+        }
+      ],
+      "stock_names": [
+        "信科移动"
+      ],
+      "reads": 1,
+      "likes": 2,
+      "comments": 12,
+      "price_pct": 1.31
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 08:02:59",
+      "title": "国投证券-科技的卖点：第一个顶部还未到来",
+      "stock_tags": [
+        {
+          "name": "中际旭创",
+          "reads": 5,
+          "likes": 4,
+          "comments": 11,
+          "price_pct": 1.65
+        }
+      ],
+      "stock_names": [
+        "中际旭创"
+      ],
+      "reads": 5,
+      "likes": 4,
+      "comments": 11,
+      "price_pct": 1.65
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 05:24:34",
+      "title": "ML­CC紧缺程度远超预期，继续看好全容值涨价超级周期",
+      "stock_tags": [
+        {
+          "name": "商络电子",
+          "reads": 13,
+          "likes": 16,
+          "comments": 31,
+          "price_pct": 3.81
+        }
+      ],
+      "stock_names": [
+        "商络电子"
+      ],
+      "reads": 13,
+      "likes": 16,
+      "comments": 31,
+      "price_pct": 3.81
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 05:20:10",
+      "title": "华西证券：SpaceX上市追踪，从xAI到太空算力，SpaceX的第二次估值革命",
+      "stock_tags": [
+        {
+          "name": "迈为股份",
+          "reads": 22,
+          "likes": 37,
+          "comments": 38,
+          "price_pct": 5.34
+        }
+      ],
+      "stock_names": [
+        "迈为股份"
+      ],
+      "reads": 22,
+      "likes": 37,
+      "comments": 38,
+      "price_pct": 5.34
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 21:19:47",
+      "title": "【zz】陈果： 本周机构沟通小结",
+      "stock_tags": [
+        {
+          "name": "中际旭创",
+          "reads": 1,
+          "likes": 2,
+          "comments": 1,
+          "price_pct": 0.14
+        }
+      ],
+      "stock_names": [
+        "中际旭创"
+      ],
+      "reads": 1,
+      "likes": 2,
+      "comments": 1,
+      "price_pct": 0.14
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 18:34:25",
+      "title": "氦气供给中长期紧张，多气源、国产氦厂商迎来价值重估",
+      "stock_tags": [
+        {
+          "name": "金宏气体",
+          "reads": 3,
+          "likes": 27,
+          "comments": 24,
+          "price_pct": 2.19
+        }
+      ],
+      "stock_names": [
+        "金宏气体"
+      ],
+      "reads": 3,
+      "likes": 27,
+      "comments": 24,
+      "price_pct": 2.19
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 15:10:49",
+      "title": "台积电官宣试产线投产，玻璃基板产业化步入实质推进阶段",
+      "stock_tags": [
+        {
+          "name": "德龙激光",
+          "reads": 20,
+          "likes": 38,
+          "comments": 44,
+          "price_pct": 10.01
+        }
+      ],
+      "stock_names": [
+        "德龙激光"
+      ],
+      "reads": 20,
+      "likes": 38,
+      "comments": 44,
+      "price_pct": 10.01
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 14:42:16",
+      "title": "国产高端机床智能化、国产化加速落地",
+      "stock_tags": [
+        {
+          "name": "汇川技术",
+          "reads": 1,
+          "likes": 10,
+          "comments": 8,
+          "price_pct": 2.92
+        }
+      ],
+      "stock_names": [
+        "汇川技术"
+      ],
+      "reads": 1,
+      "likes": 10,
+      "comments": 8,
+      "price_pct": 2.92
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 06:40:48",
+      "title": "Marvell两大核心映射：光互联、交换网络",
+      "stock_tags": [
+        {
+          "name": "中兴通讯",
+          "reads": 2,
+          "likes": 10,
+          "comments": 8,
+          "price_pct": 4.63
+        }
+      ],
+      "stock_names": [
+        "中兴通讯"
+      ],
+      "reads": 2,
+      "likes": 10,
+      "comments": 8,
+      "price_pct": 4.63
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 06:39:52",
+      "title": "涨价+国产替代+AI需求共振：工业气体投资逻辑与核心标的梳理",
+      "stock_tags": [
+        {
+          "name": "和远气体",
+          "reads": 3,
+          "likes": 6,
+          "comments": 5,
+          "price_pct": 2.59
+        }
+      ],
+      "stock_names": [
+        "和远气体"
+      ],
+      "reads": 3,
+      "likes": 6,
+      "comments": 5,
+      "price_pct": 2.59
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 06:38:10",
+      "title": "技术破局+生态闭环：物理AI投资逻辑与核心布局方向梳理",
+      "stock_tags": [
+        {
+          "name": "软通动力",
+          "reads": 6,
+          "likes": 4,
+          "comments": 4,
+          "price_pct": 2.29
+        }
+      ],
+      "stock_names": [
+        "软通动力"
+      ],
+      "reads": 6,
+      "likes": 4,
+      "comments": 4,
+      "price_pct": 2.29
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 06:36:39",
+      "title": "政策定调+技术推进：6G产业链投资逻辑与优质标的梳理",
+      "stock_tags": [
+        {
+          "name": "中电鑫龙",
+          "reads": 5,
+          "likes": 22,
+          "comments": 11,
+          "price_pct": 5.98
+        }
+      ],
+      "stock_names": [
+        "中电鑫龙"
+      ],
+      "reads": 5,
+      "likes": 22,
+      "comments": 11,
+      "price_pct": 5.98
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 06:35:52",
+      "title": "SpaceX上市催化+国内技术突破共振：商业航天进入提速发展期",
+      "stock_tags": [
+        {
+          "name": "西部材料",
+          "reads": 2,
+          "likes": 4,
+          "comments": 3,
+          "price_pct": 1.98
+        }
+      ],
+      "stock_names": [
+        "西部材料"
+      ],
+      "reads": 2,
+      "likes": 4,
+      "comments": 3,
+      "price_pct": 1.98
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 16:18:52",
+      "title": "6.5个股信息差（吓哭了）",
+      "stock_tags": [
+        {
+          "name": "达实智能",
+          "reads": 15,
+          "likes": 11,
+          "comments": 33,
+          "price_pct": 3.57
+        }
+      ],
+      "stock_names": [
+        "达实智能"
+      ],
+      "reads": 15,
+      "likes": 11,
+      "comments": 33,
+      "price_pct": 3.57
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 16:48:04",
+      "title": "2026 年 6 月 5 日连板个股复盘",
+      "stock_tags": [
+        {
+          "name": "凤凰航运",
+          "reads": 3,
+          "likes": 3,
+          "comments": 9,
+          "price_pct": 0.96
+        }
+      ],
+      "stock_names": [
+        "凤凰航运"
+      ],
+      "reads": 3,
+      "likes": 3,
+      "comments": 9,
+      "price_pct": 0.96
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 15:45:05",
+      "title": "6月5日复盘笔记：机器人/玻璃基板/AI应用/6G/芯片产业/商业航天/PCB等",
+      "stock_tags": [
+        {
+          "name": "江化微",
+          "reads": 9,
+          "likes": 6,
+          "comments": 7,
+          "price_pct": 0.76
+        }
+      ],
+      "stock_names": [
+        "江化微"
+      ],
+      "reads": 9,
+      "likes": 6,
+      "comments": 7,
+      "price_pct": 0.76
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-06-05 07:02:49",
+      "title": "6月5日股市早报：物理AI/TOKEN经济/6G/光纤/半导体/超级电容等",
+      "stock_tags": [
+        {
+          "name": "软通动力",
+          "reads": 6,
+          "likes": 4,
+          "comments": 12,
+          "price_pct": 1.4
+        }
+      ],
+      "stock_names": [
+        "软通动力"
+      ],
+      "reads": 6,
+      "likes": 4,
+      "comments": 12,
+      "price_pct": 1.4
+    }
+  ]
+}

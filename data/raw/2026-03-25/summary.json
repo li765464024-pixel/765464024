@@ -1,0 +1,29 @@
+{
+  "date": "2026-03-25",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "加油奥利给",
+      "ts": "2026-03-25 07:29:10",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "鼎龙股份",
+          "reads": 9,
+          "likes": 43,
+          "comments": 14,
+          "price_pct": 14.99
+        }
+      ],
+      "stock_names": [
+        "鼎龙股份"
+      ],
+      "reads": 9,
+      "likes": 43,
+      "comments": 14,
+      "price_pct": 14.99
+    }
+  ]
+}

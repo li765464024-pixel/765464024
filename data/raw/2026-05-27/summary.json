@@ -1,0 +1,407 @@
+{
+  "date": "2026-05-27",
+  "post_count": 19,
+  "user_count": 16,
+  "stock_count": 18,
+  "posts": [
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 07:15:22",
+      "title": "5月27日盘前纪要",
+      "stock_tags": [
+        {
+          "name": "新亚制程",
+          "reads": 280,
+          "likes": 179,
+          "comments": 269,
+          "price_pct": 100.6
+        }
+      ],
+      "stock_names": [
+        "新亚制程"
+      ],
+      "reads": 280,
+      "likes": 179,
+      "comments": 269,
+      "price_pct": 100.6
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 21:36:35",
+      "title": "晚间 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 44,
+          "likes": 41,
+          "comments": 130,
+          "price_pct": 23.06
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 44,
+      "likes": 41,
+      "comments": 130,
+      "price_pct": 23.06
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 22:16:31",
+      "title": "0527图表：铝电解电容器/MLPC、电力概念、PCB设备及耗材等",
+      "stock_tags": [
+        {
+          "name": "华塑控股",
+          "reads": 81,
+          "likes": 72,
+          "comments": 92,
+          "price_pct": 51.66
+        }
+      ],
+      "stock_names": [
+        "华塑控股"
+      ],
+      "reads": 81,
+      "likes": 72,
+      "comments": 92,
+      "price_pct": 51.66
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 01:08:21",
+      "title": "0526图表：存储芯片、3D打印、商业航天、玻璃基板、AI芯片、PTFE、铝等",
+      "stock_tags": [
+        {
+          "name": "沃格光电",
+          "reads": 165,
+          "likes": 59,
+          "comments": 103,
+          "price_pct": 69.36
+        }
+      ],
+      "stock_names": [
+        "沃格光电"
+      ],
+      "reads": 165,
+      "likes": 59,
+      "comments": 103,
+      "price_pct": 69.36
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 17:17:47",
+      "title": "韭研公社学习笔记（260527）",
+      "stock_tags": [
+        {
+          "name": "华塑控股",
+          "reads": 40,
+          "likes": 46,
+          "comments": 78,
+          "price_pct": 15.92
+        }
+      ],
+      "stock_names": [
+        "华塑控股"
+      ],
+      "reads": 40,
+      "likes": 46,
+      "comments": 78,
+      "price_pct": 15.92
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 17:43:26",
+      "title": "260527明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "宝鼎科技",
+          "reads": 33,
+          "likes": 46,
+          "comments": 21,
+          "price_pct": 19.62
+        }
+      ],
+      "stock_names": [
+        "宝鼎科技"
+      ],
+      "reads": 33,
+      "likes": 46,
+      "comments": 21,
+      "price_pct": 19.62
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 19:04:28",
+      "title": "5月27日 公社内容精选",
+      "stock_tags": [
+        {
+          "name": "东阳光",
+          "reads": 27,
+          "likes": 37,
+          "comments": 55,
+          "price_pct": 13.49
+        }
+      ],
+      "stock_names": [
+        "东阳光"
+      ],
+      "reads": 27,
+      "likes": 37,
+      "comments": 55,
+      "price_pct": 13.49
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 11:51:32",
+      "title": "韭研公社全天涨停简图（05.27）",
+      "stock_tags": [
+        {
+          "name": "华电能源",
+          "reads": 35,
+          "likes": 46,
+          "comments": 46,
+          "price_pct": 23.17
+        }
+      ],
+      "stock_names": [
+        "华电能源"
+      ],
+      "reads": 35,
+      "likes": 46,
+      "comments": 46,
+      "price_pct": 23.17
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 10:42:05",
+      "title": "电子布→覆铜板→PCBA股核心公司，产业链逻辑梳理",
+      "stock_tags": [
+        {
+          "name": "深南电路",
+          "reads": 80,
+          "likes": 33,
+          "comments": 65,
+          "price_pct": 45.61
+        }
+      ],
+      "stock_names": [
+        "深南电路"
+      ],
+      "reads": 80,
+      "likes": 33,
+      "comments": 65,
+      "price_pct": 45.61
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 07:20:16",
+      "title": "决定AI牛市的关键变量是什么？",
+      "stock_tags": [
+        {
+          "name": "麦捷科技",
+          "reads": 12,
+          "likes": 46,
+          "comments": 29,
+          "price_pct": 18.72
+        }
+      ],
+      "stock_names": [
+        "麦捷科技"
+      ],
+      "reads": 12,
+      "likes": 46,
+      "comments": 29,
+      "price_pct": 18.72
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 22:34:06",
+      "title": "50倍增幅！AI漫剧迈入爆发期！",
+      "stock_tags": [
+        {
+          "name": "万兴科技",
+          "reads": 8,
+          "likes": 5,
+          "comments": 14,
+          "price_pct": 9.99
+        }
+      ],
+      "stock_names": [
+        "万兴科技"
+      ],
+      "reads": 8,
+      "likes": 5,
+      "comments": 14,
+      "price_pct": 9.99
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 16:23:58",
+      "title": "功率半导体：涨价潮确认开启，AI驱动周期强反转",
+      "stock_tags": [
+        {
+          "name": "士兰微",
+          "reads": 13,
+          "likes": 13,
+          "comments": 18,
+          "price_pct": 14.16
+        }
+      ],
+      "stock_names": [
+        "士兰微"
+      ],
+      "reads": 13,
+      "likes": 13,
+      "comments": 18,
+      "price_pct": 14.16
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 15:49:35",
+      "title": "功率半导体需求展望乐观，预计年中开启二次涨价",
+      "stock_tags": [
+        {
+          "name": "华润微",
+          "reads": 22,
+          "likes": 11,
+          "comments": 17,
+          "price_pct": 18.92
+        }
+      ],
+      "stock_names": [
+        "华润微"
+      ],
+      "reads": 22,
+      "likes": 11,
+      "comments": 17,
+      "price_pct": 18.92
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 15:59:44",
+      "title": "5.27个股信息差（老奶奶下楼梯）",
+      "stock_tags": [
+        {
+          "name": "江海股份",
+          "reads": 23,
+          "likes": 18,
+          "comments": 53,
+          "price_pct": 12.5
+        }
+      ],
+      "stock_names": [
+        "江海股份"
+      ],
+      "reads": 23,
+      "likes": 18,
+      "comments": 53,
+      "price_pct": 12.5
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 20:29:40",
+      "title": "【核心复盘】5月27日=",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 10,
+          "likes": 36,
+          "comments": 56,
+          "price_pct": 4.23
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 10,
+      "likes": 36,
+      "comments": 56,
+      "price_pct": 4.23
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 15:52:14",
+      "title": "2026 年 5 月 27 日连板个股复盘",
+      "stock_tags": [
+        {
+          "name": "中百集团",
+          "reads": 5,
+          "likes": 6,
+          "comments": 12,
+          "price_pct": 2.74
+        }
+      ],
+      "stock_names": [
+        "中百集团"
+      ],
+      "reads": 5,
+      "likes": 6,
+      "comments": 12,
+      "price_pct": 2.74
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 18:10:42",
+      "title": "5.28盘前",
+      "stock_tags": [
+        {
+          "name": "奥比中光",
+          "reads": 1,
+          "likes": 6,
+          "comments": 15,
+          "price_pct": 1.3
+        }
+      ],
+      "stock_names": [
+        "奥比中光"
+      ],
+      "reads": 1,
+      "likes": 6,
+      "comments": 15,
+      "price_pct": 1.3
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 18:38:12",
+      "title": "5月27日一图看市场",
+      "stock_tags": [
+        {
+          "name": "南矿集团",
+          "reads": 0,
+          "likes": 0,
+          "comments": 1,
+          "price_pct": 0.06
+        }
+      ],
+      "stock_names": [
+        "南矿集团"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 1,
+      "price_pct": 0.06
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-27 22:48:08",
+      "title": "5.27题材",
+      "stock_tags": [
+        {
+          "name": "凯恩股份",
+          "reads": 2,
+          "likes": 1,
+          "comments": 2,
+          "price_pct": 0.21
+        }
+      ],
+      "stock_names": [
+        "凯恩股份"
+      ],
+      "reads": 2,
+      "likes": 1,
+      "comments": 2,
+      "price_pct": 0.21
+    }
+  ]
+}

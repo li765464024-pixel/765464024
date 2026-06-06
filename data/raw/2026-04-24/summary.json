@@ -1,0 +1,29 @@
+{
+  "date": "2026-04-24",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-04-24 19:44:01",
+      "title": "【zz】有种感觉，我们距离化工的下一轮行情越来越近了",
+      "stock_tags": [
+        {
+          "name": "宝丰能源",
+          "reads": 1,
+          "likes": 5,
+          "comments": 9,
+          "price_pct": 3.73
+        }
+      ],
+      "stock_names": [
+        "宝丰能源"
+      ],
+      "reads": 1,
+      "likes": 5,
+      "comments": 9,
+      "price_pct": 3.73
+    }
+  ]
+}

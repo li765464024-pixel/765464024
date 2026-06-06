@@ -1,0 +1,50 @@
+{
+  "date": "2026-04-23",
+  "post_count": 2,
+  "user_count": 2,
+  "stock_count": 2,
+  "posts": [
+    {
+      "user": "韭菜韭菜非韭菜",
+      "ts": "2026-04-23 10:36:30",
+      "title": "节能降碳概念股及受益核心公司",
+      "stock_tags": [
+        {
+          "name": "宁德时代",
+          "reads": 15,
+          "likes": 12,
+          "comments": 12,
+          "price_pct": 4.02
+        }
+      ],
+      "stock_names": [
+        "宁德时代"
+      ],
+      "reads": 15,
+      "likes": 12,
+      "comments": 12,
+      "price_pct": 4.02
+    },
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-04-23 12:45:02",
+      "title": "【华泰必选】今日白酒板块大涨点评",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 3,
+          "likes": 9,
+          "comments": 8,
+          "price_pct": 2.56
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 3,
+      "likes": 9,
+      "comments": 8,
+      "price_pct": 2.56
+    }
+  ]
+}

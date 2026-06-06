@@ -1,0 +1,92 @@
+{
+  "date": "2026-05-17",
+  "post_count": 4,
+  "user_count": 4,
+  "stock_count": 4,
+  "posts": [
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-17 10:25:12",
+      "title": "周末 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 80,
+          "likes": 60,
+          "comments": 148,
+          "price_pct": 16.63
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 80,
+      "likes": 60,
+      "comments": 148,
+      "price_pct": 16.63
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-17 22:59:12",
+      "title": "0517图表：长鑫科技、中国电信Token概念、上海算力、氢氟酸等",
+      "stock_tags": [
+        {
+          "name": "柏诚股份",
+          "reads": 76,
+          "likes": 48,
+          "comments": 90,
+          "price_pct": 36.57
+        }
+      ],
+      "stock_names": [
+        "柏诚股份"
+      ],
+      "reads": 76,
+      "likes": 48,
+      "comments": 90,
+      "price_pct": 36.57
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-17 13:18:54",
+      "title": "260517明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "润建股份",
+          "reads": 12,
+          "likes": 38,
+          "comments": 25,
+          "price_pct": 11.24
+        }
+      ],
+      "stock_names": [
+        "润建股份"
+      ],
+      "reads": 12,
+      "likes": 38,
+      "comments": 25,
+      "price_pct": 11.24
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-17 15:12:27",
+      "title": "运营商“Token套餐”落地 AI算力正式迈入大众消费时代",
+      "stock_tags": [
+        {
+          "name": "中国电信",
+          "reads": 6,
+          "likes": 15,
+          "comments": 22,
+          "price_pct": 9.88
+        }
+      ],
+      "stock_names": [
+        "中国电信"
+      ],
+      "reads": 6,
+      "likes": 15,
+      "comments": 22,
+      "price_pct": 9.88
+    }
+  ]
+}

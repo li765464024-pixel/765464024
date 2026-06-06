@@ -1,0 +1,29 @@
+{
+  "date": "2026-05-08",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-05-08 09:07:08",
+      "title": "【华泰金属】把握黄金补涨机遇",
+      "stock_tags": [
+        {
+          "name": "紫金矿业",
+          "reads": 1,
+          "likes": 3,
+          "comments": 1,
+          "price_pct": 1.1
+        }
+      ],
+      "stock_names": [
+        "紫金矿业"
+      ],
+      "reads": 1,
+      "likes": 3,
+      "comments": 1,
+      "price_pct": 1.1
+    }
+  ]
+}

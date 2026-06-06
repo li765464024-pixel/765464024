@@ -1,0 +1,71 @@
+{
+  "date": "2026-05-06",
+  "post_count": 3,
+  "user_count": 3,
+  "stock_count": 3,
+  "posts": [
+    {
+      "user": "韭香朋友",
+      "ts": "2026-05-06 07:05:40",
+      "title": "Agentic AI时代算力重构：从GPU狂欢到CPU价值回归",
+      "stock_tags": [
+        {
+          "name": "海光信息",
+          "reads": 95,
+          "likes": 55,
+          "comments": 66,
+          "price_pct": 55.76
+        }
+      ],
+      "stock_names": [
+        "海光信息"
+      ],
+      "reads": 95,
+      "likes": 55,
+      "comments": 66,
+      "price_pct": 55.76
+    },
+    {
+      "user": "韭香朋友",
+      "ts": "2026-05-06 11:01:19",
+      "title": "华为昇腾产业链梳理",
+      "stock_tags": [
+        {
+          "name": "泰嘉股份",
+          "reads": 78,
+          "likes": 27,
+          "comments": 35,
+          "price_pct": 41.35
+        }
+      ],
+      "stock_names": [
+        "泰嘉股份"
+      ],
+      "reads": 78,
+      "likes": 27,
+      "comments": 35,
+      "price_pct": 41.35
+    },
+    {
+      "user": "韭香朋友",
+      "ts": "2026-05-06 07:11:13",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "景旺电子",
+          "reads": 24,
+          "likes": 63,
+          "comments": 30,
+          "price_pct": 32.15
+        }
+      ],
+      "stock_names": [
+        "景旺电子"
+      ],
+      "reads": 24,
+      "likes": 63,
+      "comments": 30,
+      "price_pct": 32.15
+    }
+  ]
+}

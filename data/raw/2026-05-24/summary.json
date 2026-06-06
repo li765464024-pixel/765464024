@@ -1,0 +1,176 @@
+{
+  "date": "2026-05-24",
+  "post_count": 8,
+  "user_count": 8,
+  "stock_count": 6,
+  "posts": [
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-24 10:31:28",
+      "title": "周末 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 117,
+          "likes": 58,
+          "comments": 157,
+          "price_pct": 21.73
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 117,
+      "likes": 58,
+      "comments": 157,
+      "price_pct": 21.73
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-24 23:55:42",
+      "title": "0524图表：AI PCB、MLCC、机器人、deepseek、煤铝、商业航天等",
+      "stock_tags": [
+        {
+          "name": "风华高科",
+          "reads": 198,
+          "likes": 82,
+          "comments": 98,
+          "price_pct": 54.21
+        }
+      ],
+      "stock_names": [
+        "风华高科"
+      ],
+      "reads": 198,
+      "likes": 82,
+      "comments": 98,
+      "price_pct": 54.21
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-24 20:25:54",
+      "title": "从“价值重估”到“全线紧缺”——MLCC产业链深度透视",
+      "stock_tags": [
+        {
+          "name": "风华高科",
+          "reads": 38,
+          "likes": 19,
+          "comments": 32,
+          "price_pct": 27.15
+        }
+      ],
+      "stock_names": [
+        "风华高科"
+      ],
+      "reads": 38,
+      "likes": 19,
+      "comments": 32,
+      "price_pct": 27.15
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-24 20:20:24",
+      "title": "从“价值重估”到“业绩兑现”——PCB产业链全透视（再跟踪）",
+      "stock_tags": [
+        {
+          "name": "宏和科技",
+          "reads": 19,
+          "likes": 11,
+          "comments": 19,
+          "price_pct": 13.65
+        }
+      ],
+      "stock_names": [
+        "宏和科技"
+      ],
+      "reads": 19,
+      "likes": 11,
+      "comments": 19,
+      "price_pct": 13.65
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-24 15:29:37",
+      "title": "260524明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "宏和科技",
+          "reads": 89,
+          "likes": 97,
+          "comments": 51,
+          "price_pct": 27.76
+        }
+      ],
+      "stock_names": [
+        "宏和科技"
+      ],
+      "reads": 89,
+      "likes": 97,
+      "comments": 51,
+      "price_pct": 27.76
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-24 14:01:47",
+      "title": "5.24周末热度汇总",
+      "stock_tags": [
+        {
+          "name": "博迁新材",
+          "reads": 61,
+          "likes": 31,
+          "comments": 72,
+          "price_pct": 12.4
+        }
+      ],
+      "stock_names": [
+        "博迁新材"
+      ],
+      "reads": 61,
+      "likes": 31,
+      "comments": 72,
+      "price_pct": 12.4
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-24 21:53:19",
+      "title": "【核心复盘】5月24日=",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 10,
+          "likes": 29,
+          "comments": 51,
+          "price_pct": 0.04
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 10,
+      "likes": 29,
+      "comments": 51,
+      "price_pct": 0.04
+    },
+    {
+      "user": "题材图谱小集",
+      "ts": "2026-05-24 17:33:16",
+      "title": "5.25盘前",
+      "stock_tags": [
+        {
+          "name": "索辰科技",
+          "reads": 2,
+          "likes": 4,
+          "comments": 13,
+          "price_pct": 0.85
+        }
+      ],
+      "stock_names": [
+        "索辰科技"
+      ],
+      "reads": 2,
+      "likes": 4,
+      "comments": 13,
+      "price_pct": 0.85
+    }
+  ]
+}

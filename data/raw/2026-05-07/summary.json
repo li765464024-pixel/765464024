@@ -1,0 +1,29 @@
+{
+  "date": "2026-05-07",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-05-07 22:21:34",
+      "title": "【zz】AI自噬式上涨恐成自身敌人",
+      "stock_tags": [
+        {
+          "name": "英伟达公司",
+          "reads": 0,
+          "likes": 2,
+          "comments": 1,
+          "price_pct": 0.06
+        }
+      ],
+      "stock_names": [
+        "英伟达公司"
+      ],
+      "reads": 0,
+      "likes": 2,
+      "comments": 1,
+      "price_pct": 0.06
+    }
+  ]
+}

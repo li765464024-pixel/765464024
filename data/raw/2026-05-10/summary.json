@@ -1,0 +1,29 @@
+{
+  "date": "2026-05-10",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "听风的韭菜",
+      "ts": "2026-05-10 17:07:19",
+      "title": "【申万宏源通信】周观点更新：（20260509）",
+      "stock_tags": [
+        {
+          "name": "信科移动",
+          "reads": 1,
+          "likes": 3,
+          "comments": 1,
+          "price_pct": 0.17
+        }
+      ],
+      "stock_names": [
+        "信科移动"
+      ],
+      "reads": 1,
+      "likes": 3,
+      "comments": 1,
+      "price_pct": 0.17
+    }
+  ]
+}

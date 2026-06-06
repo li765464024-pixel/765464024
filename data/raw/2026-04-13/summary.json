@@ -1,0 +1,29 @@
+{
+  "date": "2026-04-13",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "0.13",
+      "ts": "2026-04-13 07:38:23",
+      "title": "液冷产业持续升温：科技大Beta下的高斜率赛道，龙头与黑马共舞",
+      "stock_tags": [
+        {
+          "name": "英维克",
+          "reads": 148,
+          "likes": 64,
+          "comments": 79,
+          "price_pct": 79.45
+        }
+      ],
+      "stock_names": [
+        "英维克"
+      ],
+      "reads": 148,
+      "likes": 64,
+      "comments": 79,
+      "price_pct": 79.45
+    }
+  ]
+}

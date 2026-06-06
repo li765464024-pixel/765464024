@@ -1,0 +1,50 @@
+{
+  "date": "2026-05-11",
+  "post_count": 2,
+  "user_count": 2,
+  "stock_count": 2,
+  "posts": [
+    {
+      "user": "韭香朋友",
+      "ts": "2026-05-11 08:15:03",
+      "title": "商业航天：进入事件驱动主升浪，聚焦火箭与算力双主线",
+      "stock_tags": [
+        {
+          "name": "钧达股份",
+          "reads": 205,
+          "likes": 78,
+          "comments": 81,
+          "price_pct": 61.9
+        }
+      ],
+      "stock_names": [
+        "钧达股份"
+      ],
+      "reads": 205,
+      "likes": 78,
+      "comments": 81,
+      "price_pct": 61.9
+    },
+    {
+      "user": "韭香朋友",
+      "ts": "2026-05-11 07:31:41",
+      "title": "光纤光缆：AI驱动下的新周期与投资机遇",
+      "stock_tags": [
+        {
+          "name": "长飞光纤",
+          "reads": 85,
+          "likes": 54,
+          "comments": 55,
+          "price_pct": 38.72
+        }
+      ],
+      "stock_names": [
+        "长飞光纤"
+      ],
+      "reads": 85,
+      "likes": 54,
+      "comments": 55,
+      "price_pct": 38.72
+    }
+  ]
+}

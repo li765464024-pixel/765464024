@@ -1,0 +1,386 @@
+{
+  "date": "2026-05-28",
+  "post_count": 18,
+  "user_count": 17,
+  "stock_count": 15,
+  "posts": [
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 07:21:54",
+      "title": "5月28日盘前纪要",
+      "stock_tags": [
+        {
+          "name": "华电能源",
+          "reads": 331,
+          "likes": 258,
+          "comments": 292,
+          "price_pct": 51.7
+        }
+      ],
+      "stock_names": [
+        "华电能源"
+      ],
+      "reads": 331,
+      "likes": 258,
+      "comments": 292,
+      "price_pct": 51.7
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 22:02:11",
+      "title": "晚间 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 51,
+          "likes": 63,
+          "comments": 145,
+          "price_pct": 19.96
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 51,
+      "likes": 63,
+      "comments": 145,
+      "price_pct": 19.96
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 16:34:22",
+      "title": "韭研公社学习笔记（260528）",
+      "stock_tags": [
+        {
+          "name": "宝鼎科技",
+          "reads": 64,
+          "likes": 53,
+          "comments": 105,
+          "price_pct": 18.08
+        }
+      ],
+      "stock_names": [
+        "宝鼎科技"
+      ],
+      "reads": 64,
+      "likes": 53,
+      "comments": 105,
+      "price_pct": 18.08
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 17:52:25",
+      "title": "260528明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "中际旭创",
+          "reads": 42,
+          "likes": 41,
+          "comments": 25,
+          "price_pct": 18.34
+        }
+      ],
+      "stock_names": [
+        "中际旭创"
+      ],
+      "reads": 42,
+      "likes": 41,
+      "comments": 25,
+      "price_pct": 18.34
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 19:13:46",
+      "title": "5月28日 公社内容精选",
+      "stock_tags": [
+        {
+          "name": "四方达",
+          "reads": 25,
+          "likes": 41,
+          "comments": 69,
+          "price_pct": 9.91
+        }
+      ],
+      "stock_names": [
+        "四方达"
+      ],
+      "reads": 25,
+      "likes": 41,
+      "comments": 69,
+      "price_pct": 9.91
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 12:01:36",
+      "title": "韭研公社全天涨停简图（05.28)",
+      "stock_tags": [
+        {
+          "name": "华电能源",
+          "reads": 53,
+          "likes": 60,
+          "comments": 62,
+          "price_pct": 18.91
+        }
+      ],
+      "stock_names": [
+        "华电能源"
+      ],
+      "reads": 53,
+      "likes": 60,
+      "comments": 62,
+      "price_pct": 18.91
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 10:24:13",
+      "title": "半导体三王",
+      "stock_tags": [
+        {
+          "name": "寒武纪",
+          "reads": 291,
+          "likes": 51,
+          "comments": 77,
+          "price_pct": 55.17
+        }
+      ],
+      "stock_names": [
+        "寒武纪"
+      ],
+      "reads": 291,
+      "likes": 51,
+      "comments": 77,
+      "price_pct": 55.17
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 07:23:29",
+      "title": "“安全资产”——穿越周期的长期核心主线",
+      "stock_tags": [
+        {
+          "name": "开尔新材",
+          "reads": 16,
+          "likes": 49,
+          "comments": 31,
+          "price_pct": 22.4
+        }
+      ],
+      "stock_names": [
+        "开尔新材"
+      ],
+      "reads": 16,
+      "likes": 49,
+      "comments": 31,
+      "price_pct": 22.4
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 12:48:00",
+      "title": "AI短剧：成本结构与供给模式重塑，内容变现与出海产业链升级！",
+      "stock_tags": [
+        {
+          "name": "德才股份",
+          "reads": 3,
+          "likes": 2,
+          "comments": 5,
+          "price_pct": 4.6
+        }
+      ],
+      "stock_names": [
+        "德才股份"
+      ],
+      "reads": 3,
+      "likes": 2,
+      "comments": 5,
+      "price_pct": 4.6
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 15:47:04",
+      "title": "5.28个股信息差（暴力反弹）",
+      "stock_tags": [
+        {
+          "name": "联特科技",
+          "reads": 70,
+          "likes": 28,
+          "comments": 68,
+          "price_pct": 14.69
+        }
+      ],
+      "stock_names": [
+        "联特科技"
+      ],
+      "reads": 70,
+      "likes": 28,
+      "comments": 68,
+      "price_pct": 14.69
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 18:03:07",
+      "title": "【核心复盘】5月28日=",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 9,
+          "likes": 50,
+          "comments": 57,
+          "price_pct": 3.65
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 9,
+      "likes": 50,
+      "comments": 57,
+      "price_pct": 3.65
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 15:54:57",
+      "title": "2026 年 5 月 28 日连板个股复盘",
+      "stock_tags": [
+        {
+          "name": "粤电力A",
+          "reads": 5,
+          "likes": 3,
+          "comments": 14,
+          "price_pct": 2.41
+        }
+      ],
+      "stock_names": [
+        "粤电力A"
+      ],
+      "reads": 5,
+      "likes": 3,
+      "comments": 14,
+      "price_pct": 2.41
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 18:08:43",
+      "title": "5.29盘前",
+      "stock_tags": [
+        {
+          "name": "沃格光电",
+          "reads": 2,
+          "likes": 7,
+          "comments": 14,
+          "price_pct": 1.17
+        }
+      ],
+      "stock_names": [
+        "沃格光电"
+      ],
+      "reads": 2,
+      "likes": 7,
+      "comments": 14,
+      "price_pct": 1.17
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 15:51:11",
+      "title": "5月28日复盘笔记：芯片产业链/PCB/MLCC/超级电容/液冷/光通信/电力/电网设备等",
+      "stock_tags": [
+        {
+          "name": "联特科技",
+          "reads": 8,
+          "likes": 8,
+          "comments": 13,
+          "price_pct": 2.28
+        }
+      ],
+      "stock_names": [
+        "联特科技"
+      ],
+      "reads": 8,
+      "likes": 8,
+      "comments": 13,
+      "price_pct": 2.28
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 07:02:39",
+      "title": "5月28日股市早报：AI基建/PCB/电源芯片/MLCC/先进制程/超级电容等",
+      "stock_tags": [
+        {
+          "name": "江海股份",
+          "reads": 18,
+          "likes": 13,
+          "comments": 25,
+          "price_pct": 6.87
+        }
+      ],
+      "stock_names": [
+        "江海股份"
+      ],
+      "reads": 18,
+      "likes": 13,
+      "comments": 25,
+      "price_pct": 6.87
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 21:19:31",
+      "title": "5月28日一图看市场",
+      "stock_tags": [
+        {
+          "name": "中兴通讯",
+          "reads": 1,
+          "likes": 0,
+          "comments": 1,
+          "price_pct": 0.06
+        }
+      ],
+      "stock_names": [
+        "中兴通讯"
+      ],
+      "reads": 1,
+      "likes": 0,
+      "comments": 1,
+      "price_pct": 0.06
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 22:54:13",
+      "title": "5.28题材",
+      "stock_tags": [
+        {
+          "name": "江海股份",
+          "reads": 3,
+          "likes": 1,
+          "comments": 4,
+          "price_pct": 0.95
+        }
+      ],
+      "stock_names": [
+        "江海股份"
+      ],
+      "reads": 3,
+      "likes": 1,
+      "comments": 4,
+      "price_pct": 0.95
+    },
+    {
+      "user": "一思一记",
+      "ts": "2026-05-28 21:02:27",
+      "title": "PCB",
+      "stock_tags": [
+        {
+          "name": "风华高科",
+          "reads": 11,
+          "likes": 4,
+          "comments": 6,
+          "price_pct": 2.03
+        }
+      ],
+      "stock_names": [
+        "风华高科"
+      ],
+      "reads": 11,
+      "likes": 4,
+      "comments": 6,
+      "price_pct": 2.03
+    }
+  ]
+}

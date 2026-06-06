@@ -1,0 +1,197 @@
+{
+  "date": "2026-05-31",
+  "post_count": 9,
+  "user_count": 9,
+  "stock_count": 9,
+  "posts": [
+    {
+      "user": "韭菜团子",
+      "ts": "2026-05-31 10:46:13",
+      "title": "周末 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 78,
+          "likes": 71,
+          "comments": 184,
+          "price_pct": 28.04
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 78,
+      "likes": 71,
+      "comments": 184,
+      "price_pct": 28.04
+    },
+    {
+      "user": "韭菜团子",
+      "ts": "2026-05-31 15:40:33",
+      "title": "260531明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "工业富联",
+          "reads": 65,
+          "likes": 91,
+          "comments": 57,
+          "price_pct": 31.88
+        }
+      ],
+      "stock_names": [
+        "工业富联"
+      ],
+      "reads": 65,
+      "likes": 91,
+      "comments": 57,
+      "price_pct": 31.88
+    },
+    {
+      "user": "韭菜团子",
+      "ts": "2026-05-31 18:12:13",
+      "title": "5月29日到5月31日 公社内容精选",
+      "stock_tags": [
+        {
+          "name": "平安银行",
+          "reads": 48,
+          "likes": 53,
+          "comments": 82,
+          "price_pct": 43.62
+        }
+      ],
+      "stock_names": [
+        "平安银行"
+      ],
+      "reads": 48,
+      "likes": 53,
+      "comments": 82,
+      "price_pct": 43.62
+    },
+    {
+      "user": "韭菜团子",
+      "ts": "2026-05-31 09:27:12",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "协鑫能科",
+          "reads": 46,
+          "likes": 56,
+          "comments": 39,
+          "price_pct": 24.27
+        }
+      ],
+      "stock_names": [
+        "协鑫能科"
+      ],
+      "reads": 46,
+      "likes": 56,
+      "comments": 39,
+      "price_pct": 24.27
+    },
+    {
+      "user": "韭菜团子",
+      "ts": "2026-05-31 12:45:44",
+      "title": "5.31周末热度汇总",
+      "stock_tags": [
+        {
+          "name": "春秋电子",
+          "reads": 77,
+          "likes": 39,
+          "comments": 87,
+          "price_pct": 16.56
+        }
+      ],
+      "stock_names": [
+        "春秋电子"
+      ],
+      "reads": 77,
+      "likes": 39,
+      "comments": 87,
+      "price_pct": 16.56
+    },
+    {
+      "user": "韭菜团子",
+      "ts": "2026-05-31 22:04:59",
+      "title": "【核心复盘】5月31日=",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 10,
+          "likes": 30,
+          "comments": 58,
+          "price_pct": 3.89
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 10,
+      "likes": 30,
+      "comments": 58,
+      "price_pct": 3.89
+    },
+    {
+      "user": "韭菜团子",
+      "ts": "2026-05-31 13:51:26",
+      "title": "6.1盘前",
+      "stock_tags": [
+        {
+          "name": "沃格光电",
+          "reads": 2,
+          "likes": 7,
+          "comments": 13,
+          "price_pct": 0.99
+        }
+      ],
+      "stock_names": [
+        "沃格光电"
+      ],
+      "reads": 2,
+      "likes": 7,
+      "comments": 13,
+      "price_pct": 0.99
+    },
+    {
+      "user": "韭菜团子",
+      "ts": "2026-05-31 20:38:15",
+      "title": "5月29日一图看市场",
+      "stock_tags": [
+        {
+          "name": "盛剑科技",
+          "reads": 0,
+          "likes": 0,
+          "comments": 3,
+          "price_pct": 0.15
+        }
+      ],
+      "stock_names": [
+        "盛剑科技"
+      ],
+      "reads": 0,
+      "likes": 0,
+      "comments": 3,
+      "price_pct": 0.15
+    },
+    {
+      "user": "韭菜团子",
+      "ts": "2026-05-31 17:39:45",
+      "title": "电力",
+      "stock_tags": [
+        {
+          "name": "华能蒙电",
+          "reads": 3,
+          "likes": 1,
+          "comments": 2,
+          "price_pct": 0.66
+        }
+      ],
+      "stock_names": [
+        "华能蒙电"
+      ],
+      "reads": 3,
+      "likes": 1,
+      "comments": 2,
+      "price_pct": 0.66
+    }
+  ]
+}

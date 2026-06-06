@@ -1,0 +1,50 @@
+{
+  "date": "2026-03-30",
+  "post_count": 2,
+  "user_count": 2,
+  "stock_count": 2,
+  "posts": [
+    {
+      "user": "79.45",
+      "ts": "2026-03-30 06:57:10",
+      "title": "锂电产业链全线爆发：溶剂超预期 + 锂矿供给危机 + 材料涨价共振",
+      "stock_tags": [
+        {
+          "name": "永兴材料",
+          "reads": 267,
+          "likes": 96,
+          "comments": 124,
+          "price_pct": 138.16
+        }
+      ],
+      "stock_names": [
+        "永兴材料"
+      ],
+      "reads": 267,
+      "likes": 96,
+      "comments": 124,
+      "price_pct": 138.16
+    },
+    {
+      "user": "韭菜韭菜非韭菜",
+      "ts": "2026-03-30 13:34:40",
+      "title": "创新药核心概念股",
+      "stock_tags": [
+        {
+          "name": "荣昌生物",
+          "reads": 94,
+          "likes": 29,
+          "comments": 45,
+          "price_pct": 64.8
+        }
+      ],
+      "stock_names": [
+        "荣昌生物"
+      ],
+      "reads": 94,
+      "likes": 29,
+      "comments": 45,
+      "price_pct": 64.8
+    }
+  ]
+}

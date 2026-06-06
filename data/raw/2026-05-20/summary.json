@@ -1,0 +1,176 @@
+{
+  "date": "2026-05-20",
+  "post_count": 8,
+  "user_count": 8,
+  "stock_count": 6,
+  "posts": [
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-20 06:52:12",
+      "title": "5月20日盘前纪要",
+      "stock_tags": [
+        {
+          "name": "威龙股份",
+          "reads": 355,
+          "likes": 221,
+          "comments": 287,
+          "price_pct": 85.79
+        }
+      ],
+      "stock_names": [
+        "威龙股份"
+      ],
+      "reads": 355,
+      "likes": 221,
+      "comments": 287,
+      "price_pct": 85.79
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-20 21:35:23",
+      "title": "晚间 A股值得关注的资讯",
+      "stock_tags": [
+        {
+          "name": "中国平安",
+          "reads": 39,
+          "likes": 48,
+          "comments": 136,
+          "price_pct": 25.04
+        }
+      ],
+      "stock_names": [
+        "中国平安"
+      ],
+      "reads": 39,
+      "likes": 48,
+      "comments": 136,
+      "price_pct": 25.04
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-20 15:55:33",
+      "title": "韭研公社学习笔记（260520）",
+      "stock_tags": [
+        {
+          "name": "柏诚股份",
+          "reads": 80,
+          "likes": 49,
+          "comments": 88,
+          "price_pct": 20.22
+        }
+      ],
+      "stock_names": [
+        "柏诚股份"
+      ],
+      "reads": 80,
+      "likes": 49,
+      "comments": 88,
+      "price_pct": 20.22
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-20 17:10:49",
+      "title": "260520明日看好方向投票",
+      "stock_tags": [
+        {
+          "name": "中芯国际",
+          "reads": 28,
+          "likes": 53,
+          "comments": 23,
+          "price_pct": 19.98
+        }
+      ],
+      "stock_names": [
+        "中芯国际"
+      ],
+      "reads": 28,
+      "likes": 53,
+      "comments": 23,
+      "price_pct": 19.98
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-20 11:46:19",
+      "title": "韭研公社全天涨停简图（05.20)",
+      "stock_tags": [
+        {
+          "name": "威龙股份",
+          "reads": 48,
+          "likes": 43,
+          "comments": 29,
+          "price_pct": 13.61
+        }
+      ],
+      "stock_names": [
+        "威龙股份"
+      ],
+      "reads": 48,
+      "likes": 43,
+      "comments": 29,
+      "price_pct": 13.61
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-20 21:49:42",
+      "title": "【核心复盘】5月20日=",
+      "stock_tags": [
+        {
+          "name": "贵州茅台",
+          "reads": 6,
+          "likes": 33,
+          "comments": 51,
+          "price_pct": 4.56
+        }
+      ],
+      "stock_names": [
+        "贵州茅台"
+      ],
+      "reads": 6,
+      "likes": 33,
+      "comments": 51,
+      "price_pct": 4.56
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-20 16:30:50",
+      "title": "2026 年 5 月 20 日连板个股复盘",
+      "stock_tags": [
+        {
+          "name": "三孚股份",
+          "reads": 4,
+          "likes": 2,
+          "comments": 9,
+          "price_pct": 7.28
+        }
+      ],
+      "stock_names": [
+        "三孚股份"
+      ],
+      "reads": 4,
+      "likes": 2,
+      "comments": 9,
+      "price_pct": 7.28
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-20 20:07:03",
+      "title": "5月20日一图看市场",
+      "stock_tags": [
+        {
+          "name": "威龙股份",
+          "reads": 1,
+          "likes": 0,
+          "comments": 3,
+          "price_pct": 0.16
+        }
+      ],
+      "stock_names": [
+        "威龙股份"
+      ],
+      "reads": 1,
+      "likes": 0,
+      "comments": 3,
+      "price_pct": 0.16
+    }
+  ]
+}

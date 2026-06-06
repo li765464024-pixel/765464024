@@ -1,0 +1,71 @@
+{
+  "date": "2026-05-23",
+  "post_count": 3,
+  "user_count": 3,
+  "stock_count": 3,
+  "posts": [
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-23 10:02:49",
+      "title": "韭研公社学习笔记（260522）",
+      "stock_tags": [
+        {
+          "name": "宝鼎科技",
+          "reads": 68,
+          "likes": 77,
+          "comments": 93,
+          "price_pct": 10.37
+        }
+      ],
+      "stock_names": [
+        "宝鼎科技"
+      ],
+      "reads": 68,
+      "likes": 77,
+      "comments": 93,
+      "price_pct": 10.37
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-23 09:39:46",
+      "title": "英伟达Vera Rubin(VR200)最全产业链梳理",
+      "stock_tags": [
+        {
+          "name": "景旺电子",
+          "reads": 432,
+          "likes": 88,
+          "comments": 132,
+          "price_pct": 97.52
+        }
+      ],
+      "stock_names": [
+        "景旺电子"
+      ],
+      "reads": 432,
+      "likes": 88,
+      "comments": 132,
+      "price_pct": 97.52
+    },
+    {
+      "user": "一图看市场",
+      "ts": "2026-05-23 20:51:00",
+      "title": "5月23日一图看市场",
+      "stock_tags": [
+        {
+          "name": "金利华电",
+          "reads": 1,
+          "likes": 0,
+          "comments": 0,
+          "price_pct": 0.03
+        }
+      ],
+      "stock_names": [
+        "金利华电"
+      ],
+      "reads": 1,
+      "likes": 0,
+      "comments": 0,
+      "price_pct": 0.03
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "date": "2026-04-28",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "韭菜韭菜非韭菜",
+      "ts": "2026-04-28 10:07:48",
+      "title": "超聚变IPO辅导工作完成，相关概念股及核心受益公司（附股）",
+      "stock_tags": [
+        {
+          "name": "神州数码",
+          "reads": 22,
+          "likes": 12,
+          "comments": 18,
+          "price_pct": 21.01
+        }
+      ],
+      "stock_names": [
+        "神州数码"
+      ],
+      "reads": 22,
+      "likes": 12,
+      "comments": 18,
+      "price_pct": 21.01
+    }
+  ]
+}

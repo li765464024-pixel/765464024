@@ -1,0 +1,29 @@
+{
+  "date": "2026-03-18",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "韭菜韭菜非韭菜",
+      "ts": "2026-03-18 13:39:20",
+      "title": "阿里云AI算力和存储产品最高涨价34%，受益板块及个股一览",
+      "stock_tags": [
+        {
+          "name": "英维克",
+          "reads": 53,
+          "likes": 19,
+          "comments": 33,
+          "price_pct": 34.36
+        }
+      ],
+      "stock_names": [
+        "英维克"
+      ],
+      "reads": 53,
+      "likes": 19,
+      "comments": 33,
+      "price_pct": 34.36
+    }
+  ]
+}

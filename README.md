@@ -96,3 +96,22 @@ git checkout v1.0
 ## 端口说明
 
 默认端口 **5500** (macOS 上 5000 被 AirPlay Receiver 占用)。如需修改端口，改 `backend/app.py` 和 `frontend/js/app.js` 中的端口号。
+
+---
+
+## v1.3 — 韭研公社数据导入器 & 按日期组织
+
+### 新增功能
+- **韭研公社数据导入**: `backend/import_jiuyan.py` — 从爬取的HTML提取帖子，按日期组织
+- **日期结构化数据**: `data/raw/YYYY-MM-DD/summary.json` — 每日帖子摘要
+- **自动生成Section**: 每个日期自动生成 s5(题材热度排行榜) 和 s6(韭研公社热议) 内容
+- **前端日期切换**: 支持查看历史日期的韭研公社数据
+
+### 数据导入
+```bash
+# 爬取最新数据 → 组织到 data/raw/ → 导入 database
+python3 backend/import_jiuyan.py
+```
+
+### 历史数据查看
+前端日期选择器支持任意历史日期切换，数据按 `YYYY-MM-DD` 格式组织。
