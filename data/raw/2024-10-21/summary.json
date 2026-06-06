@@ -1,0 +1,29 @@
+{
+  "date": "2024-10-21",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "加油奥利给",
+      "ts": "2024-10-21 07:22:48",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "*ST海钦",
+          "reads": 359,
+          "likes": 146,
+          "comments": 72,
+          "price_pct": 86.79
+        }
+      ],
+      "stock_names": [
+        "*ST海钦"
+      ],
+      "reads": 359,
+      "likes": 146,
+      "comments": 72,
+      "price_pct": 86.79
+    }
+  ]
+}

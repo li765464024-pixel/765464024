@@ -1,0 +1,29 @@
+{
+  "date": "2024-01-27",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "怼辨识度核心",
+      "ts": "2024-01-27 17:53:37",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "上海凯鑫",
+          "reads": 80,
+          "likes": 132,
+          "comments": 165,
+          "price_pct": 0.57
+        }
+      ],
+      "stock_names": [
+        "上海凯鑫"
+      ],
+      "reads": 80,
+      "likes": 132,
+      "comments": 165,
+      "price_pct": 0.57
+    }
+  ]
+}

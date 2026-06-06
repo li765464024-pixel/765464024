@@ -1,0 +1,29 @@
+{
+  "date": "2023-12-22",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "每日题材收集",
+      "ts": "2023-12-22 12:58:55",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "包钢股份",
+          "reads": 0,
+          "likes": 4,
+          "comments": 8,
+          "price_pct": 5.17
+        }
+      ],
+      "stock_names": [
+        "包钢股份"
+      ],
+      "reads": 0,
+      "likes": 4,
+      "comments": 8,
+      "price_pct": 5.17
+    }
+  ]
+}

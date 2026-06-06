@@ -1,0 +1,29 @@
+{
+  "date": "2024-06-24",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "一思一记",
+      "ts": "2024-06-24 10:09:33",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "华天科技",
+          "reads": 33,
+          "likes": 20,
+          "comments": 37,
+          "price_pct": 36.76
+        }
+      ],
+      "stock_names": [
+        "华天科技"
+      ],
+      "reads": 33,
+      "likes": 20,
+      "comments": 37,
+      "price_pct": 36.76
+    }
+  ]
+}

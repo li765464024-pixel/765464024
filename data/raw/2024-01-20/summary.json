@@ -1,0 +1,29 @@
+{
+  "date": "2024-01-20",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "怼辨识度核心",
+      "ts": "2024-01-20 19:20:59",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "新易盛",
+          "reads": 52,
+          "likes": 135,
+          "comments": 202,
+          "price_pct": 11.62
+        }
+      ],
+      "stock_names": [
+        "新易盛"
+      ],
+      "reads": 52,
+      "likes": 135,
+      "comments": 202,
+      "price_pct": 11.62
+    }
+  ]
+}

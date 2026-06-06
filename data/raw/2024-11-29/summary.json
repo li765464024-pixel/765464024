@@ -1,0 +1,29 @@
+{
+  "date": "2024-11-29",
+  "post_count": 1,
+  "user_count": 1,
+  "stock_count": 1,
+  "posts": [
+    {
+      "user": "韭菜团子",
+      "ts": "2024-11-29 20:55:27",
+      "title": "置顶",
+      "stock_tags": [
+        {
+          "name": "中国石油",
+          "reads": 211,
+          "likes": 216,
+          "comments": 134,
+          "price_pct": 106.26
+        }
+      ],
+      "stock_names": [
+        "中国石油"
+      ],
+      "reads": 211,
+      "likes": 216,
+      "comments": 134,
+      "price_pct": 106.26
+    }
+  ]
+}
