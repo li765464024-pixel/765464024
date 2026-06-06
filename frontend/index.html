@@ -156,5 +156,39 @@
 </main>
 
 <script src="/js/app.js?v=3.2"></script>
+
+<script>
+// 盘前纪要 - 查看原文弹窗
+function showArticle(title, content, ts, stock, reads, likes, comments, pct) {
+  var modal = document.getElementById('article-modal');
+  if (!modal) return;
+  
+  document.getElementById('article-modal-title').textContent = '📰 ' + title;
+  
+  var meta = '📅 ' + ts;
+  if (stock) {
+    var pctNum = parseFloat(pct) || 0;
+    var pctStr = pctNum > 0 ? '+' + pctNum.toFixed(2) + '%' : pctNum.toFixed(2) + '%';
+    var pctColor = pctNum > 0 ? 'var(--red)' : 'var(--green)';
+    meta += ' · <strong>' + stock + '</strong> <span style="color:' + pctColor + '">' + pctStr + '</span>';
+  }
+  meta += ' · 👁 ' + (parseInt(reads) || 0) + ' 👍 ' + (parseInt(likes) || 0) + ' 💬 ' + (parseInt(comments) || 0);
+  document.getElementById('article-modal-meta').innerHTML = meta;
+  
+  document.getElementById('article-modal-body').textContent = content;
+  
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function hideArticle() {
+  var modal = document.getElementById('article-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+</script>
+
 </body>
 </html>
