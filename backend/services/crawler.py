@@ -1427,7 +1427,7 @@ def _build_s9_html(today):
     # 组装输出
     # ════════════════════════════════════════════
     
-    return f'''<h2>九、题材轮动逻辑 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时数据 · {today}</span></h2>
+    return f'''<h2>题材轮动逻辑 <span style="font-size:11px;color:var(--muted);font-weight:normal">实时数据 · {today}</span></h2>
 
 <div class="card">
 <h3>5日主线切换路径</h3>
@@ -1476,7 +1476,7 @@ def _build_s4_html(today):
     jy_posts = query("SELECT title, author, content FROM posts WHERE platform='jy' AND date=? ORDER BY id DESC LIMIT 30", (today,))
     
     if not sectors:
-        return '<h2>四、产业链深度拆解</h2><div class="card"><p>暂无数据</p></div>'
+        return '<h2>产业链深度拆解</h2><div class="card"><p>暂无数据</p></div>'
     
     cards = ''
     
@@ -1596,7 +1596,7 @@ def _build_s4_html(today):
 <div class="bl-red">📈 <strong>核心判断：</strong>大有能源5板成市场最高标，但板块跟风极弱仅1家涨停。煤炭高标独舞分歧大，后续需观察板块联动能否跟上。</div>
 </div>'''
     
-    return f'''<h2>四、产业链深度拆解 <span style="font-size:11px;color:var(--muted);font-weight:normal">今日涨停{zt_total}家 · 数据来源：韭研公社实时抓取 + 数据库</span></h2>
+    return f'''<h2>产业链深度拆解 <span style="font-size:11px;color:var(--muted);font-weight:normal">今日涨停{zt_total}家 · 数据来源：韭研公社实时抓取 + 数据库</span></h2>
 {cards}'''
 
 
