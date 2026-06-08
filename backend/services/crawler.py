@@ -277,8 +277,7 @@ def fetch_market_data():
                     if len(parts) >= 10:
                         raw = parts[9].strip().replace(',', '')
                         # 提取数字部分（去除特殊字符）
-                        import re
-                        nums = re.findall(r'[\d.]+', raw)
+                        nums = __import__('re').findall(r'[\d.]+', raw)
                         if nums:
                             try:
                                 total_vol += float(nums[0]) / 1e8
