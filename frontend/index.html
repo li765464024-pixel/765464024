@@ -23,7 +23,6 @@
 <div class="tabs-wrap">
 <div class="tab active" onclick="switchTab('s1')">📈 大盘概况</div>
 <div class="tab" onclick="switchTab('s2')">🔥 板块热度</div>
-<div class="tab" onclick="switchTab('s3')">🔄 题材生命周期</div>
 <div class="tab" onclick="switchTab('s9')">🔀 题材轮动</div>
 <div class="tab" onclick="switchTab('s4')">⛓ 产业链深度</div>
 <div class="tab" onclick="switchTab('s5')">🐂 淘股吧视角</div>
@@ -54,74 +53,7 @@
 <!-- 所有 section 容器由 JS 从 API 加载并填充 -->
 <div class="section active" id="s1"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s2"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
-<div class="section" id="s3">
-  <!-- 题材生命周期 v2 — 前端动态渲染 -->
-  <div class="filter-bar">
-    <div class="filter-group">
-      <label>分析日期</label>
-      <input type="date" id="s3-filter-date" class="filter-input">
-    </div>
-    <div class="filter-group">
-      <label>题材搜索</label>
-      <input type="text" id="s3-filter-search" class="filter-input" placeholder="输入题材关键词..." style="width:160px">
-    </div>
-    <div class="filter-group">
-      <label>生命周期</label>
-      <select id="s3-filter-stage" class="filter-input" style="width:140px">
-        <option value="">全部阶段</option>
-        <option value="孕育期/预热期">🌱 孕育期/预热期</option>
-        <option value="启动期">🚀 启动期</option>
-        <option value="爆发期">💥 爆发期</option>
-        <option value="分歧震荡期">⚡ 分歧震荡期</option>
-        <option value="退潮期">📉 退潮期</option>
-        <option value="余温反复/二波观察期">🔄 余温反复/二波观察期</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>&nbsp;</label>
-      <button id="s3-btn-analyze" class="btn btn-primary btn-sm" onclick="s3triggerAnalysis()">🔍 启动分析</button>
-    </div>
-  </div>
-
-  <div class="stats-row" id="s3-stats">
-    <div class="stat-card">活跃题材 <span id="s3-stat-total">-</span></div>
-    <div class="stat-card" style="border-color:#059669">爆发期 <span id="s3-stat-explosion" style="color:#059669">-</span></div>
-    <div class="stat-card" style="border-color:#22c55e">启动期 <span id="s3-stat-start" style="color:#22c55e">-</span></div>
-    <div class="stat-card" style="border-color:#f59e0b">分歧 <span id="s3-stat-divergence" style="color:#f59e0b">-</span></div>
-    <div class="stat-card" style="border-color:#ef4444">退潮 <span id="s3-stat-cooling" style="color:#ef4444">-</span></div>
-    <div class="stat-card" style="border-color:#6b7280">预热 <span id="s3-stat-preheat" style="color:#6b7280">-</span></div>
-  </div>
-
-  <div class="table-wrap">
-    <table id="s3-topics-table">
-      <thead>
-        <tr>
-          <th>题材名称</th>
-          <th>生命周期阶段</th>
-          <th>总分</th>
-          <th>价格</th>
-          <th>资金</th>
-          <th>催化</th>
-          <th>热度</th>
-          <th>结构</th>
-          <th>龙头股</th>
-          <th>涨停</th>
-          <th>风险</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody id="s3-topics-tbody">
-        <tr><td colspan="12" class="loading"><div class="spinner"></div><div>加载题材数据...</div></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="pagination" id="s3-pagination">
-    <button class="btn btn-sm" id="s3-page-prev" onclick="s3changePage(-1)">← 上一页</button>
-    <span id="s3-page-info" style="font-size:12px;color:var(--muted)">第 1 页</span>
-    <button class="btn btn-sm" id="s3-page-next" onclick="s3changePage(1)">下一页 →</button>
-  </div>
-</div><div class="section" id="s4"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
+<div class="section" id="s4"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s5"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s6"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s7"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>

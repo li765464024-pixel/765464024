@@ -27,77 +27,192 @@ def fmt_percent(v):
 # ════════════════════════════════════════════
 
 def fetch_jiuyangongshe():
-    """抓取韭研公社热榜帖子 → 写入 posts 表（用 agent-browser 真实浏览器加载JS内容）"""
-    try:
-        url = "https://www.jiuyangongshe.com/community/community"
-        
-        # 用 agent-browser 打开页面，等待JS渲染，获取纯文本
-        import subprocess, tempfile, json
-        
-        # 导航到页面
-        subprocess.run(["npx", "agent-browser", "open", url], capture_output=True, timeout=30)
-        # 等待渲染
-        subprocess.run(["npx", "agent-browser", "wait", "--load", "networkidle"], capture_output=True, timeout=30)
+    """抓取韭研公社热榜帖子 → 写入 posts 表（agent-browser 渲染 + 结构化解析）"""
+    import subprocess
+    url = "https://www.jiuyangongshe.com/community/community"
+    
+    def _agent_browser_get_text():
+        """用 agent-browser 渲染 SPA 页面并返回纯文本"""
+        subprocess.run(["npx", "agent-browser", "open", url], capture_output=True, timeout=25)
+        subprocess.run(["npx", "agent-browser", "wait", "--load", "networkidle"], capture_output=True, timeout=25)
         subprocess.run(["npx", "agent-browser", "wait", "3000"], capture_output=True, timeout=10)
-        # 获取页面完整文本
-        result = subprocess.run(["npx", "agent-browser", "get", "text", "@page"], capture_output=True, text=True, timeout=30)
-        page_text = result.stdout
+        result = subprocess.run(["npx", "agent-browser", "get", "text", "@page"], capture_output=True, text=True, timeout=25)
+        subprocess.run(["npx", "agent-browser", "close"], capture_output=True, timeout=5)
+        return result.stdout
+    
+    try:
+        page_text = _agent_browser_get_text()
+        if not page_text or len(page_text) < 200:
+            print("  ⚠️ 韭研公社: agent-browser 返回过短，尝试 requests 直连")
+            # fallback: 先用 requests 拿 cookie 再请求
+            sess = requests.Session()
+            sess.headers.update({"User-Agent": HEADERS["User-Agent"], "Accept-Language": "zh-CN,zh;q=0.9"})
+            sess.get("https://www.jiuyangongshe.com/", timeout=15)
+            r2 = sess.get(url, timeout=15)
+            page_text = r2.text if len(r2.text) > 200 else ""
         
-        # 关闭浏览器
-        subprocess.run(["npx", "agent-browser", "close"], capture_output=True, timeout=10)
-        
-        if not page_text or len(page_text) < 100:
-            print("  ⚠️ 韭研公社: agent-browser 返回内容过短，可能被反爬")
+        if not page_text or len(page_text) < 200:
+            print("  ⚠️ 韭研公社: 仍无法获取内容")
             return 0
         
-        # ⚠️ 清除今日旧帖子，防止重复累积
+        # 清除今日旧帖子
         execute("DELETE FROM posts WHERE platform='jy' AND date=?", (TODAY,))
         
-        # 从纯文本中提取帖子（基于常见模式）
-        posts = []
         lines = page_text.split('\n')
+        posts = []
         
-        current_title = ''
-        for i, line in enumerate(lines):
-            line = line.strip()
-            if not line or len(line) < 8:
+        # ─── 结构化解析 ─────────────────────────────────
+        # 帖子块特征: 作者行(2-12字) + 描述行 + 时间戳行
+        # 关键行模式: "2026-06-08 14:54:34      物理AI发展加速... S 快克智能   2  4  6    0"
+        
+        i = 0
+        while i < len(lines):
+            line = lines[i].strip()
+            i += 1
+            
+            # 跳过无用行
+            if not line or len(line) < 6:
+                continue
+            if any(kw in line for kw in ['首页','注册','登录','关于','帮助','版权','备案',
+                                          '举报','密码','发长文','发文档','发链接','提问',
+                                          '发布','编辑交易计划','下载APP','社区规则',
+                                          '风险提示','问题反馈','沪ICP备','沪公网安备']):
+                continue
+            if line.startswith('http') or line.startswith('//'):
                 continue
             
-            # 跳过导航/页脚/样式文本
-            if any(kw in line for kw in ['首页','注册','登录','关于','帮助','版权','备案','举报','密码']):
+            # ── 检测时间戳行（帖子核心标志） ──
+            ts_match = re.match(r'^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})\s+(.+)$', line)
+            if not ts_match:
                 continue
             
-            # 标题行（通常较短、有实质内容）
-            if 8 <= len(line) <= 80 and not line.startswith('http') and not any(c in line for c in ['%', '://']):
-                # 有实质内容的短句可能是标题
-                if any(kw in line for kw in ['涨停','跌停','板','板块','概念','AI','芯片','机器人','光伏','新能源','消费','地产','汽车','煤炭','电力','通信','医药']):
-                    if current_title and i > 0:
-                        # 上一条标题的正文
-                        context = lines[i-1].strip() if i > 0 else ''
-                        if len(context) > 10 and context != current_title:
-                            posts.append({
-                                'date': TODAY, 'platform': 'jy', 'author': '韭研公社',
-                                'title': current_title[:200],
-                                'content': (context[:300] if context != current_title else line[:300]),
-                                'direction': '看多' if any(k in line for k in ['利好','涨停','爆发','突破','龙头','大涨','主升']) else ('看空' if any(k in line for k in ['利空','跌停','风险','减持','退市','暴跌','下跌']) else '中性'),
-                                'views': 0, 'comments': 0, 'tags': '韭研公社·agent-browser',
-                            })
-                    current_title = line
+            post_date = ts_match.group(1)
+            post_time = ts_match.group(2)
+            rest = ts_match.group(3)
+            
+            # 向前找作者（在前1-4行，短文本2-14字，无缩进的为作者名）
+            author = "韭研公社"
+            lookback = max(0, i - 4)
+            candidates = []
+            for k in range(lookback, i - 1):
+                raw_line = lines[k] if k < len(lines) else ""
+                stripped = raw_line.strip()
+                if not stripped or len(stripped) < 2 or len(stripped) > 14:
+                    continue
+                if re.match(r'^[\u4e00-\u9fff\w·]{2,14}$', stripped):
+                    # 无缩进或缩进明显小的为作者名，缩进大的是描述
+                    indent = len(raw_line) - len(raw_line.lstrip())
+                    candidates.append((indent, stripped))
+            # 选缩进最小的（通常作者名无缩进，描述有缩进）
+            if candidates:
+                candidates.sort(key=lambda x: x[0])  # 按缩进排序，小->大
+                author = candidates[0][1]
+            
+            # ── 解析 S 股标签 ──
+            stock_tags = re.findall(r'S\s+([\u4e00-\u9fffA-Z]{2,10})', line)
+            for look in range(3):
+                if i + look < len(lines):
+                    stock_tags.extend(re.findall(r'S\s+([\u4e00-\u9fffA-Z]{2,10})', lines[i + look]))
+            stock_tags = list(dict.fromkeys(stock_tags))
+            
+            # ── 解析阅读/点赞/评论 ──
+            views, likes, comments = 0, 0, 0
+            for pat in [r'(\d+)\s+(\d+)\s+(\d+)\s+0\s*$',
+                        r'(\d+)\s+(\d+)\s+(\d+)\s+-?\d+\.?\d*$',
+                        r'(\d+)\s+(\d+)\s+(\d+)\s+\d+\s*$']:
+                m = re.search(pat, line)
+                if m:
+                    try:
+                        views, likes, comments = int(m.group(1)), int(m.group(2)), int(m.group(3))
+                    except: pass
+                    break
+            
+            if views == 0:
+                for look in range(min(3, len(lines) - i)):
+                    for pat in [r'(\d+)\s+(\d+)\s+(\d+)\s+0\s*$',
+                                r'(\d+)\s+(\d+)\s+(\d+)\s+-?\d+\.?\d*$']:
+                        m = re.search(pat, lines[i + look].strip())
+                        if m:
+                            try:
+                                views, likes, comments = int(m.group(1)), int(m.group(2)), int(m.group(3))
+                            except: pass
+                            break
+            
+            # ── 分离标题和正文 ──
+            title_text = rest
+            title_text = re.sub(r'S\s+[\u4e00-\u9fffA-Z]{2,10}', '', title_text)
+            title_text = re.sub(r'\d+\s+\d+\s+\d+[\s\d\.]*$', '', title_text)
+            title_text = title_text.strip()
+            title = title_text[:120].split('\n')[0].strip()
+            title = re.sub(r'\s{3,}', ' ', title)
+            
+            # 正文：取后续文本行（直到遇到新时间戳或指标行）
+            content_lines = []
+            for look in range(min(8, len(lines) - i)):
+                next_line = lines[i + look].strip()
+                if not next_line: continue
+                if re.match(r'^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}', next_line): break
+                if re.match(r'^\d+\s+\d+\s+\d+\s+0?\s*$', next_line): break
+                if any(kw in next_line for kw in ['编辑交易计划','发长文','发布','发文档','发链接']): break
+                if next_line in ['S','全部','个股研究','题材行业','纪要转载','资讯荟萃']: break
+                if re.match(r'^(S\s+[\u4e00-\u9fffA-Z]{2,10}\s*)+$', next_line): continue
+                content_lines.append(next_line)
+            
+            content = ' '.join(content_lines)[:500] if content_lines else title_text[:300]
+            content = re.sub(r'\s{3,}', ' ', content).strip()
+            
+            # ── 判断方向 ──
+            combined = (title + ' ' + content)
+            if any(k in combined for k in ['利好','涨停','爆发','突破','龙头','大涨','主升',
+                                            '超预期','看好','看多','催化','放量','反包']):
+                direction = '看多'
+            elif any(k in combined for k in ['利空','跌停','风险','减持','退市','暴跌','下跌',
+                                              '不及预期','警惕','出货','看空','冰点','退潮']):
+                direction = '看空'
+            else:
+                direction = '中性'
+            
+            if not title or len(title) < 4:
+                continue
+            
+            posts.append({
+                'date': TODAY,
+                'platform': 'jy',
+                'author': author[:20],
+                'title': title[:200],
+                'content': content[:500],
+                'direction': direction,
+                'views': views,
+                'comments': comments,
+                'tags': ','.join(stock_tags[:10]) if stock_tags else '韭研公社',
+            })
         
-        # 去重
-        seen = set()
-        unique = []
+        # ── 去重 ──
+        seen_titles = set()
+        unique_posts = []
         for p in posts:
-            if p['title'] not in seen:
-                seen.add(p['title']); unique.append(p)
+            key = p['author'] + '|' + p['title'][:40]
+            if key not in seen_titles:
+                seen_titles.add(key)
+                unique_posts.append(p)
         
-        if unique:
-            insert_many('posts', unique[:20])
-            print(f"    ✅ agent-browser: {len(unique[:20])}条韭研公社帖子")
-            return len(unique[:20])
+        unique_posts.sort(key=lambda x: x['views'], reverse=True)
+        
+        if unique_posts:
+            insert_many('posts', unique_posts[:30])
+            print(f"    ✅ 韭研公社: {len(unique_posts[:30])}条帖子 (agent-browser)")
+            return len(unique_posts[:30])
+        print("  ⚠️ 韭研公社: 解析出0条帖子")
+        return 0
+        
+    except subprocess.TimeoutExpired:
+        print("  ⚠️ 韭研公社: agent-browser 超时")
+        try:
+            subprocess.run(["npx", "agent-browser", "close"], capture_output=True, timeout=5)
+        except: pass
         return 0
     except Exception as e:
-        print(f"  ⚠️ 韭研公社 agent-browser 爬取失败: {e}")
+        print(f"  ⚠️ 韭研公社 爬取失败: {e}")
         return 0
 
 
@@ -2017,7 +2132,7 @@ def rebuild_section_html(today=None):
     if s2:
         sections.append({'date': today, 'section_id': 's2', 'title': f'板块热度 {today}', 'html': s2})
 
-    # 4. 题材生命周期 (已迁移到前端 v2 渲染，此处跳过)
+
     
     # 5. 题材轮动 (实时)
     s9 = _build_s9_html(today)
