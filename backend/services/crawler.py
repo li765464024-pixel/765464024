@@ -2169,6 +2169,21 @@ def refresh_all():
     results['ths_concepts'] = ths_count
     print(f"    ✅ {ths_count}个概念")
     
+    # 5c. MCP 辅助数据采集
+    print("  → MCP辅助采集(板块+快讯)...")
+    try:
+        from backend.services.mcp_engine import collect_hot_sectors, collect_cls_news_mcp
+        sec_cnt = collect_hot_sectors()
+        cls_cnt = collect_cls_news_mcp()
+        results['mcp_sectors'] = sec_cnt
+        results['mcp_cls'] = cls_cnt
+        if sec_cnt: print(f"    ✅ MCP板块: {sec_cnt}个")
+        if cls_cnt: print(f"    ✅ MCP快讯: {cls_cnt}条")
+    except Exception as e:
+        print(f"    ⚠️ MCP采集: {e}")
+        results['mcp_sectors'] = 0
+        results['mcp_cls'] = 0
+    
     # 6. 题材生命周期分析
     print("  → 分析题材生命周期...")
     try:
@@ -2203,7 +2218,25 @@ def refresh_all():
     results['sections'] = sec_count
     
     # 汇总
-    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · 财联社{cls_count}条 · 淘股吧{tg_count}条 · 同花顺{ths_count}概念 · 题材{results['lifecycle_topics']}个 · {sec_count}个板块已更新")
+    print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · 财联社{cls_count}条 · 淘股吧{tg_count}条 · 同花顺{ths_count}概念 · 题材{results['lifecycle_topics']}个 · MCP{results.get('mcp_cls',0)}条快讯 · {sec_count}个板块已更新")
+    
+    # 版本管理 & Git 推送（在非 refresh_all 直接调用时跳过）
+    import traceback
+    for frame in traceback.extract_stack():
+        if 'scheduler.py' in frame.filename or 'run_full_update' in frame.filename:
+            try:
+                from backend.services.scheduler import bump_version, get_latest_tag, sync_frontend_version, git_commit_push
+                today_str = TODAY
+                latest_tag = get_latest_tag()
+                new_ver = bump_version(latest_tag)
+                sync_frontend_version(new_ver)
+                print(f"  📌 版本: {latest_tag} → {new_ver}")
+                git_commit_push(new_ver, today_str)
+                print(f"  🌐 GitHub Tags: https://github.com/li765464024-pixel/765464024/tags")
+            except Exception as e:
+                print(f"  ⚠️ 版本管理跳过: {e}")
+        break
+    
     return results
 
 
