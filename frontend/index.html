@@ -16,7 +16,7 @@
 </div>
 <div style="display:flex;align-items:center;gap:10px">
 <select id="date-selector" style="background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:12px;cursor:pointer" onchange="switchDate(this.value)"></select>
-<span style="font-size:10px;color:var(--muted)"><span id="db-status">数据库</span> · <span id="ver-status">v7.0</span></span>
+<span style="font-size:10px;color:var(--muted)"><span id="db-status">数据库</span> · <span id="ver-status">v7.1</span></span>
 </div>
 </header>
 
@@ -55,95 +55,73 @@
 <div class="section active" id="s1"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s2"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s3">
-<h2>三、题材生命周期全景 <span style="font-size:12px;color:var(--muted);font-weight:normal">今日涨停82家 · 数据来源：韭研公社实时抓取 + 数据库</span></h2>
+  <!-- 题材生命周期 v2 — 前端动态渲染 -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>分析日期</label>
+      <input type="date" id="s3-filter-date" class="filter-input">
+    </div>
+    <div class="filter-group">
+      <label>题材搜索</label>
+      <input type="text" id="s3-filter-search" class="filter-input" placeholder="输入题材关键词..." style="width:160px">
+    </div>
+    <div class="filter-group">
+      <label>生命周期</label>
+      <select id="s3-filter-stage" class="filter-input" style="width:140px">
+        <option value="">全部阶段</option>
+        <option value="孕育期/预热期">🌱 孕育期/预热期</option>
+        <option value="启动期">🚀 启动期</option>
+        <option value="爆发期">💥 爆发期</option>
+        <option value="分歧震荡期">⚡ 分歧震荡期</option>
+        <option value="退潮期">📉 退潮期</option>
+        <option value="余温反复/二波观察期">🔄 余温反复/二波观察期</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>&nbsp;</label>
+      <button id="s3-btn-analyze" class="btn btn-primary btn-sm" onclick="s3triggerAnalysis()">🔍 启动分析</button>
+    </div>
+  </div>
 
-<div class="stock-box" style="border-color:var(--red);background:rgba(248,81,73,.04)">
-<h4>🤖 机器人/物理AI <span class="tag r">爆发期</span><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#fff;background:#f85149;margin-left:6px">涨停18家</span></h4>
-<div class="headline">黄仁勋全力押注物理AI，机器人产业链全线爆发</div>
-<p>黄仁勋在Computex公开表示&quot;未来半导体制造将越来越依赖机器人和人工智能&quot;，英伟达与韩国制造企业深度合作推进Physical AI落地。A股机器人板块全面爆发：绿的谐波(谐波减速器龙头批量配套斗山机器人)、艾迪精密(工业机器人发往韩国)、阿尔特(英伟达A股独家全链路绑定)。 <span class="src st">淘:木炭一箩筐</span> <span class="src sj">韭:戈壁淘金</span></p>
+  <div class="stats-row" id="s3-stats">
+    <div class="stat-card">活跃题材 <span id="s3-stat-total">-</span></div>
+    <div class="stat-card" style="border-color:#059669">爆发期 <span id="s3-stat-explosion" style="color:#059669">-</span></div>
+    <div class="stat-card" style="border-color:#22c55e">启动期 <span id="s3-stat-start" style="color:#22c55e">-</span></div>
+    <div class="stat-card" style="border-color:#f59e0b">分歧 <span id="s3-stat-divergence" style="color:#f59e0b">-</span></div>
+    <div class="stat-card" style="border-color:#ef4444">退潮 <span id="s3-stat-cooling" style="color:#ef4444">-</span></div>
+    <div class="stat-card" style="border-color:#6b7280">预热 <span id="s3-stat-preheat" style="color:#6b7280">-</span></div>
+  </div>
 
-<!-- 涨停标的 -->
-<div style="margin:8px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📈 涨停标的</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">中重科技 <span style="font-size:10px;opacity:0.85">(3b)</span></span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">泰坦股份 <span style="font-size:10px;opacity:0.85">(2b)</span></span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">宇环数控</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">莱伯泰科</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">创远信科</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">华瑞股份</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">上海亚虹</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">智能自控</span></div>
-<div style="margin:4px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📊 容量趋势票</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">双环传动</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">汇川技术</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">埃斯顿</span></div>
+  <div class="table-wrap">
+    <table id="s3-topics-table">
+      <thead>
+        <tr>
+          <th>题材名称</th>
+          <th>生命周期阶段</th>
+          <th>总分</th>
+          <th>价格</th>
+          <th>资金</th>
+          <th>催化</th>
+          <th>热度</th>
+          <th>结构</th>
+          <th>龙头股</th>
+          <th>涨停</th>
+          <th>风险</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="s3-topics-tbody">
+        <tr><td colspan="12" class="loading"><div class="spinner"></div><div>加载题材数据...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
 
-<div class="vote"><div class="v-up" style="width:75%"></div><div class="v-dn" style="width:10%"></div><div class="v-ne" style="width:15%"></div></div>
-<div class="v-label">看多75% | 看空10% | 中性15%（木炭&quot;英伟达钦点物理AI&quot; | 戈壁&quot;机器人进入产业加速期&quot;）</div>
-</div>
-<div class="stock-box" style="border-color:var(--red);background:rgba(248,81,73,.04)">
-<h4>🔬 玻璃基板/先进封装 <span class="tag r">主升期</span><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#fff;background:#f85149;margin-left:6px">涨停8家</span></h4>
-<div class="headline">台积电官宣CoPoS玻璃基板试产线投产，产业化加速推进</div>
-<p>台积电正式官宣CoPoS玻璃基板技术试产线建成投产，标志着玻璃基板作为下一代先进封装核心材料的产业化步入实质推进阶段。德龙激光(TGV设备龙头)强势涨停，帝尔激光、大族激光跟涨。沃格光电、京东方A产业链受益。玻璃基板适配大尺寸高密度AI芯片封装，0到1产业机遇明确。 <span class="src st">淘:Vin7的大</span> <span class="src sj">韭:异动特工小队</span></p>
-
-<!-- 涨停标的 -->
-<div style="margin:8px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📈 涨停标的</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">三峡新材 <span style="font-size:10px;opacity:0.85">(2b)</span></span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">维信诺</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">北玻股份</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">凯盛科技</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">江化微</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">耀皮玻璃</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">雷曼光电</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">芯瑞达</span></div>
-<div style="margin:4px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📊 容量趋势票</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">京东方A</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">沃格光电</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">德龙激光</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">帝尔激光</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">大族激光</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">彩虹股份</span></div>
-
-<div class="vote"><div class="v-up" style="width:70%"></div><div class="v-dn" style="width:5%"></div><div class="v-ne" style="width:25%"></div></div>
-<div class="v-label">看多70% | 看空5% | 中性25%（Vin7大&quot;台积电官宣试产线&quot; | 无名小韭763&quot;TGV设备+耗材双爆发&quot;）</div>
-</div>
-<div class="stock-box" style="border-color:var(--gold);background:rgba(248,81,73,.04)">
-<h4>📡 6G通信 <span class="tag r">启动期</span><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#fff;background:#f85149;margin-left:6px">涨停3家</span></h4>
-<div class="headline">6G核心AI产业链梳理，武汉凡谷/东方通信/中兴通讯集体走强</div>
-<p>6G概念全线爆发。中兴通讯作为全球通信设备巨头及6G标准核心制定者，已全面展开6G端到端系统预研。信科移动深度参与IMT-2030(6G)推进组。武汉凡谷、东方通信涨停。6G与AI深度融合，通感算一体化、太赫兹通信、星地融合组网三大方向备受关注。 <span class="src st">淘:炒谷养娃2007</span> <span class="src sj">韭:题材图谱小集</span></p>
-
-<!-- 涨停标的 -->
-<div style="margin:8px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📈 涨停标的</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">武汉凡谷</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">东方通信</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">东土科技</span></div>
-<div style="margin:4px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📊 容量趋势票</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">中兴通讯</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">信科移动</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">中国移动</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">盛路通信</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">创远信科</span></div>
-
-<div class="vote"><div class="v-up" style="width:65%"></div><div class="v-dn" style="width:5%"></div><div class="v-ne" style="width:30%"></div></div>
-<div class="v-label">看多65% | 看空5% | 中性30%（6G核心AI产业链有望成为新主线，但需持续催化验证）</div>
-</div>
-<div class="stock-box" style="border-color:var(--red);background:rgba(248,81,73,.04)">
-<h4>🔌 MLCC/电容/电感 <span class="tag r">主升期</span><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#fff;background:#f85149;margin-left:6px">涨停6家</span></h4>
-<div class="headline">被动元件提价再加速！村田/太阳诱电7月电感涨价，MLCC供不应求</div>
-<p>被动元件供需持续紧张。村田、太阳诱电有望在7月1日起再次对电感进行提价。三环集团计划自7月1日起对晶振基座调价10-30%。MLCC目前供需极为紧张，村田、三星均表示MLCC景气度极高、持续供不应求。氧化镝作为MLCC核心材料，卖方给出10倍涨价空间。顺络电子、麦捷科技强势涨停。 <span class="src st">淘:小陆研选</span> <span class="src sj">韭:戈壁淘金</span></p>
-
-<!-- 涨停标的 -->
-<div style="margin:8px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📈 涨停标的</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">维信诺</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">凯盛科技</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">江化微</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">雷曼光电</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">芯瑞达</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">顺络电子</span></div>
-<div style="margin:4px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📊 容量趋势票</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">麦捷科技</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">风华高科</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">三环集团</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">江海股份</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">铂科新材</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">国瓷材料</span></div>
-
-<div class="vote"><div class="v-up" style="width:80%"></div><div class="v-dn" style="width:5%"></div><div class="v-ne" style="width:15%"></div></div>
-<div class="v-label">看多80% | 看空5% | 中性15%（戈壁&quot;被动元件涨价大行情&quot; | 无名小韭5718&quot;氧化镝=下一个中船特气&quot;）</div>
-</div>
-<div class="stock-box" style="border-color:var(--gold);background:rgba(248,81,73,.04)">
-<h4>⛏️ 煤炭 <span class="tag y">高位分歧</span><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#fff;background:#f85149;margin-left:6px">涨停1家</span></h4>
-<div class="headline">大有能源5板领涨！煤炭板块逆势走强</div>
-<p>大有能源超预期晋级5板，成为全市场最高标。焦煤期货大涨，安泰集团、平煤股份涨停助攻。煤炭板块作为防御避险品种逆势活跃。大有能源5板高度打开空间，但煤炭板块跟风力度偏弱，分歧较大。 <span class="src st">淘:庄哥说股</span></p>
-
-<!-- 涨停标的 -->
-<div style="margin:8px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📈 涨停标的</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">大有能源 <span style="font-size:10px;opacity:0.85">(5b)</span></span></div>
-<div style="margin:4px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📊 容量趋势票</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">安泰集团</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">平煤股份</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">陕西煤业</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">中国神华</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">中煤能源</span></div>
-
-<div class="vote"><div class="v-up" style="width:50%"></div><div class="v-dn" style="width:25%"></div><div class="v-ne" style="width:25%"></div></div>
-<div class="v-label">看多50% | 看空25% | 中性25%（庄哥&quot;煤炭逆势但跟风弱&quot; | 大有能源5板空间龙）</div>
-</div>
-<div class="stock-box" style="border-color:var(--gold);background:rgba(248,81,73,.04)">
-<h4>💡 光纤/光通信 <span class="tag y">活跃</span><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#fff;background:#f85149;margin-left:6px">涨停3家</span></h4>
-<div class="headline">光纤预制棒价格暴涨550%，宏柏新材9N高纯四氯化硅卡位</div>
-<p>央视实锤光纤全行业爆单，头部光缆厂订单排至2027年。AI算力拉动高端A2光纤预制棒年内暴涨550%、一棒难求。光棒扩产周期18-24月，上游9N高纯四氯化硅成为核心卡脖子原料。宏柏新材布局2万吨光纤级高纯四氯化硅，对标三孚股份。亨通光电、长飞光纤主力流入。 <span class="src st">淘:独自等待</span> <span class="src sj">韭:题材图谱小集</span></p>
-
-<!-- 涨停标的 -->
-<div style="margin:8px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📈 涨停标的</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">武汉凡谷</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">东方通信</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">东土科技</span></div>
-<div style="margin:4px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📊 容量趋势票</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">亨通光电</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">长飞光纤</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">宏柏新材</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">三孚股份</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">中天科技</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">烽火通信</span></div>
-
-<div class="vote"><div class="v-up" style="width:60%"></div><div class="v-dn" style="width:10%"></div><div class="v-ne" style="width:30%"></div></div>
-<div class="v-label">看多60% | 看空10% | 中性30%（宏柏新材对标三孚硅烷，光棒紧缺2027年前无解）</div>
-</div>
-<div class="stock-box" style="border-color:var(--blue);background:rgba(248,81,73,.04)">
-<h4>💎 石墨烯/金刚石散热 <span class="tag b">试错</span><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#fff;background:#f85149;margin-left:6px">涨停7家</span></h4>
-<div class="headline">美股Solidion暴涨350%引爆石墨烯太空电池，英伟达钦点散热材料</div>
-<p>美股Solidion因石墨烯太空电池暴涨350%。英伟达最新Rubin服务器采用石墨烯+金刚石双散热方案。方大炭素3天2板、东方碳素冲30cm涨停（石墨烯版惠丰钻石）。德尔未来、黄河旋风跟涨。AI高端GPU散热迎来产业级机遇，但从0到1阶段初期，板块联动尚弱。 <span class="src st">淘:土拨鼠</span></p>
-
-<!-- 涨停标的 -->
-<div style="margin:8px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📈 涨停标的</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">方大炭素</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">广东明珠</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">江南新材</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">德尔未来</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">松霖科技</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">家联科技</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#f85149;margin:3px;box-shadow:0 1px 4px rgba(248,81,73,.3)">天安新材</span></div>
-<div style="margin:4px 0"><span style="font-size:11px;color:var(--muted);margin-right:6px">📊 容量趋势票</span> <span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">黄河旋风</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">东方碳素</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">惠丰钻石</span><span style="display:inline-block;padding:3px 12px;border-radius:5px;font-size:13px;font-weight:700;color:#fff;background:#d2991d;margin:3px;box-shadow:0 1px 4px rgba(210,153,29,.3)">中兵红箭</span></div>
-
-<div class="vote"><div class="v-up" style="width:40%"></div><div class="v-dn" style="width:15%"></div><div class="v-ne" style="width:45%"></div></div>
-<div class="v-label">看多40% | 看空15% | 中性45%（土拨鼠&quot;石墨烯散热新概念&quot; | 产业逻辑待验证）</div>
-</div>
-</div>
-
-<div class="section" id="s4"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
+  <div class="pagination" id="s3-pagination">
+    <button class="btn btn-sm" id="s3-page-prev" onclick="s3changePage(-1)">← 上一页</button>
+    <span id="s3-page-info" style="font-size:12px;color:var(--muted)">第 1 页</span>
+    <button class="btn btn-sm" id="s3-page-next" onclick="s3changePage(1)">下一页 →</button>
+  </div>
+</div><div class="section" id="s4"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s5"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s6"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s7"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>

@@ -33,12 +33,15 @@ def get_latest_tag():
         return "v6.0"
 
 def bump_version(tag):
-    """版本号+0.1"""
+    """版本号+0.1（支持多位数版本 v6.10->v6.11）"""
     try:
-        v = float(tag.replace('v', ''))
-        return f"v{v + 0.1:.1f}"
+        parts = tag.replace('v', '').split('.')
+        major = int(parts[0])
+        minor = int(parts[1]) if len(parts) > 1 else 0
+        minor += 1
+        return f"v{major}.{minor}"
     except:
-        return "v6.9"
+        return "v7.1"
 
 def sync_frontend_version(new_version):
     """同步前端版本号"""
@@ -93,10 +96,10 @@ def run_full_update():
         print(f"  ⏭️ {today} 非交易日，跳过")
         return False
     
-    # 2. 导入并执行完整更新
+    # 2. 导入并执行完整更新（自动Git推送）
     try:
         from backend.services.crawler import refresh_all
-        results = refresh_all()
+        results = refresh_all(git_push=True)
         
         # 3. 版本管理
         latest_tag = get_latest_tag()

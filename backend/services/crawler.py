@@ -27,51 +27,77 @@ def fmt_percent(v):
 # ════════════════════════════════════════════
 
 def fetch_jiuyangongshe():
-    """抓取韭研公社热榜帖子 → 写入 posts 表"""
+    """抓取韭研公社热榜帖子 → 写入 posts 表（用 agent-browser 真实浏览器加载JS内容）"""
     try:
         url = "https://www.jiuyangongshe.com/community/community"
-        r = requests.get(url, headers=HEADERS, timeout=15)
-        soup = BeautifulSoup(r.text, 'html.parser')
+        
+        # 用 agent-browser 打开页面，等待JS渲染，获取纯文本
+        import subprocess, tempfile, json
+        
+        # 导航到页面
+        subprocess.run(["npx", "agent-browser", "open", url], capture_output=True, timeout=30)
+        # 等待渲染
+        subprocess.run(["npx", "agent-browser", "wait", "--load", "networkidle"], capture_output=True, timeout=30)
+        subprocess.run(["npx", "agent-browser", "wait", "3000"], capture_output=True, timeout=10)
+        # 获取页面完整文本
+        result = subprocess.run(["npx", "agent-browser", "get", "text", "@page"], capture_output=True, text=True, timeout=30)
+        page_text = result.stdout
+        
+        # 关闭浏览器
+        subprocess.run(["npx", "agent-browser", "close"], capture_output=True, timeout=10)
+        
+        if not page_text or len(page_text) < 100:
+            print("  ⚠️ 韭研公社: agent-browser 返回内容过短，可能被反爬")
+            return 0
         
         # ⚠️ 清除今日旧帖子，防止重复累积
         execute("DELETE FROM posts WHERE platform='jy' AND date=?", (TODAY,))
         
+        # 从纯文本中提取帖子（基于常见模式）
         posts = []
+        lines = page_text.split('\n')
+        
         current_title = ''
-        
-        for div in soup.find_all('div'):
-            cls = ' '.join(div.get('class', []))
-            txt = div.get_text(strip=True)
+        for i, line in enumerate(lines):
+            line = line.strip()
+            if not line or len(line) < 8:
+                continue
             
-            # 标题行
-            if 'book-title' in cls and len(txt) > 5:
-                current_title = txt
+            # 跳过导航/页脚/样式文本
+            if any(kw in line for kw in ['首页','注册','登录','关于','帮助','版权','备案','举报','密码']):
+                continue
             
-            # 内容行
-            if 'flexItem' in cls and len(txt) > 10 and current_title:
-                # 找作者
-                author_el = div.find_previous('div', class_=re.compile('author|name|user'))
-                author = author_el.get_text(strip=True)[:20] if author_el else '韭研公社'
-                
-                posts.append({
-                    'date': TODAY,
-                    'platform': 'jy',
-                    'author': author,
-                    'title': current_title[:200],
-                    'content': txt[:500],
-                    'direction': '看多' if any(k in txt for k in ['利好','涨停','爆发','突破','龙头']) else '中性',
-                    'views': 0,
-                    'comments': 0,
-                    'tags': '韭研公社·实时爬取',
-                })
-                current_title = ''
+            # 标题行（通常较短、有实质内容）
+            if 8 <= len(line) <= 80 and not line.startswith('http') and not any(c in line for c in ['%', '://']):
+                # 有实质内容的短句可能是标题
+                if any(kw in line for kw in ['涨停','跌停','板','板块','概念','AI','芯片','机器人','光伏','新能源','消费','地产','汽车','煤炭','电力','通信','医药']):
+                    if current_title and i > 0:
+                        # 上一条标题的正文
+                        context = lines[i-1].strip() if i > 0 else ''
+                        if len(context) > 10 and context != current_title:
+                            posts.append({
+                                'date': TODAY, 'platform': 'jy', 'author': '韭研公社',
+                                'title': current_title[:200],
+                                'content': (context[:300] if context != current_title else line[:300]),
+                                'direction': '看多' if any(k in line for k in ['利好','涨停','爆发','突破','龙头','大涨','主升']) else ('看空' if any(k in line for k in ['利空','跌停','风险','减持','退市','暴跌','下跌']) else '中性'),
+                                'views': 0, 'comments': 0, 'tags': '韭研公社·agent-browser',
+                            })
+                    current_title = line
         
-        if posts:
-            insert_many('posts', posts)
-            return len(posts)
+        # 去重
+        seen = set()
+        unique = []
+        for p in posts:
+            if p['title'] not in seen:
+                seen.add(p['title']); unique.append(p)
+        
+        if unique:
+            insert_many('posts', unique[:20])
+            print(f"    ✅ agent-browser: {len(unique[:20])}条韭研公社帖子")
+            return len(unique[:20])
         return 0
     except Exception as e:
-        print(f"  ⚠️ 韭研公社爬取失败: {e}")
+        print(f"  ⚠️ 韭研公社 agent-browser 爬取失败: {e}")
         return 0
 
 
@@ -239,17 +265,30 @@ def fetch_market_data():
                     elif name and '深证' in name: indices['sz'] = price
                     elif name and '创业' in name: indices['cy'] = price
                     elif name and '科创' in name: indices['kc'] = price
-            # 成交额: 只取上证+深证（全市场）
-            r3b = requests.get("https://hq.sinajs.cn/list=sh000001,sz399001",
-                              headers={"User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn"}, timeout=5)
-            for line in r3b.text.strip().split('\n'):
-                parts = line.split(',')
-                if len(parts) > 10:
-                    v = parts[9].strip()
-                    if v.replace('.','').isdigit():
-                        total_vol += float(v) / 1e8
-            if total_vol > 0:
-                volume_str = f"{total_vol:.0f}亿"
+            # 成交额: 取上证+深证（全市场）
+            try:
+                r3b = requests.get("https://hq.sinajs.cn/list=sh000001,sz399001",
+                                  headers={"User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn"}, timeout=5)
+                total_vol = 0
+                for line in r3b.text.strip().split('\n'):
+                    if not line.strip(): continue
+                    parts = line.split(',')
+                    # 新浪格式: parts[9]是成交额(元)，可能有小数点和逗号
+                    if len(parts) >= 10:
+                        raw = parts[9].strip().replace(',', '')
+                        # 提取数字部分（去除特殊字符）
+                        import re
+                        nums = re.findall(r'[\d.]+', raw)
+                        if nums:
+                            try:
+                                total_vol += float(nums[0]) / 1e8
+                            except:
+                                pass
+                if total_vol > 0:
+                    volume_str = f"{total_vol:.0f}亿"
+                    print(f"  📊 成交额(新浪): {volume_str}")
+            except Exception as e:
+                print(f"  ⚠️ 成交额获取失败: {e}")
         except:
             pass
         
@@ -2029,34 +2068,43 @@ def rebuild_section_html(today=None):
 # ════════════════════════════════════════════
 
 def fetch_taoguba_realtime():
-    """从淘股吧首页爬取热门帖子 → 写入 posts 表"""
+    """从淘股吧爬取热门帖子 → 写入 posts 表（用 agent-browser 真实浏览器加载JS内容）"""
     try:
+        import subprocess
+        url = "https://www.taoguba.com.cn"
+        
+        # 用 agent-browser 打开淘股吧，等待JS渲染
+        subprocess.run(["npx", "agent-browser", "open", url], capture_output=True, timeout=30)
+        subprocess.run(["npx", "agent-browser", "wait", "--load", "networkidle"], capture_output=True, timeout=30)
+        subprocess.run(["npx", "agent-browser", "wait", "3000"], capture_output=True, timeout=10)
+        result = subprocess.run(["npx", "agent-browser", "get", "text", "@page"], capture_output=True, text=True, timeout=30)
+        page_text = result.stdout
+        subprocess.run(["npx", "agent-browser", "close"], capture_output=True, timeout=10)
+        
+        if not page_text or len(page_text) < 100:
+            print("  ⚠️ 淘股吧: agent-browser 返回内容过短")
+            return 0
+        
+        # 从纯文本中提取帖子
         posts = []
-        # 从首页和boardList提取内容
-        for url in ["https://www.taoguba.com.cn", "https://www.taoguba.com.cn/boardList", "https://www.tgb.cn/feeds/qryFeedsViewPointView"]:
-            r = requests.get(url, headers=HEADERS, timeout=10)
-            if r.status_code != 200:
+        lines = page_text.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            if len(line) < 15 or len(line) > 200:
                 continue
-            soup = BeautifulSoup(r.text, 'html.parser')
-            for tag in soup.find_all(['a', 'div', 'h2', 'h3', 'h4']):
-                text = tag.get_text(strip=True)
-                if len(text) < 15 or len(text) > 200:
-                    continue
-                if any(kw in text for kw in ['首页','论坛','我的','登录','注册','版权','备案','举报','密码','关注','收藏','设置']):
-                    continue
-                if any(kw in text for kw in ['涨停','跌停','涨','板','板块','概念','AI','算力','MLCC','芯片','半导体','机器人','光伏','新能源','消费','地产','医药','汽车','煤炭','电力','通信','光纤','CPO','房地产','消费']):
-                    direction = '看多' if any(k in text for k in ['涨停','爆发','强势','大涨','突破','利好','主升']) else ('看空' if any(k in text for k in ['跌停','下跌','风险','利空','减持','退市','暴跌']) else '中性')
-                    posts.append({'date': TODAY, 'platform': 'taoguba', 'author': '淘股吧', 'title': text[:200], 'content': text[:300], 'direction': direction, 'views': len(posts), 'comments': 0, 'tags': '淘股吧·实时爬取'})
-            if len(posts) >= 20:
-                break
-        # 兜底：首页行情文本
-        if len(posts) < 5:
-            r = requests.get("https://www.taoguba.com.cn", headers=HEADERS, timeout=10)
-            soup = BeautifulSoup(r.text, 'html.parser')
-            for tag in soup.find_all(['a', 'div']):
-                text = tag.get_text(strip=True)
-                if len(text) > 10 and len(text) < 100 and '/' in text and ('%' in text or '万' in text):
-                    posts.append({'date': TODAY, 'platform': 'taoguba', 'author': '淘股吧行情', 'title': text[:200], 'content': f"实时行情: {text[:200]}", 'direction': '看多' if '+' in text else ('看空' if '-' in text else '中性'), 'views': 0, 'comments': 0, 'tags': '淘股吧·实时行情'})
+            # 跳过导航/功能文字
+            if any(kw in line for kw in ['首页','论坛','我的','登录','注册','版权','备案','举报','密码','关注','收藏','设置','帮助','关于']):
+                continue
+            # 只保留有短线关键词的内容
+            if any(kw in line for kw in ['涨停','跌停','涨','板','板块','概念','AI','算力','MLCC','芯片','半导体','机器人','光伏','新能源','消费','地产','医药','汽车','煤炭','电力','通信','光纤','CPO','房地产','消费','龙头','主升','分歧','退潮','冰点']):
+                direction = '看多' if any(k in line for k in ['涨停','爆发','强势','大涨','突破','利好','主升','龙头','反核']) else ('看空' if any(k in line for k in ['跌停','下跌','风险','利空','减持','退市','暴跌','断板','退潮']) else '中性')
+                posts.append({
+                    'date': TODAY, 'platform': 'taoguba', 'author': '淘股吧',
+                    'title': line[:200], 'content': line[:300], 'direction': direction,
+                    'views': len(posts), 'comments': 0, 'tags': '淘股吧·agent-browser',
+                })
+        
         if posts:
             seen = set()
             unique = []
@@ -2065,10 +2113,11 @@ def fetch_taoguba_realtime():
                     seen.add(p['title']); unique.append(p)
             execute("DELETE FROM posts WHERE platform='taoguba' AND date=?", (TODAY,))
             insert_many('posts', unique[:25])
+            print(f"    ✅ agent-browser: {len(unique[:25])}条淘股吧帖子")
             return len(unique[:25])
         return 0
     except Exception as e:
-        print(f"  ⚠️ 淘股吧实时爬取失败: {e}")
+        print(f"  ⚠️ 淘股吧 agent-browser 爬取失败: {e}")
         return 0
 
 
@@ -2077,50 +2126,59 @@ def fetch_taoguba_realtime():
 # ════════════════════════════════════════════
 
 def fetch_thys_concepts():
-    """从同花顺爬取概念板块列表及热度 → 写入 posts 表 (platform='ths')"""
+    """从同花顺爬取概念板块列表及热度 → 写入 posts 表（用 agent-browser）"""
     try:
-        r = requests.get("https://q.10jqka.com.cn/gn/", headers=HEADERS, timeout=10)
-        if r.status_code != 200:
+        import subprocess
+        
+        subprocess.run(["npx", "agent-browser", "open", "https://q.10jqka.com.cn/gn/"], capture_output=True, timeout=30)
+        subprocess.run(["npx", "agent-browser", "wait", "--load", "networkidle"], capture_output=True, timeout=30)
+        subprocess.run(["npx", "agent-browser", "wait", "2000"], capture_output=True, timeout=10)
+        result = subprocess.run(["npx", "agent-browser", "get", "text", "@page"], capture_output=True, text=True, timeout=30)
+        page_text = result.stdout
+        subprocess.run(["npx", "agent-browser", "close"], capture_output=True, timeout=10)
+        
+        if not page_text or len(page_text) < 100:
+            print("  ⚠️ 同花顺: agent-browser 返回内容过短")
             return 0
         
-        soup = BeautifulSoup(r.text, 'html.parser')
-        
-        # 概念板块包含涨跌幅信息
-        # 从列表中提取概念名称和涨跌幅
+        # 提取概念板块名称
+        import re
         concepts = []
-        for a in soup.find_all('a'):
-            href = a.get('href', '')
-            text = a.get_text(strip=True)
-            if '/gn/detail/code/' in href and len(text) > 2 and len(text) < 20 and '..' not in href:
-                concepts.append(text.strip())
+        lines = page_text.split('\n')
+        for line in lines:
+            line = line.strip()
+            if len(line) > 2 and len(line) < 15:
+                # 排除明显不是板块名的行
+                if not any(kw in line for kw in ['首页','全部','涨幅','下跌','上涨','序号','代码','名称','概念','更多','上一页','下一页']):
+                    if any(kw in line for kw in ['概念','板块','AI','芯片','新能源','消费','医药','汽车','地产','科技','智能','数据','通信','材料']):
+                        concepts.append(line)
         
         if not concepts:
-            return 0
+            # 兜底：取所有长2-15的短行
+            concepts = [l.strip() for l in lines if 2 <= len(l.strip()) <= 12 and not any(kw in l for kw in ['首页','登录','注册','版权','备案'])]
         
-        # 存入 posts 表 (platform='ths')
+        concepts = list(dict.fromkeys(concepts))  # 去重保序
+        
         execute("DELETE FROM posts WHERE platform='ths' AND date=?", (TODAY,))
         
         ths_posts = []
         for i, name in enumerate(concepts[:30]):
-            direction = '看多' if any(k in name for k in ['概念','电池','芯片','AI','算力','光','半导体','新','超']) else '中性'
+            direction = '看多' if any(k in name for k in ['概念','电池','芯片','AI','算力','光','半导体','新','超','科技','智能']) else '中性'
             ths_posts.append({
-                'date': TODAY,
-                'platform': 'ths',
-                'author': '同花顺',
+                'date': TODAY, 'platform': 'ths', 'author': '同花顺',
                 'title': f"概念板块#{i+1}: {name}",
                 'content': f"同花顺概念板块: {name}",
-                'direction': direction,
-                'views': 30 - i,
-                'comments': 0,
-                'tags': '同花顺·概念板块',
+                'direction': direction, 'views': 30 - i, 'comments': 0,
+                'tags': '同花顺·概念板块·agent-browser',
             })
         
         if ths_posts:
             insert_many('posts', ths_posts)
+            print(f"    ✅ agent-browser: {len(ths_posts)}个同花顺概念")
             return len(ths_posts)
         return 0
     except Exception as e:
-        print(f"  ⚠️ 同花顺爬取失败: {e}")
+        print(f"  ⚠️ 同花顺 agent-browser 爬取失败: {e}")
         return 0
 
 
@@ -2128,8 +2186,10 @@ def fetch_thys_concepts():
 # 统一入口
 # ════════════════════════════════════════════
 
-def refresh_all():
-    """执行所有数据抓取"""
+def refresh_all(git_push=False):
+    """执行所有数据抓取
+    git_push=True 时自动版本管理+Git推送
+    """
     results = {}
     
     print(f"\n📡 [{datetime.now().strftime('%H:%M:%S')}] 开始数据更新...")
@@ -2220,22 +2280,19 @@ def refresh_all():
     # 汇总
     print(f"\n📊 更新完成: 涨停{stock_count}只 · 韭研公社{post_count}条 · 财联社{cls_count}条 · 淘股吧{tg_count}条 · 同花顺{ths_count}概念 · 题材{results['lifecycle_topics']}个 · MCP{results.get('mcp_cls',0)}条快讯 · {sec_count}个板块已更新")
     
-    # 版本管理 & Git 推送（在非 refresh_all 直接调用时跳过）
-    import traceback
-    for frame in traceback.extract_stack():
-        if 'scheduler.py' in frame.filename or 'run_full_update' in frame.filename:
-            try:
-                from backend.services.scheduler import bump_version, get_latest_tag, sync_frontend_version, git_commit_push
-                today_str = TODAY
-                latest_tag = get_latest_tag()
-                new_ver = bump_version(latest_tag)
-                sync_frontend_version(new_ver)
-                print(f"  📌 版本: {latest_tag} → {new_ver}")
-                git_commit_push(new_ver, today_str)
-                print(f"  🌐 GitHub Tags: https://github.com/li765464024-pixel/765464024/tags")
-            except Exception as e:
-                print(f"  ⚠️ 版本管理跳过: {e}")
-        break
+    # 版本管理 & Git 推送（参数控制）
+    if git_push:
+        try:
+            from backend.services.scheduler import bump_version, get_latest_tag, sync_frontend_version, git_commit_push
+            today_str = TODAY
+            latest_tag = get_latest_tag()
+            new_ver = bump_version(latest_tag)
+            sync_frontend_version(new_ver)
+            print(f"  📌 版本: {latest_tag} → {new_ver}")
+            git_commit_push(new_ver, today_str)
+            print(f"  🌐 GitHub Tags: https://github.com/li765464024-pixel/765464024/tags")
+        except Exception as e:
+            print(f"  ⚠️ 版本管理跳过: {e}")
     
     return results
 

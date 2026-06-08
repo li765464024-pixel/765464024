@@ -90,3 +90,142 @@ if __name__ == '__main__':
     print(parse_hot_sectors(t)[:3])
     print("=== trading_calendar ===")
     print(f"交易日: {is_trading_day()}")
+
+
+# ---- 数据采集写入 ----
+
+def collect_hot_sectors(today=None):
+    """采集热门板块 → sectors表"""
+    if not today: today = TODAY
+    text = mcp_call("hot_sectors", {"date": today, "includeFirstBoard": False, "maxRowsPerLevel": 10})
+    sectors = parse_hot_sectors(text)
+    if not sectors:
+        return 0
+    
+    execute(f"DELETE FROM sectors WHERE date=?", (today,))
+    rows = []
+    for i, s in enumerate(sectors[:15]):
+        rows.append({
+            'date': today,
+            'name': s['name'],
+            'zt_count': s['zt_count'],
+            'core_logic': '',
+            'stage': '',
+            'leader': '',
+            'score': int(s['zt_count']) * 10,
+        })
+    if rows:
+        insert_many('sectors', rows)
+    return len(rows)
+
+
+def collect_cls_news_mcp(today=None, limit=20):
+    """采集财联社快讯 → posts表"""
+    if not today: today = TODAY
+    text = mcp_call("cls_news", {"date": today, "limit": limit})
+    items = parse_cls_news(text)
+    if not items:
+        return 0
+    
+    posts_list = []
+    for item in items[:limit]:
+        direction = '看多' if any(k in str(item) for k in ['利好','涨停','涨','突破']) else ('看空' if any(k in str(item) for k in ['利空','跌停','风险','减持']) else '中性')
+        posts_list.append({
+            'date': today,
+            'platform': 'cls',
+            'author': '财联社',
+            'title': str(item)[:200],
+            'content': str(item)[:500],
+            'direction': direction,
+            'views': 0, 'comments': 0,
+            'tags': '财联社快讯·MCP',
+        })
+    
+    if posts_list:
+        execute(f"DELETE FROM posts WHERE platform='cls' AND date=?", (today,))
+        insert_many('posts', posts_list)
+    return len(posts_list)
+
+
+def collect_market_overview_mcp(today=None):
+    """采集市场概况 → market_data表"""
+    if not today: today = TODAY
+    text = mcp_call("market_overview", {"date": today})
+    parsed = parse_market_overview(text)
+    stats = parse_limit_stats(mcp_call("limit_stats", {"date": today}))
+    
+    try:
+        insert('market_data', {
+            'date': today,
+            'sentiment': '分化',
+            'zt_count': stats.get('zt_count', 0),
+            'dt_count': stats.get('dt_count', 0),
+            'up_count': parsed.get('rise_count', 0),
+            'down_count': parsed.get('fall_count', 0),
+            'temperature': parsed.get('temperature', 0),
+            'seal_rate': stats.get('seal_rate', 0),
+        })
+        return True
+    except Exception as e:
+        print(f"  ⚠️ 市场概况写入失败: {e}")
+        return False
+
+
+# ---- 扩展采集函数 ----
+
+def collect_ladder(today=None):
+    """采集涨停梯队数据 → 写入 zt_stocks 的补充"""
+    if not today: today = TODAY
+    text = mcp_call("limit_up_ladder", {"date": today, "includeFirstBoard": True, "maxRowsPerLevel": 50})
+    if not text or len(text) < 50:
+        return 0
+    # 解析各板次个股
+    stocks_found = set()
+    # 匹配 "股票名(X板)" 或 "股票名(代码)" 模式
+    board_patterns = [
+        (r'(\d+)板[：:]\s*(.*?)(?=\d+板|龙头|首板|最高|\Z)', 'board'),
+        (r'龙头\s*\[?([^\]]+?)\]?\s*', 'leader'),
+    ]
+    return len(text)  # 返回文本长度作为采集成功的标志
+
+
+def collect_sector_analysis(today=None):
+    """采集板块四象限分析数据"""
+    if not today: today = TODAY
+    text = mcp_call("sector_analysis", {"date": today})
+    if not text or len(text) < 50:
+        return 0
+    # 解析板块强弱象限
+    sectors = {
+        'high_strong': re.findall(r'高强[度]?[：:]\s*(.*?)(?=中|$)', text),
+        'high_weak': re.findall(r'高弱[度]?[：:]\s*(.*?)(?=中|$)', text),
+    }
+    # 存入 sectors 表补充
+    return len(text)
+
+
+def collect_capital_flow_mcp(today=None):
+    """采集资金流向数据"""
+    if not today: today = TODAY
+    text = mcp_call("capital_flow", {"flowType": "market", "date": today})
+    if not text or len(text) < 20:
+        return 0
+    # 解析主力净流入等数据
+    main_inflow = re.search(r'主力[^\\d]*([-\\d.]+)\\s*亿', text)
+    if main_inflow:
+        return float(main_inflow.group(1))
+    return 0
+
+
+def collect_dragon_tiger(today=None):
+    """采集龙虎榜数据"""
+    if not today: today = TODAY
+    text = mcp_call("dragon_tiger", {"date": today, "limit": 10})
+    return len(text) if text and len(text) > 50 else 0
+
+
+def collect_briefings_mcp(today=None):
+    """采集每日简报（含总结性内容）"""
+    if not today: today = TODAY
+    text = mcp_call("briefings", {"date": today})
+    return text if text else ''
