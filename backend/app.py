@@ -42,8 +42,12 @@ def serve_frontend_files(filename):
 
 @app.route('/api/market/today')
 def api_market_today():
-    """今日大盘数据"""
-    rows = query("SELECT * FROM market_data WHERE date = (SELECT MAX(date) FROM market_data)")
+    """今日大盘数据（支持 ?date= 参数）"""
+    req_date = request.args.get('date', '')
+    if req_date:
+        rows = query("SELECT * FROM market_data WHERE date=? ORDER BY id DESC LIMIT 1", (req_date,))
+    else:
+        rows = query("SELECT * FROM market_data WHERE date = (SELECT MAX(date) FROM market_data)")
     if rows:
         return jsonify({'ok': True, 'data': rows[0]})
     return jsonify({'ok': False, 'error': '暂无数据'})

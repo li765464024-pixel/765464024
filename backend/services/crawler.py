@@ -158,9 +158,9 @@ def fetch_zt_pool():
 # ════════════════════════════════════════════
 
 def fetch_market_data():
-    """大盘概况 — 以悟道API为主, 补充成交额(新浪)+指数(腾讯)"""
+    """大盘概况 — 以悟道MCP为主, 补充成交额(新浪)+指数(腾讯)"""
     try:
-        # 1. 悟道API → 涨停/跌停/上涨/下跌/封板率/温度
+        MCP_URL = "https://stock.quicktiny.cn/api/mcp"
         KEY = os.environ.get('LB_API_KEY', '')
         if not KEY:
             try:
@@ -174,27 +174,53 @@ def fetch_market_data():
             if not KEY:
                 KEY = "lb_1325c45a076a931746b446eba05812df3fabcfeca35b4655603670999119484b"
         
-        r = requests.get(f"https://stock.quicktiny.cn/api/openclaw/market-overview?date={TODAY}",
-                        headers={"Authorization": f"Bearer {KEY}"}, timeout=10)
-        data = r.json()['data']
-        zt_count = data['limit_up_count']
-        dt_count = data['limit_down_count']
-        up_count = data['rise_count']
-        down_count = data['fall_count']
-        seal_rate = round((1 - data['limit_up_broken_ratio']) * 100, 1)
-        temperature = round(data['market_temperature'], 1)
+        # MCP 工具调用函数
+        def mcp_call(tool, args=None):
+            if args is None: args = {}
+            try:
+                r = requests.post(MCP_URL,
+                    headers={"Authorization": f"Bearer {KEY}", "Content-Type": "application/json"},
+                    json={"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":tool,"arguments":args}},
+                    timeout=15)
+                result = r.json()
+                content = result.get('result', {}).get('content', [])
+                return ''.join([c.get('text','') for c in content])
+            except:
+                return ''
         
-        # 2. 悟道API ladder → 最高板
-        r2 = requests.get(f"https://stock.quicktiny.cn/api/openclaw/ladder?date={TODAY}",
-                         headers={"Authorization": f"Bearer {KEY}"}, timeout=10)
-        ladder = r2.json()['data']['dates'][0]
-        max_board = max(b['level'] for b in ladder['boards'])
-        top_stocks = []
-        for b in ladder['boards']:
-            if b['level'] == max_board:
-                for s in b['stocks']:
-                    top_stocks.append(s['name'])
-        max_board_stocks = '/'.join(top_stocks[:3])
+        # 1. MCP limit_stats → 涨停数/跌停数/封板率
+        stats_text = mcp_call("limit_stats", {"date": TODAY})
+        zt_count = 0; dt_count = 0; seal_rate = 0
+        m1 = re.search(r'封住涨停\s*(\d+)', stats_text)
+        if m1: zt_count = int(m1.group(1))
+        m2 = re.search(r'封住跌停\s*(\d+)', stats_text)
+        if m2: dt_count = int(m2.group(1))
+        m3 = re.search(r'封板率\s*([\d.]+)%', stats_text)
+        if m3: seal_rate = round(float(m3.group(1)), 1)
+        
+        # 2. MCP market_overview → 涨跌家数/温度
+        market_text = mcp_call("market_overview", {"date": TODAY})
+        up_count = 0; down_count = 0; temperature = 0
+        m4 = re.search(r'上涨\s*(\d+)', market_text)
+        if m4: up_count = int(m4.group(1))
+        m5 = re.search(r'下跌\s*(\d+)', market_text)
+        if m5: down_count = int(m5.group(1))
+        m6 = re.search(r'温度\s*([\d.]+)', market_text)
+        if m6: temperature = round(float(m6.group(1)), 1)
+        
+        # 3. MCP limit_up_ladder → 最高板
+        ladder_text = mcp_call("limit_up_ladder", {"date": TODAY})
+        
+        # 2b. MCP limit_up_ladder → 最高板（从文本解析）
+        max_board = 0; max_board_stocks = ''
+        m7 = re.search(r'最高\s*(\d+)\s*板', ladder_text)
+        if m7: max_board = int(m7.group(1))
+        # 取梯队格式中最高板的个股
+        m8 = re.search(r'梯队.*?(\d+)板(\d+)', ladder_text)
+        # 从"龙头"字段取
+        m9 = re.search(r'龙头\s*\[([^\]]+)\]', ladder_text)
+        if m9:
+            max_board_stocks = m9.group(1).split('/')[0].split('(')[0]
         
         # 3. 新浪财经 → 指数 + 成交额 (替代腾讯证券)
         indices = {'sh': None, 'sz': None, 'cy': None, 'kc': None}
@@ -1976,14 +2002,20 @@ def rebuild_section_html(today=None):
         sections.append({'date': today, 'section_id': 's16', 'title': f'Serenity瓶颈分析 {today}', 'html': s16})
     
     # 9. 静态分析部分 (从最新可用日期复制)
-    analysis_sections = ['s0', 's8', 's10', 's13', 's15', 's17', 's18']
+    analysis_sections = ['s0', 's8', 's10', 's13', 's18', 's19', 's20', 's21', 's22', 's23', 's24']
     latest_date = query("SELECT MAX(date) as md FROM section_html WHERE date < ?", (today,))
     if latest_date and latest_date[0]['md']:
         src_date = latest_date[0]['md']
         old = query("SELECT * FROM section_html WHERE date=? ORDER BY id", (src_date,))
         for r in old:
             if r['section_id'] in analysis_sections:
-                sections.append({'date': today, 'section_id': r['section_id'], 'title': r['title'], 'html': r['html']})
+                # 复制时同步更新 HTML 内的日期标签，避免"旧数据新日期"bug
+                html_fixed = r['html']
+                html_fixed = html_fixed.replace(src_date, today)
+                src_short = src_date[5:7] + '/' + src_date[8:10]
+                today_short = today[5:7] + '/' + today[8:10]
+                html_fixed = html_fixed.replace(src_short, today_short)
+                sections.append({'date': today, 'section_id': r['section_id'], 'title': r['title'], 'html': html_fixed})
     
     if sections:
         insert_many('section_html', sections)

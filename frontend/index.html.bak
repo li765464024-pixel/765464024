@@ -32,11 +32,6 @@
 <div class="tab" onclick="switchTab('s17')">🔫 92科比</div>
 <div class="tab" onclick="switchTab('s18')">🐲 陈小群</div>
 <div class="tab" onclick="switchTab('s19')" style="color:#fff">🎯 华东大导弹</div>
-<div class="tab" onclick="switchTab('s20')">🔄 涅槃重生</div>
-<div class="tab" onclick="switchTab('s21')">💫 一瞬流光</div>
-<div class="tab" onclick="switchTab('s22')">⚡ 小睿睿</div>
-<div class="tab" onclick="switchTab('s23')">❄️ 爱在冰川</div>
-<div class="tab" onclick="switchTab('s24')">📖 归因</div>
 <div class="tab" onclick="switchTab('s0')">📰 盘前纪要</div>
 <div class="tab" onclick="switchTab('s13')">💰 游资实盘</div>
 <div class="tab" onclick="switchTab('s16')">🔬 Serenity</div>
@@ -153,11 +148,6 @@
 <div class="section" id="s17"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s18"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s19"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
-<div class="section" id="s20"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
-<div class="section" id="s21"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
-<div class="section" id="s22"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
-<div class="section" id="s23"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
-<div class="section" id="s24"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 <div class="section" id="s0"><div class="loading"><div class="spinner"></div><div>加载中...</div></div></div>
 </main>
 
